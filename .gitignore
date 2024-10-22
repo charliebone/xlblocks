@@ -1,2 +1,12 @@
 bin/
 obj/
+artifacts/
+
+.vs/
+.vscode/
+
+# ignore user csproj
+*.csproj.user
+
+# ignore open excel files
+~*.xls*

@@ -1,0 +1,81 @@
+# 
+# to use this, run the csly-cli tool
+# testing: csly-cli test -g ./src/xlBlocks.AddIn/Parser/grammar.txt --source ./src/xlBlocks.AddIn/Parser/source.txt
+# source generation: csly-cli generate -g ./src/xlBlocks.AddIn/Parser/grammar.txt -n XlBlocks.AddIn.Parser -o IDataFrameExpression -d ./src/xlBlocks.AddIn/Parser/output
+#
+
+# lexer spec
+genericLexer DataFrameExpressionToken;
+
+
+[AlphaNumId] IDENTIFIER;
+[Double] NUMBER;
+[String] STRING;
+
+[KeyWord] AND : "AND";
+[KeyWord] OR : "OR";
+[KeyWord] NULL : "NULL";
+
+[Sugar] ARITH_PLUS : "+";
+[Sugar] ARITH_MINUS : "-";
+[Sugar] ARITH_TIMES : "*";
+[Sugar] ARITH_DIVIDE : "/";
+[Sugar] COMMA : ",";
+[Sugar] PARENS_LEFT : "(";
+[Sugar] PARENS_RIGHT : ")";
+[Sugar] BRACKET_LEFT : "[";
+[Sugar] BRACKET_RIGHT : "]";
+[Sugar] COMP_EQUALS : "=" ;
+[Sugar] COMP_NOTEQUALS : "<>" ;
+[Sugar] COMP_LT : "<" ;
+[Sugar] COMP_GT : ">" ;
+[Sugar] COMP_LTE : "<=" ;
+[Sugar] COMP_GTE : ">=" ;
+
+
+# parser grammar spec
+
+parser DataFrameExpressionParser;
+
+-> root: expression; 
+
+#[Right 10] ARITH_PLUS ;
+#[Left 10] ARITH_MINUS ;
+#[Right 50] ARITH_TIMES ;
+#[Left 50] ARITH_DIVIDE ;
+#[Prefix 100] ARITH_MINUS ;
+#[Operand] operand : expression;
+
+expression : term (logical_op expression)* ;
+term : factor (arith_op term)* ;
+factor : primary (comparison_op factor)* ;
+expression-group : PARENS_LEFT[d] expression PARENS_RIGHT[d] ;
+
+primary : column-name ;
+primary : literal ;
+primary : function_call ;
+primary : expression-group ;
+
+logical_op : AND ;
+logical_op : OR ;
+
+arith_op : ARITH_PLUS ;
+arith_op : ARITH_MINUS ;
+arith_op : ARITH_TIMES ;
+arith_op : ARITH_DIVIDE ;
+
+comparison_op : COMP_EQUALS ;
+comparison_op : COMP_NOTEQUALS ;
+comparison_op : COMP_LT ;
+comparison_op : COMP_GT ;
+comparison_op : COMP_LTE ;
+comparison_op : COMP_GTE ;
+
+literal : NUMBER ;
+literal : STRING ;
+literal : NULL ;
+
+column-name : BRACKET_LEFT[d] IDENTIFIER BRACKET_RIGHT[d] ;
+
+function_call : IDENTIFIER PARENS_LEFT[d] expression_list PARENS_RIGHT[d] ;
+expression_list : expression (COMMA expression)* ;
