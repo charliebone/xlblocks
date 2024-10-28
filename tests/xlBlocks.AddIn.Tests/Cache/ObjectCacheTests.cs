@@ -2,7 +2,6 @@ namespace XlBlocks.AddIn.Tests.Cache;
 
 using System.Collections.Generic;
 using XlBlocks.AddIn.Cache;
-using XlBlocks.AddIn.Dna;
 using XlBlocks.AddIn.Types;
 
 public class ObjectCacheTests

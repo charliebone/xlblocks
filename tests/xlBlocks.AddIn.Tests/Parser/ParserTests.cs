@@ -4,8 +4,6 @@ using System;
 using Microsoft.Data.Analysis;
 using sly.parser;
 using sly.parser.generator;
-using xlBlocks.AddIn.Tests.Parser;
-using xlBlocks.AddIn.Utilities;
 using XlBlocks.AddIn.Parser;
 using XlBlocks.AddIn.Parser.Expressions;
 using XlBlocks.AddIn.Utilities;
@@ -313,9 +311,9 @@ public class ParserTests
 
     // function call errors
     [InlineData("BAD_FUNCTION([Id])", "Unknown function 'BAD_FUNCTION'")]
-    [InlineData("ISNULL([Nickname], [Id])", "Error evaluating function 'ISNULL': Expected 1 arg, got 2")]
-    [InlineData("IIF([Nickname], [Id], [Age])", "Error evaluating function 'IIF': The conditional argument must evaluate to a boolean")]
-    [InlineData("IIF([Nickname] IS NULL, [Name], [Age])", "Error evaluating function 'IIF': True and false columns must be the same data type, got 'String' and 'Int32'")]
+    [InlineData("ISNULL([Nickname])", "Error evaluating function 'ISNULL': Expected 2 args, got 1")]
+    [InlineData("IIF([Nickname], [Id], [Age])", "Error evaluating function 'IIF': Conditional must be boolean")]
+    [InlineData("IIF([Nickname] IS NULL, [Name], [Age])", "Error evaluating function 'IIF': Cannot determine output column type for operation between 'String' and 'Int32' columns")]
     public void EvaluationErrors_InvalidOperations(string expression, string message)
     {
         var ex = Assert.Throws<DataFrameExpressionException>(() => ParseWithDataFrame(expression, _testData1));
@@ -333,6 +331,8 @@ public class ParserTests
     [InlineData("1 * (2 + 3) * 4", "1 * (2 + 3) * 4")]
     [InlineData("1 * (6 % 4) * 4", "1 * 2 * 4")]
     [InlineData("1 * 6 % 4 * 4", "(1 * 6) % (4 * 4)")]
+    [InlineData("1 * 2 ^ 2 - 4", "(1 * (2^2)) - 4")]
+    [InlineData("3 ^ 4 - 2 * 3", "(3^4) - (2 * 3)")]
 
     // left associative and same precedence for addition / subtraction and multiplication / division
     [InlineData("1 - 2 - 3", "(1 - 2) - 3")]
@@ -341,7 +341,7 @@ public class ParserTests
     [InlineData("1 * 2 / 3", "(1 * 2) / 3")]
     [InlineData("1 * 2 / 3 * 4", "((1 * 2) / 3) * 4")]
 
-    // boolean, AND before OR before XOR
+    // boolean, AND before OR and XOR
     [InlineData("TRUE OR FALSE", "TRUE")]
     [InlineData("TRUE AND FALSE", "FALSE")]
     [InlineData("TRUE OR TRUE AND FALSE", "TRUE")]
@@ -359,7 +359,7 @@ public class ParserTests
     [InlineData("TRUE OR FALSE XOR TRUE", "FALSE")]
     [InlineData("TRUE OR (FALSE XOR TRUE)", "TRUE")]
     [InlineData("FALSE OR (FALSE XOR FALSE)", "FALSE")]
-    [InlineData("TRUE OR FALSE XOR FALSE OR TRUE", "FALSE")]
+    [InlineData("TRUE OR FALSE XOR FALSE OR TRUE", "TRUE")]
     [InlineData("TRUE OR (FALSE XOR FALSE) OR TRUE", "TRUE")]
 
     // null checks with is and equals
@@ -429,6 +429,33 @@ public class ParserTests
 
     #endregion
 
+    #region Function tests
+
+    [Fact]
+    public void Functions_ISNULL_Test()
+    {
+        result = ParseWithDataFrame("ISNULL([Name], 'Default')", _testData1);
+        expected = _testData1.Columns["Name"];
+        DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
+
+        result = ParseWithDataFrame("ISNULL([Nickname], [Name])", _testData1);
+        expected = _testData1.Columns["Nickname"].Clone();
+        expected[1] = "Bob";
+        DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
+    }
+
+    [Fact]
+    public void Functions_IIF_Test()
+    {
+        result = ParseWithDataFrame("IIF([Age] >= 30, 'Over30', 'Under30')", _testData1);
+        expected = _testData1.Columns["Age"].ElementwiseGreaterThanOrEqual(30).ElementwiseIfThenElse(
+            DataFrameUtilities.CreateConstantDataFrameColumn("Over30", _testData1.Rows.Count),
+            DataFrameUtilities.CreateConstantDataFrameColumn("Under30", _testData1.Rows.Count));
+        DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
+    }
+
+    #endregion
+
     [Fact]
     public void ParserThreadSafety()
     {
@@ -486,6 +513,4 @@ public class ParserTests
         Assert.Null(exception);
         Assert.Equal(0, Interlocked.CompareExchange(ref nFailures, 0, 0));
     }
-
-
 }

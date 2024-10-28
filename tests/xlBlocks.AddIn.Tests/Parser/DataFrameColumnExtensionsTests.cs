@@ -1,8 +1,6 @@
 ﻿namespace XlBlocks.AddIn.Tests.Parser;
 
 using Microsoft.Data.Analysis;
-using xlBlocks.AddIn.Tests.Parser;
-using xlBlocks.AddIn.Utilities;
 using XlBlocks.AddIn.Utilities;
 using Xunit;
 

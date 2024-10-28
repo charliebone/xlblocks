@@ -24,10 +24,12 @@ freely, subject to the following restrictions:
 -----------------------------------------------------------------------------
                         The MIT License (MIT)
         applies to: 
-		- System.Management, System.Microsoft.CodeDom, System.Reactive
+		- Microsoft.Data.Analysis (ML.NET), System.Management, 
+          System.Microsoft.CodeDom, System.Reactive
 			Copyright (c) .NET Foundation and Contributors									  
         - ReaLTaiizor, Copyright (c) Taiizor
 		- HexConverter, Copyright (c) Fausto David Suarez Rosario
+        - csly, Copyright (c) Olivier Duhart
 -----------------------------------------------------------------------------
 
 Permission is hereby granted, free of charge, to any person obtaining a copy

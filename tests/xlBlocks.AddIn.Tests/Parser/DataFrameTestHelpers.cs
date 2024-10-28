@@ -1,4 +1,4 @@
-﻿namespace xlBlocks.AddIn.Tests.Parser;
+﻿namespace XlBlocks.AddIn.Tests.Parser;
 
 using Microsoft.Data.Analysis;
 
