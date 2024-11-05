@@ -13,7 +13,7 @@
           <button id="button_errorlog" label="Error Log" keytip="L" imageMso="FieldCodes" size="normal" description="Open error viewer" onAction="Ribbon_OnButtonPressed"/>
         </group>
         <group id="group_info" label="About">
-          <button id="button_about" label="About" keytip="A" image="xlbrew_icon_96" size="large" description="Display information about the XlBlocks AddIn" onAction="Ribbon_OnButtonPressed"/>
+          <button id="button_about" label="About" keytip="A" image="xlblocks_logo_square" size="large" description="Display information about the XlBlocks AddIn" onAction="Ribbon_OnButtonPressed"/>
         </group>
       </tab>
     </tabs>	

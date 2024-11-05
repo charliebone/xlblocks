@@ -101,7 +101,7 @@ partial class ErrorLogViewerForm
         ClientSize = new Size(917, 443);
         Controls.Add(panel1);
         DoubleBuffered = false;
-        Icon = (Icon)resources.GetObject("$this.Icon");
+        Icon = XlBlocks.AddIn.Properties.Resources.xlblocks_icon;
         Name = "ErrorLogViewerForm";
         Text = "Error Log";
         FormClosing += ErrorLogViewerForm_FormClosing;

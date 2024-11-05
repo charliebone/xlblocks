@@ -74,12 +74,12 @@
 	
   <ItemGroup>
     <None Update="nlog.$(Configuration).config">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 
-  <Target Name="RenameNLogConfig" AfterTargets="Build">
-    <Move SourceFiles="$(OutputPath)\nlog.$(Configuration).config" DestinationFiles="$(OutputPath)\nlog.config" />
+  <Target Name="CopyNLogConfig" AfterTargets="CopyFilesToOutputDirectory">
+    <Copy SourceFiles="$(MSBuildProjectDirectory)\nlog.$(Configuration).config" DestinationFiles="$(OutputPath)\nlog.config" />
   </Target>
 	
 </Project>

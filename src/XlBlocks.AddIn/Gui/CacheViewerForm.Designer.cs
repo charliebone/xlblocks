@@ -89,7 +89,7 @@ partial class CacheViewerForm
         ClientSize = new Size(800, 450);
         Controls.Add(panel1);
         DoubleBuffered = false;
-        Icon = (Icon)resources.GetObject("$this.Icon");
+        Icon = XlBlocks.AddIn.Properties.Resources.xlblocks_icon;
         Name = "CacheViewerForm";
         Text = "Cache Viewer";
         FormClosing += CacheViewerForm_FormClosing;

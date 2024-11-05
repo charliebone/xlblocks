@@ -31,6 +31,27 @@ internal class XlBlocksAddIn : IExcelAddIn
         get => _instance ?? throw new Exception("Cannot access XlBlocksAddIn.Instance prior to AutoOpen()");
     }
 
+    private static string? _productVersion;
+    public static string ProductVersion
+    {
+        get
+        {
+            if (_productVersion == null)
+            {
+                var dllDirectory = ExcelDnaUtil.XllPathInfo.Directory;
+                var dllName = Assembly.GetExecutingAssembly().GetName().Name;
+                if (dllDirectory != null && dllName != null)
+                {
+                    var dllPath = Path.Combine(dllDirectory.FullName, $"{dllName}.dll");
+                    var fileVersionInfo = FileVersionInfo.GetVersionInfo(dllPath);
+                    _productVersion = fileVersionInfo.ProductVersion;
+                }
+
+                _productVersion ??= Version?.ToString() ?? string.Empty;
+            }
+            return _productVersion;
+        }
+    }
     public static string? Version => Assembly.GetExecutingAssembly().GetName().Version?.ToString();
 
     public static bool PrintExceptions

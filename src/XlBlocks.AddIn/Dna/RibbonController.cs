@@ -37,11 +37,20 @@ public class RibbonController : ExcelRibbon
     {
         try
         {
-            if (Resources.ResourceManager.GetObject(imageId) is not byte[] imageBytes)
+            var imageObj = Resources.ResourceManager.GetObject(imageId);
+            if (imageObj == null)
                 return null;
 
-            using var imageStream = new MemoryStream(imageBytes);
-            return Image.FromStream(imageStream);
+            if (imageObj is Image image)
+            {
+                return image;
+            }
+            else if (imageObj is byte[] imageBytes)
+            {
+                using var imageStream = new MemoryStream(imageBytes);
+                return Image.FromStream(imageStream);
+            }
+            return null;
         }
         catch (Exception ex)
         {

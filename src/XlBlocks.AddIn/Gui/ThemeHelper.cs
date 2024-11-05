@@ -114,6 +114,12 @@ internal class ThemeHelper
         Light = 1
     }
 
+    public enum XlBlocksColor
+    {
+        Blue = 0x015989,
+        Green = 0x158901
+    }
+
     public static MaterialColorScheme GetMaterialColorScheme(OfficeTheme officeTheme, out MaterialSkinManager.Themes theme)
     {
         if (officeTheme == OfficeTheme.System)
@@ -128,11 +134,11 @@ internal class ThemeHelper
             MaterialSkinManager.Themes.LIGHT;
 
         var colorScheme = new MaterialColorScheme(
-                    MaterialPrimary.Green600,
-                    MaterialPrimary.Green700,
-                    MaterialPrimary.Green200,
-                    MaterialAccent.Red100,
-                MaterialTextShade.LIGHT);
+            (MaterialPrimary)XlBlocksColor.Blue,
+            MaterialPrimary.BlueGrey800,
+            MaterialPrimary.BlueGrey200,
+            MaterialAccent.Blue200,
+            MaterialTextShade.LIGHT);
 
         return colorScheme;
     }

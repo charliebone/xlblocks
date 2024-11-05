@@ -1,11 +1,13 @@
 ﻿namespace XlBlocks.AddIn.Gui;
 
 using System;
+using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using ExcelDna.Integration;
 using ReaLTaiizor.Forms;
+using XlBlocks.AddIn.Dna;
 
 public partial class AboutForm : MaterialForm
 {
@@ -19,7 +21,7 @@ public partial class AboutForm : MaterialForm
 
     private void AboutForm_Load(object sender, EventArgs e)
     {
-        materialLabelVersion.Text = $"XlBlocks AddIn v{Assembly.GetExecutingAssembly().GetName().Version}";
+        materialLabelVersion.Text = $"XlBlocks AddIn v{XlBlocksAddIn.ProductVersion}";
     }
 
     private void AboutForm_FormClosing(object sender, FormClosingEventArgs e)

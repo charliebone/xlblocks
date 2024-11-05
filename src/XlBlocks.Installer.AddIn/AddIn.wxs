@@ -1,0 +1,13 @@
+<?include ..\..\variables.wxi ?>
+
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Fragment>
+    <ComponentGroup Id="ComponentGroup_AddIn" Directory="INSTALLFOLDER">
+      
+      <Files Include="$(XlBlocks.AddIn.TargetDir)\**" Directory="Directory_AddIn">
+        <Exclude Files="$(XlBlocks.AddIn.TargetDir)\*-packed.xll" />
+      </Files>
+      
+    </ComponentGroup>
+  </Fragment>
+</Wix>

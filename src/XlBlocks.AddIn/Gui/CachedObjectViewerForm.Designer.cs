@@ -49,7 +49,7 @@ partial class CachedObjectViewerForm
         Controls.Add(panel1);
         DoubleBuffered = false;
         FormStyle = ReaLTaiizor.Enum.Material.FormStyles.ActionBar_None;
-        Icon = (Icon)resources.GetObject("$this.Icon");
+        Icon = XlBlocks.AddIn.Properties.Resources.xlblocks_icon;
         Name = "CachedObjectViewerForm";
         Padding = new Padding(3, 28, 3, 3);
         Text = "CacheViewerForm";

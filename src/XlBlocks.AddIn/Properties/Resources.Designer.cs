@@ -97,31 +97,21 @@ namespace XlBlocks.AddIn.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
-        internal static byte[] xlbrew_icon {
+        internal static System.Drawing.Icon xlblocks_icon {
             get {
-                object obj = ResourceManager.GetObject("xlbrew_icon", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        internal static byte[] xlbrew_icon_96 {
-            get {
-                object obj = ResourceManager.GetObject("xlbrew_icon_96", resourceCulture);
-                return ((byte[])(obj));
+                object obj = ResourceManager.GetObject("xlblocks_icon", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
             }
         }
         
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap xlbrew_icon_full {
+        internal static System.Drawing.Bitmap xlblocks_logo {
             get {
-                object obj = ResourceManager.GetObject("xlbrew_icon_full", resourceCulture);
+                object obj = ResourceManager.GetObject("xlblocks_logo", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

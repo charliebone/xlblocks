@@ -1,0 +1,11 @@
+<?include ..\..\variables.wxi ?>
+
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Fragment>
+    <Directory Id="USER_PROGRAM_FILES_PATH">
+      <Directory Id="INSTALLFOLDER" Name="$(ProductName)" >
+        <Directory Id="Directory_AddIn" Name="AddIn" />
+      </Directory>
+    </Directory>
+  </Fragment>
+</Wix>
