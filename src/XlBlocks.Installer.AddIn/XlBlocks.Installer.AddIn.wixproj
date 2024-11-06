@@ -1,0 +1,23 @@
+﻿<Project Sdk="WixToolset.Sdk/5.0.2">
+  <PropertyGroup>
+    <OutputType>Package</OutputType>
+    <DefineConstants>VersionString=$(VersionPrefix);$(DefineConstants)</DefineConstants>
+    <DefineConstants>BuildConfiguration=$(Configuration);$(DefineConstants)</DefineConstants>
+    <Pedantic>true</Pedantic>
+    <VerboseOutput>true</VerboseOutput>
+    <OutputPath>$(ArtifactsPath)\bin\$(MSBuildProjectName)\$(Configuration)</OutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="theme.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="WixToolset.Netfx.wixext" Version="5.0.2" />
+    <PackageReference Include="WixToolset.UI.wixext" Version="5.0.2" />
+    <PackageReference Include="WixToolset.Util.wixext" Version="5.0.2" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\XlBlocks.AddIn\XlBlocks.AddIn.csproj" />
+    <ProjectReference Include="..\XlBlocks.Installer.CustomActions\XlBlocks.Installer.CustomActions.vcxproj" Properties="Platform=Win32" />
+    <ProjectReference Include="..\XlBlocks.Installer.CustomActions\XlBlocks.Installer.CustomActions.vcxproj" Properties="Platform=x64" />
+  </ItemGroup>
+</Project>

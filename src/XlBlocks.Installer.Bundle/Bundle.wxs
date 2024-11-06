@@ -1,0 +1,31 @@
+﻿<?include ..\..\variables.wxi ?>
+
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal">
+  <Bundle Name="$(ProductName) Excel AddIn" 
+          Version="$(VersionString)" 
+          Manufacturer="$(Manufacturer)" 
+          UpgradeCode="be474afd-7813-4152-a58e-745778a5df49"
+          IconSourceFile="$(XlBlocks.AddIn.ProjectDir)resources\xlblocks_icon.ico">
+    
+    <BootstrapperApplication>
+      <bal:WixStandardBootstrapperApplication 
+        LicenseUrl="https://xlblocks.net/license" 
+        SuppressOptionsUI="yes" 
+        Theme="hyperlinkLargeLicense"
+        LogoFile="$(XlBlocks.AddIn.ProjectDir)resources\xlblocks_logo.png" 
+        ThemeFile="theme.xml" 
+        LocalizationFile="theme.wxl" />
+      <Payload Name="icon.ico" SourceFile="$(XlBlocks.AddIn.ProjectDir)resources\xlblocks_icon.ico" Compressed="yes" />
+    </BootstrapperApplication>
+    
+    <Chain>
+      <MsiPackage
+        SourceFile="$(XlBlocks.Installer.AddIn.TargetDir)$(XlBlocks.Installer.AddIn.TargetName).msi"
+        Name="$(ProductName) Excel AddIn"
+        Description="$(ProductName) Excel AddIn v$(VersionString)"
+        Visible="no"
+        Id="XlBlocks_$(VersionString)_AddIn" />
+    </Chain>
+
+  </Bundle>
+</Wix>

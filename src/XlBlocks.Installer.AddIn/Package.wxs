@@ -1,0 +1,57 @@
+﻿<?include ..\..\variables.wxi ?>
+
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui" xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
+  
+  <Package Name="$(ProductName) Excel AddIn Msi" Manufacturer="$(Manufacturer)" Version="$(VersionString)" Scope="perUser" UpgradeCode="ce74b9ec-8346-4ec5-9e26-916b4e5f0015">
+    <MajorUpgrade DowngradeErrorMessage="!(loc.DowngradeError)" />
+
+    <MediaTemplate EmbedCab="yes" />
+
+    <util:QueryNativeMachine />
+    <!--<ui:WixUI Id="WixUI_Minimal" InstallDirectory="INSTALLFOLDER" />-->
+    
+    <!-- this is set by the GetUserProgramFilesPath custom action because Wix doesnt change standard ProgramFilesFolder known folder to per user directory in a perUser scope; see https://github.com/wixtoolset/issues/issues/8101 -->
+    <Property Id="USER_PROGRAM_FILES_PATH" Secure="yes" />
+    
+    <!-- these are set by the GetOfficeInfo custom action -->
+    <Property Id="OFFICE_VERSION" Secure="yes" />
+    <Property Id="OFFICE_BITNESS" Secure="yes" />
+    
+    <!-- this is set by the CheckExcelRunning custom action -->
+    <Property Id="EXCEL_RUNNING" Secure="yes" />
+    
+    <!-- define custom actions -->
+    <Binary Id="Installer_CustomActions" SourceFile="$(XlBlocks.Installer.CustomActions.TargetDir)$(XlBlocks.Installer.CustomActions.Platform)\$(Configuration)\$(XlBlocks.Installer.CustomActions.TargetName).dll" />
+    <CustomAction Id="CustomAction_GetOfficeInfo" BinaryRef="Installer_CustomActions" DllEntry="GetOfficeInfo" Return="check" Execute="immediate" />
+    <CustomAction Id="CustomAction_GetUserProgramFilesPath" BinaryRef="Installer_CustomActions" DllEntry="GetUserProgramFilesPath" Return="check" Execute="immediate" />
+    <CustomAction Id="CustomAction_RegisterAddIn" BinaryRef="Installer_CustomActions" DllEntry="RegisterAddIn" Return="check" Execute="immediate" Impersonate="no" />
+    <CustomAction Id="CustomAction_UnregisterAddIn" BinaryRef="Installer_CustomActions" DllEntry="UnregisterAddIn" Return="ignore" Execute="immediate" Impersonate="no" />
+    <CustomAction Id="CustomAction_CheckIfExcelRunning" BinaryRef="Installer_CustomActions" DllEntry="CheckIfExcelRunning" Return="ignore" Execute="immediate" Impersonate="no" />
+
+    <SetProperty Action="SetAddInName64" Id="ADDIN_FILE_NAME" Value="$(ProductName)-AddIn64.xll" After="CustomAction_GetOfficeInfo" Sequence="execute" Condition="OFFICE_BITNESS ~= &quot;x64&quot;" />
+    <SetProperty Action="SetAddInName32" Id="ADDIN_FILE_NAME" Value="$(ProductName)-AddIn.xll" After="CustomAction_GetOfficeInfo" Sequence="execute" Condition="OFFICE_BITNESS &lt;&gt; &quot;x64&quot;" />
+    
+    <!--<Launch Condition="NOT OFFICE_VERSION" Message="Microsoft Office is required to use the $(ProductName) Excel AddIn" />-->
+
+    <Feature Id="Main">
+      <ComponentGroupRef Id="ComponentGroup_AddIn" />
+    </Feature>
+
+    <InstallExecuteSequence>
+      <!-- check for installed office details -->
+      <Custom Action="CustomAction_GetOfficeInfo" Before="LaunchConditions" />
+      <Custom Action="CustomAction_CheckIfExcelRunning" After="CustomAction_GetOfficeInfo" />
+      
+      <!-- fetch user program files path -->
+      <Custom Action="CustomAction_GetUserProgramFilesPath" Before="CostFinalize" Condition="NOT Installed Or REINSTALL" />
+      
+      <!-- register addin when installing -->
+      <Custom Action="CustomAction_RegisterAddIn" Before="InstallFinalize" Condition="(NOT Installed Or REINSTALL) And OFFICE_VERSION" />
+
+      <!-- unregister addin when uninstalling -->
+      <Custom Action="CustomAction_UnregisterAddIn" Before="InstallFinalize" Condition="Installed And NOT REINSTALL And NOT UPGRADINGPRODUCTCODE And OFFICE_VERSION" />
+    </InstallExecuteSequence>
+
+  </Package>
+  
+</Wix>

@@ -1,0 +1,8 @@
+LIBRARY "XlBlocks.Installer.CustomActions.dll"
+
+EXPORTS
+    CheckIfExcelRunning
+    GetUserProgramFilesPath
+    GetOfficeInfo
+    RegisterAddIn
+    UnregisterAddIn

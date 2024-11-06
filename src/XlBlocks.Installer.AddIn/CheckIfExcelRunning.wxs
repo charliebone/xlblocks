@@ -1,0 +1,20 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/netfx">
+  <Fragment>
+    <UI>
+      <Dialog Id="Dialog_ExcelRunning" Width="370" Height="200" Title="Excel Running">
+        <Control Id="Retry" Type="PushButton" X="50" Y="120" Width="80" Height="20" Text="Retry">
+          <Publish Event="DoAction" Value="CustomAction_CheckIfExcelRunning" Condition="1" />
+          <Publish Event="EndDialog" Value="Return" Condition="EXCEL_RUNNING" />
+        </Control>
+        <Control Id="Cancel" Type="PushButton" X="200" Y="120" Width="80" Height="20" Text="Cancel" Cancel="yes">
+          <Publish Event="EndDialog" Value="Exit" Condition="1" />
+        </Control>
+        <Control Id="Description" Type="Text" X="20" Y="60" Width="330" Height="40" Transparent="yes" NoPrefix="yes" 
+                 Text="Microsoft Excel is currently running. Please close Excel and click Retry to continue, or click Cancel to exit the installation." />
+      </Dialog>
+      <InstallUISequence>
+        <Show Dialog="Dialog_ExcelRunning" After="LaunchConditions" Condition="EXCEL_RUNNING"/>
+      </InstallUISequence>
+    </UI>
+  </Fragment>
+</Wix>

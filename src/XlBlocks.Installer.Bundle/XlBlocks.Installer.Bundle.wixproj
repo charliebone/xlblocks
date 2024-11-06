@@ -1,0 +1,19 @@
+﻿<Project Sdk="WixToolset.Sdk/5.0.2">
+  <PropertyGroup>
+    <OutputType>Bundle</OutputType>
+    <DefineConstants>VersionString=$(VersionPrefix);$(DefineConstants)</DefineConstants>
+    <Pedantic>true</Pedantic>
+    <VerboseOutput>true</VerboseOutput>
+    <OutputPath>$(ArtifactsPath)\bin\$(MSBuildProjectName)\$(Configuration)</OutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="theme.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="WixToolset.Bal.wixext" Version="5.0.2" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\XlBlocks.AddIn\XlBlocks.AddIn.csproj" />
+    <ProjectReference Include="..\XlBlocks.Installer.AddIn\XlBlocks.Installer.AddIn.wixproj" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,85 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <RollForward>LatestMajor</RollForward>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ApplicationHighDpiMode>SystemAware</ApplicationHighDpiMode>
+    <ForceDesignerDpiUnaware>true</ForceDesignerDpiUnaware>
+    
+    <ExcelAddInName>XlBlocks AddIn</ExcelAddInName>
+    <ExcelAddInFileName>XlBlocks-AddIn</ExcelAddInFileName>
+    <RunExcelDnaClean>true</RunExcelDnaClean>
+    <RunExcelDnaBuild>true</RunExcelDnaBuild>
+    <RunExcelDnaPack>true</RunExcelDnaPack>
+    <ExcelDnaPublishPath>.</ExcelDnaPublishPath>
+    <ExcelDnaPackXllSuffix></ExcelDnaPackXllSuffix>
+    <ExcelAddInExplicitExports>true</ExcelAddInExplicitExports>
+    <ExcelAddInExplicitRegistration>true</ExcelAddInExplicitRegistration>
+    <ExcelAddInLoadFromBytes>true</ExcelAddInLoadFromBytes>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+    <NoWarn>1701;1702;IDE1006</NoWarn>
+    <IsPublishable>True</IsPublishable>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+    <NoWarn>1701;1702;IDE1006</NoWarn>
+    <IsPublishable>True</IsPublishable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="XlBlocks.AddIn.Tests" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="ExcelDna.AddIn" Version="1.8.0" />
+    <PackageReference Include="ExcelDna.IntelliSense" Version="1.8.0" />
+    <PackageReference Include="ExcelDna.Registration" Version="1.8.0" />
+    <PackageReference Include="HexConverter" Version="1.1.1" />
+    <PackageReference Include="Microsoft.Data.Analysis" Version="0.21.1" />
+    <PackageReference Include="murmurhash" Version="1.0.3" />
+    <PackageReference Include="NLog" Version="5.3.4" />
+    <PackageReference Include="ReaLTaiizor" Version="3.8.0.7" />
+    <PackageReference Include="sly" Version="3.4.0" />
+    <PackageReference Include="System.Management" Version="8.0.0" />
+    <PackageReference Include="System.Reactive" Version="6.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Gui\ErrorLogViewerForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Gui\CachedObjectViewerForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+	
+  <ItemGroup>
+    <None Update="nlog.$(Configuration).config">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <Target Name="CopyNLogConfig" AfterTargets="CopyFilesToOutputDirectory">
+    <Copy SourceFiles="$(MSBuildProjectDirectory)\nlog.$(Configuration).config" DestinationFiles="$(OutputPath)\nlog.config" />
+  </Target>
+	
+</Project>

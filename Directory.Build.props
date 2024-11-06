@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <PropertyGroup>
+    <VersionPrefix>1.0.1</VersionPrefix>
+    <VersionSuffix Condition="'$(SourceBranchName)' != 'master'">$(SourceBranchName)</VersionSuffix>
+    <ArtifactsPath>$(MSBuildThisFileDirectory)artifacts</ArtifactsPath>
+  </PropertyGroup>
+</Project>
