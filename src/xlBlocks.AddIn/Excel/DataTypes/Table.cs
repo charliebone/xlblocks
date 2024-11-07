@@ -25,6 +25,18 @@ internal static class DataTypes_Table
         return XlBlockTable.BuildWithTypes(dataRange, columnTypeRange, columnNameRange);
     }
 
+    [return: CacheContents]
+    [ExcelFunction(Description = "Build a table from a range, specifying the column types and names", IsThreadSafe = true)]
+    public static XlBlockTable? XBTable_BuildFromCsv(
+        [ExcelArgument(Description = "A range of data to use for the table")] string csvPath,
+        [ExcelArgument(Description = "A range of column types")] string separator,
+        [ExcelArgument(Description = "A range of column names")] bool hasHeader = true,
+        [ExcelArgument(Description = "A range of column names")] XlBlockRange? columnNameRange = null,
+        [ExcelArgument(Description = "A range of column names")] XlBlockRange? columnTypeRange = null)
+    {
+        return XlBlockTable.BuildFromCsv(csvPath, separator, hasHeader, columnNameRange, columnTypeRange);
+    }
+
     [ExcelFunction(Description = "Get a table", IsThreadSafe = true)]
     public static object[,] XBTable_Get(
         [ExcelArgument(Description = "A table"), CacheContents(AsReference = true)] XlBlockTable table,
@@ -166,9 +178,9 @@ internal static class DataTypes_Table
     public static XlBlockTable XBTable_AppendWith(
         [ExcelArgument(Description = "A table"), CacheContents(AsReference = true)] XlBlockTable table,
         [ExcelArgument(Description = "Column names")] XlBlockRange columnNames,
-        [ExcelArgument(Description = "Column expressions")] XlBlockRange filterExpressions)
+        [ExcelArgument(Description = "Column expressions")] XlBlockRange columnExpressions)
     {
-        return table.AppendColumnsWith(columnNames, filterExpressions);
+        return table.AppendColumnsWith(columnNames, columnExpressions);
     }
 
     [return: CacheContents]
