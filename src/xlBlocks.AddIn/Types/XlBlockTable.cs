@@ -359,7 +359,7 @@ internal class XlBlockTable : IXlBlockCopyableObject<XlBlockTable>, IXlBlockArra
     public XlBlockTable Filter(string expression)
     {
         if (string.IsNullOrEmpty(expression))
-            throw new ArgumentException("expression must be a valid string");
+            return this;
 
         var parsed = DataFrameExpressionParser.Parser.Parse(expression);
         if (parsed.IsError)
