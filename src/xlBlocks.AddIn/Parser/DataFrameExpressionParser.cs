@@ -42,11 +42,16 @@ internal class DataFrameExpressionParser
 
     [Infix((int)DataFrameExpressionToken.IN, Associativity.Left, 70)]
     [Infix((int)DataFrameExpressionToken.LIKE, Associativity.Left, 70)]
+    [Infix((int)DataFrameExpressionToken.LIKEI, Associativity.Left, 70)]
     public IColumnExpression Operator_InLike(IColumnExpression left, Token<DataFrameExpressionToken> likeOrInToken, IColumnExpression right)
     {
-        return likeOrInToken.TokenID == DataFrameExpressionToken.LIKE ?
-            new LikeClauseExpression(left, right) :
-            new InClauseExpression(left, right);
+        return likeOrInToken.TokenID switch
+        {
+            DataFrameExpressionToken.LIKE => new LikeClauseExpression(left, right, false),
+            DataFrameExpressionToken.LIKEI => new LikeClauseExpression(left, right, true),
+            DataFrameExpressionToken.IN => new InClauseExpression(left, right),
+            _ => throw new ArgumentException($"unhandled token: '{likeOrInToken.TokenID}'")
+        };
     }
 
     [Infix((int)DataFrameExpressionToken.CARET, Associativity.Left, 50)]

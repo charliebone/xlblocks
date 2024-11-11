@@ -213,23 +213,23 @@ internal static class DataFrameColumnExtensions
                     if (escapedMatch.Index == match.Index - 1)
                         return match.Value.Last().ToString(); // remove escapes becaues these aren't actually special to regex
                 }
-                return match.Value.Last() == '%' ? ".+" : ".";
+                return match.Value.Last() == '%' ? ".*" : ".";
             });
 
         return Regex.Replace(interim, @"\\\\([%_])", "$1"); // remove unnecessary escapes
     }
 
-    private static bool? IsWildcardMatch(string? input, string? pattern, bool escapePattern = true)
+    private static bool? IsWildcardMatch(string? input, string? pattern, bool escapePattern, bool caseInsensitive)
     {
         if (input is null || pattern is null)
             return null;
 
         // % = match zero or more, _ = match zero or one
         pattern = $"^{(escapePattern ? EscapeLikePattern(pattern) : pattern)}$";
-        return Regex.IsMatch(input, pattern);
+        return Regex.IsMatch(input, pattern, caseInsensitive ? RegexOptions.IgnoreCase : RegexOptions.None);
     }
 
-    internal static DataFrameColumn ElementwiseLike(this DataFrameColumn column, string pattern)
+    internal static DataFrameColumn ElementwiseLike(this DataFrameColumn column, string pattern, bool caseInsensitive = false)
     {
         if (column is not StringDataFrameColumn stringColumn)
             throw new ArgumentException("Input must be a string");
@@ -237,12 +237,12 @@ internal static class DataFrameColumnExtensions
         pattern = EscapeLikePattern(pattern);
         var result = new BooleanDataFrameColumn(column.Name, column.Length);
         for (var i = 0; i < column.Length; i++)
-            result[i] = IsWildcardMatch(stringColumn[i], pattern, false);
+            result[i] = IsWildcardMatch(stringColumn[i], pattern, false, caseInsensitive);
 
         return result;
     }
 
-    internal static DataFrameColumn ElementwiseLike(this DataFrameColumn column, DataFrameColumn patternColumn)
+    internal static DataFrameColumn ElementwiseLike(this DataFrameColumn column, DataFrameColumn patternColumn, bool caseInsensitive = false)
     {
         if (column is not StringDataFrameColumn stringColumn || patternColumn is not StringDataFrameColumn patternStringColumn)
             throw new ArgumentException("Input and pattern must be strings");
@@ -252,7 +252,7 @@ internal static class DataFrameColumnExtensions
 
         var result = new BooleanDataFrameColumn(column.Name, column.Length);
         for (var i = 0L; i < column.Length; i++)
-            result[i] = IsWildcardMatch(stringColumn[i], patternStringColumn[i]);
+            result[i] = IsWildcardMatch(stringColumn[i], patternStringColumn[i], true, caseInsensitive);
 
         return result;
     }

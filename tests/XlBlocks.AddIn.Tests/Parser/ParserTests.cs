@@ -32,6 +32,16 @@ public class ParserTests
         },
         new[] { typeof(int), typeof(string), typeof(int), typeof(string) });
 
+    private static readonly DataFrame _testData2 = DataFrameUtilities.ToDataFrame(
+        new object[,]
+        {
+            { "Id", "Name", "Age", "Nickname" },
+            { 1, "Alice", 30, "Liz" },
+            { 2, "Bob", 25, "" },
+            { 3, "Charlie", 35, "Chuck" }
+        },
+        new[] { typeof(int), typeof(string), typeof(int), typeof(string) });
+
     #region Helpers
 
     private static Parser<DataFrameExpressionToken, IColumnExpression> GetParser(ITestOutputHelper outputHelper)
@@ -390,12 +400,28 @@ public class ParserTests
         expected = _testData1.Columns["Name"].ElementwiseLike("Al%");
         DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
 
+        result = ParseWithDataFrame("[Name] LIKE 'al%'", _testData1);
+        expected = _testData1.Columns["Name"].ElementwiseLike("al%");
+        DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
+
+        result = ParseWithDataFrame("[Name] LIKEI 'al%'", _testData1);
+        expected = _testData1.Columns["Name"].ElementwiseLike("al%", true);
+        DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
+
         result = ParseWithDataFrame("[Name] LIKE '%li%'", _testData1);
         expected = _testData1.Columns["Name"].ElementwiseLike("%li%");
         DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
 
         result = ParseWithDataFrame("[Name] LIKE '%li_'", _testData1);
         expected = _testData1.Columns["Name"].ElementwiseLike("%li_");
+        DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
+
+        result = ParseWithDataFrame("[Name] LIKE '%Li_'", _testData1);
+        expected = _testData1.Columns["Name"].ElementwiseLike("%Li_");
+        DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
+
+        result = ParseWithDataFrame("[Name] LIKEI '%Li_'", _testData1);
+        expected = _testData1.Columns["Name"].ElementwiseLike("%Li_", true);
         DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
 
         result = ParseWithDataFrame("[Name] LIKE 'li'", _testData1);
@@ -454,7 +480,30 @@ public class ParserTests
         DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
     }
 
+    [Fact]
+    public void Functions_LEN_Test()
+    {
+        result = ParseWithDataFrame("IIF(LEN([Nickname]) == 0, 'No nickname', [Nickname])", _testData1);
+        expected = _testData2.Columns["Nickname"].ElementwiseLength().ElementwiseEquals(0).ElementwiseIfThenElse(
+            DataFrameUtilities.CreateConstantDataFrameColumn("No nickname", _testData2.Rows.Count),
+            _testData2.Columns["Nickname"]);
+        DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
+    }
+
     #endregion
+
+    #region Misc tests
+
+    [Fact]
+    public void Equality_BlankString()
+    {
+        result = ParseWithDataFrame("IIF([Nickname] == '', 'No nickname', [Nickname])", _testData2);
+        expected = _testData2.Columns["Nickname"].ElementwiseEquals(string.Empty).ElementwiseIfThenElse(
+            DataFrameUtilities.CreateConstantDataFrameColumn("No nickname", _testData2.Rows.Count),
+            _testData2.Columns["Nickname"]);
+        DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
+    }
+
 
     [Fact]
     public void ParserThreadSafety()
@@ -513,4 +562,6 @@ public class ParserTests
         Assert.Null(exception);
         Assert.Equal(0, Interlocked.CompareExchange(ref nFailures, 0, 0));
     }
+
+    #endregion
 }
