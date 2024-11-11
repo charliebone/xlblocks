@@ -11,10 +11,10 @@ public class DataFrameColumnExtensionsTests
     [Theory]
     [InlineData(@"test", @"test")]
     [InlineData(@"another_string", @"another.string")]
-    [InlineData(@"wild%card", @"wild.+card")]
+    [InlineData(@"wild%card", @"wild.*card")]
     [InlineData(@"escaped\_char", @"escaped_char")]
-    [InlineData(@"$#^_%", @"\$\#\^..+")]
-    [InlineData(@"A mix%of \_escaped \and $ special.chars", @"A\ mix.+of\ _escaped\ \\and\ \$\ special\.chars")]
+    [InlineData(@"$#^_%", @"\$\#\^..*")]
+    [InlineData(@"A mix%of \_escaped \and $ special.chars", @"A\ mix.*of\ _escaped\ \\and\ \$\ special\.chars")]
     public void EscapeLikePattern_Works(string input, string expected)
     {
         Assert.Equal(expected, DataFrameColumnExtensions.EscapeLikePattern(input));
@@ -42,6 +42,14 @@ public class DataFrameColumnExtensionsTests
         DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
 
         result = _testData["Name"].ElementwiseLike("Al%");
+        expected = DataFrameUtilities.CreateDataFrameColumn(new[] { true, false, false });
+        DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
+
+        result = _testData["Name"].ElementwiseLike("al%");
+        expected = DataFrameUtilities.CreateDataFrameColumn(new[] { false, false, false });
+        DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
+
+        result = _testData["Name"].ElementwiseLike("al%", true);
         expected = DataFrameUtilities.CreateDataFrameColumn(new[] { true, false, false });
         DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
 

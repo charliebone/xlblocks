@@ -20,6 +20,7 @@ public enum DataFrameExpressionToken
     NUMBER,
 
     [LexemeLabel("en", "string literal")]
+    [String("\"", "\\")]
     [String("\'", "\\")]
     STRING,
 
@@ -62,6 +63,11 @@ public enum DataFrameExpressionToken
     [Keyword("LIKE")]
     [Keyword("like")]
     LIKE,
+
+    [LexemeLabel("en", "case-insensitive like")]
+    [Keyword("LIKEI")]
+    [Keyword("likei")]
+    LIKEI,
 
     [LexemeLabel("en", "TRUE")]
     [Keyword("TRUE")]
