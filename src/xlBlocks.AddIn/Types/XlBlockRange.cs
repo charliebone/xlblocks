@@ -114,7 +114,6 @@ internal class XlBlockRange : IXlBlockArrayableObject, IEnumerable<object>
             "error" => CleanBehavior.ThrowOnErrors,
             _ => throw new ArgumentException($"{nameof(onErrors)} must be one of 'drop', 'keep' or 'error'"),
         };
-        ;
     }
 
     public XlBlockRange Clean(string onErrors)
@@ -125,6 +124,11 @@ internal class XlBlockRange : IXlBlockArrayableObject, IEnumerable<object>
     public XlBlockRange Clean(CleanBehavior cleanBehavior)
     {
         return new XlBlockRange(AsCleanEnumerable(cleanBehavior).AsColumnArray());
+    }
+
+    public XlBlockRange MakeSafeForArrayFormulas()
+    {
+        return Count == 1 ? new XlBlockRange(new[,] { { _rangeArray[0, 0] }, { ExcelError.ExcelErrorNA } }) : this; 
     }
 
     public XlBlockRange Shape(int? rowCount, int? columnCount, object fillWith)

@@ -13,6 +13,14 @@ public class ParamTypeConverterTests
     }
 
     [Fact]
+    public void ConvertToGeneric_Single_ReturnsDouble()
+    {
+        var input = 42.5f;
+        var result = ParamTypeConverter.ConvertTo<double>(input);
+        Assert.Equal(42.5, result);
+    }
+
+    [Fact]
     public void ConvertToGeneric_String_ReturnsString()
     {
         var input = 42.5;
