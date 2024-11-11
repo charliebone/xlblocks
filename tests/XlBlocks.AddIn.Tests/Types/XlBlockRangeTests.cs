@@ -462,6 +462,50 @@ public class XlBlockRangeTests
         Assert.Throws<ArgumentException>(() => range.Clean(XlBlockRange.CleanBehavior.ThrowOnErrors));
     }
 
+    [Fact]
+    public void Clean_MakeArraySafe_SingleValue()
+    {
+        object[,] array =
+        {
+            { ExcelMissing.Value, 2 },
+            { ExcelEmpty.Value, ExcelError.ExcelErrorNA }
+        };
+
+        var range = XlBlockRange.Build(array);
+        var cleaned = range.Clean(XlBlockRange.CleanBehavior.DropErrors);
+
+        Assert.Equal(1, cleaned.RowCount);
+        Assert.Equal(1, cleaned.ColumnCount);
+        Assert.Equal(2, cleaned[0, 0]);
+
+        var madeSafe = cleaned.MakeSafeForArrayFormulas();
+
+        Assert.Equal(2, madeSafe.RowCount);
+        Assert.Equal(1, madeSafe.ColumnCount);
+        Assert.Equal(2, madeSafe[0, 0]);
+        Assert.Equal(ExcelError.ExcelErrorNA, madeSafe[1, 0]);
+    }
+
+    [Fact]
+    public void Clean_MakeArraySafe_MultipleValues()
+    {
+        object[,] array =
+        {
+            { 1, 2, 3 },
+            { ExcelEmpty.Value, ExcelMissing.Value, ExcelError.ExcelErrorNA }
+        };
+
+        var range = XlBlockRange.Build(array);
+        var cleaned = range.Clean(XlBlockRange.CleanBehavior.DropErrors);
+        var madeSafe = cleaned.MakeSafeForArrayFormulas();
+
+        Assert.Equal(3, madeSafe.RowCount);
+        Assert.Equal(1, madeSafe.ColumnCount);
+        Assert.Equal(1, madeSafe[0, 0]);
+        Assert.Equal(2, madeSafe[1, 0]);
+        Assert.Equal(3, madeSafe[2, 0]);
+    }
+
     #endregion
 
     #region Shape tests

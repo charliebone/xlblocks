@@ -11,7 +11,7 @@ internal static class DataTypes_Range
         [ExcelArgument(Description = "A range")] XlBlockRange range,
         [ExcelArgument(Description = "Error handling ('drop', 'keep', or 'error'). Default is 'drop'")] string onErrors = "drop")
     {
-        return range.Clean(onErrors);
+        return range.Clean(onErrors).MakeSafeForArrayFormulas();
     }
 
     [ExcelFunction(Description = "Get the number of cells in a range", IsThreadSafe = true)]
@@ -77,6 +77,4 @@ internal static class DataTypes_Range
     {
         throw new NotImplementedException();
     }
-
-
 }
