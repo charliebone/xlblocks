@@ -928,6 +928,20 @@ public class XlBlockTableTests
     }
 
     [Fact]
+    public void Filter_Expression_Empty()
+    {
+        var result = _employeeTable.Filter("");
+        object[,] expectedResult =
+        {
+            { "ID", "Name", "Age" },
+            { 1d, "Alice", 30d },
+            { 2d, "Bob", 25d },
+            { 3d, "Charlie", 35d }
+        };
+        AssertTableMatchesExpected(expectedResult, result);
+    }
+
+    [Fact]
     public void Filter_Expression_GreaterThanOrEqual()
     {
         var result = _employeeTable.Filter("[Age] >= 30");
