@@ -375,9 +375,27 @@ public class XlBlockTableTests
         Assert.Equal(new Type[] { typeof(int), typeof(DateTime) }, table.ColumnTypes);
     }
 
+    [Fact]
+    public void BuildFromCsv_UnspecifiedTypes()
+    {
+        var csvPath = Path.Combine(Directory.GetCurrentDirectory(), "Types", "logData.csv");
+        var table = XlBlockTable.BuildFromCsv(csvPath, ",", true);
+        Assert.Equal(12, table.RowCount);
+        Assert.Equal(4, table.ColumnCount);
+    }
+
+    [Fact]
+    public void BuildFromCsv_SpecifiedTypes()
+    {
+        var csvPath = Path.Combine(Directory.GetCurrentDirectory(), "Types", "logData.csv");
+        var table = XlBlockTable.BuildFromCsv(csvPath, ",", true);
+        Assert.Equal(12, table.RowCount);
+        Assert.Equal(4, table.ColumnCount);
+    }
+
     #endregion
 
-    #region Join and Union tests
+    #region Join and Union
 
     [Fact]
     public void Join_InnerJoin_CommonColumns()

@@ -183,6 +183,24 @@ internal class XlBlockTable : IXlBlockCopyableObject<XlBlockTable>, IXlBlockArra
         return new XlBlockTable(dataFrame);
     }
 
+    public static XlBlockTable BuildFromCsv(string csvPath, string separator, bool hasHeader, XlBlockRange? columnNameRange = null, XlBlockRange? columnTypeRange = null)
+    {
+        if (!File.Exists(csvPath))
+            throw new FileNotFoundException($"file '{csvPath}' was not found");
+
+        if (separator.Length != 1)
+            throw new ArgumentException("separator must be a single character");
+
+        var columnNames = columnNameRange?.GetAs<string>(false).ToArray();
+        var columnTypes = columnTypeRange?.GetAs<string>(false).Select(ParamTypeConverter.StringToType).ToArray();
+
+        if (columnNames is not null && columnTypes is not null && columnNames.Length != columnTypes.Length)
+            throw new ArgumentException("Column names and column types must be same length");
+        
+        var dataFrame = DataFrame.LoadCsv(csvPath, separator[0], hasHeader, columnNames, columnTypes, addIndexColumn: false);
+        return new XlBlockTable(dataFrame);
+    }
+
     public static XlBlockTable Join(XlBlockTable left, XlBlockTable right, string joinType, XlBlockRange? joinOn,
         string? leftSuffix = ".left", string? rightSuffix = ".right", bool includeDuplicateJoinColumns = false)
     {
