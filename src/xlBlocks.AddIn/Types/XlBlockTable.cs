@@ -197,7 +197,7 @@ internal class XlBlockTable : IXlBlockCopyableObject<XlBlockTable>, IXlBlockArra
         if (columnNames is not null && columnTypes is not null && columnNames.Length != columnTypes.Length)
             throw new ArgumentException("Column names and column types must be same length");
         
-        var dataFrame = DataFrame.LoadCsv(csvPath, separator[0], hasHeader, columnNames, columnTypes);
+        var dataFrame = DataFrame.LoadCsv(csvPath, separator[0], hasHeader, columnNames, columnTypes, addIndexColumn: false);
         return new XlBlockTable(dataFrame);
     }
 

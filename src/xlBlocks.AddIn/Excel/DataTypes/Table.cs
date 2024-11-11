@@ -26,11 +26,11 @@ internal static class DataTypes_Table
     }
 
     [return: CacheContents]
-    [ExcelFunction(Description = "Build a table from a range, specifying the column types and names", IsThreadSafe = true)]
+    [ExcelFunction(Description = "Build a table from a delimited file", IsThreadSafe = true)]
     public static XlBlockTable? XBTable_BuildFromCsv(
         [ExcelArgument(Description = "A range of data to use for the table")] string csvPath,
-        [ExcelArgument(Description = "A range of column types")] string separator,
-        [ExcelArgument(Description = "A range of column names")] bool hasHeader = true,
+        [ExcelArgument(Description = "The separator to use, default is ','")] string separator = ",",
+        [ExcelArgument(Description = "Optional flag indicating whether the csv has a header row, default is TRUE")] bool hasHeader = true,
         [ExcelArgument(Description = "A range of column names")] XlBlockRange? columnNameRange = null,
         [ExcelArgument(Description = "A range of column names")] XlBlockRange? columnTypeRange = null)
     {
