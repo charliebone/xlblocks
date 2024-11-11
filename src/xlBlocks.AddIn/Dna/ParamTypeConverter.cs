@@ -55,13 +55,17 @@ internal static class ParamTypeConverter
         {
             "string" or "str" => typeof(string),
             "double" or "dbl" => typeof(double),
+            "single" or "float" => typeof(float),
             "boolean" or "bool" => typeof(bool),
             "datetime" or "date" => typeof(DateTime),
             "int" or "integer" or "int32" => typeof(int),
             "uint" or "uint32" => typeof(uint),
             "long" or "int64" => typeof(long),
+            "ulong" or "uint64" => typeof(ulong),
             "short" or "int16" => typeof(short),
             "ushort" or "uint16" => typeof(ushort),
+            "sbyte" or "int8" => typeof(sbyte),
+            "byte" or "uint8" => typeof(byte),
             "decimal" => typeof(decimal),
             "object" or "obj" => typeof(object),
             _ => null
@@ -103,6 +107,10 @@ internal static class ParamTypeConverter
         {
             convertedInput = convertedDouble;
         }
+        else if (type == typeof(float) && TryConvertToDouble(input, out var convertedSingle))
+        {
+            convertedInput = convertedSingle;
+        }
         else if (type == typeof(bool) && TryConvertToBoolean(input, true, out var convertedBool))
         {
             convertedInput = convertedBool;
@@ -123,6 +131,10 @@ internal static class ParamTypeConverter
         {
             convertedInput = convertedInt64;
         }
+        else if (type == typeof(ulong) && TryConvertToInt64(input, out var convertedUInt64))
+        {
+            convertedInput = convertedUInt64;
+        }
         else if (type == typeof(short) && TryConvertToInt16(input, out var convertedInt16))
         {
             convertedInput = convertedInt16;
@@ -130,6 +142,14 @@ internal static class ParamTypeConverter
         else if (type == typeof(ushort) && TryConvertToUInt16(input, out var convertedUInt16))
         {
             convertedInput = convertedUInt16;
+        }
+        else if (type == typeof(sbyte) && TryConvertToInt8(input, out var convertedInt8))
+        {
+            convertedInput = convertedInt8;
+        }
+        else if (type == typeof(byte) && TryConvertToUInt8(input, out var convertedUInt8))
+        {
+            convertedInput = convertedUInt8;
         }
         else if (type == typeof(decimal) && TryConvertToDecimal(input, out var convertedDecimal))
         {
@@ -364,6 +384,9 @@ internal static class ParamTypeConverter
             {
                 case double doubleValue:
                     converted = doubleValue;
+                    break;
+                case float floatValue:
+                    converted = floatValue;
                     break;
                 case long longValue:
                     converted = longValue;
@@ -683,6 +706,8 @@ internal static class ParamTypeConverter
         {
             if (value is long longValue)
                 converted = checked((int)longValue);
+            else if (value is ulong ulongValue)
+                converted = checked((int)ulongValue);
             else if (value is int intValue)
                 converted = intValue;
             else if (value is uint uintValue)
@@ -725,18 +750,20 @@ internal static class ParamTypeConverter
         {
             if (value is long longValue)
                 converted = checked((uint)longValue);
+            else if (value is ulong ulongValue)
+                converted = checked((uint)ulongValue);
             else if (value is int intValue)
                 converted = checked((uint)intValue);
             else if (value is uint uintValue)
-                converted = checked(uintValue);
+                converted = uintValue;
             else if (value is short shortValue)
                 converted = checked((uint)shortValue);
             else if (value is ushort ushortValue)
-                converted = checked(ushortValue);
+                converted = ushortValue;
             else if (value is sbyte sbyteValue)
                 converted = checked((uint)sbyteValue);
             else if (value is byte byteValue)
-                converted = checked(byteValue);
+                converted = byteValue;
             else
             {
                 converted = default;
@@ -767,18 +794,20 @@ internal static class ParamTypeConverter
         {
             if (value is long longValue)
                 converted = checked((short)longValue);
+            else if (value is ulong ulongValue)
+                converted = checked((short)ulongValue);
             else if (value is int intValue)
                 converted = checked((short)intValue);
             else if (value is uint uintValue)
                 converted = checked((short)uintValue);
             else if (value is short shortValue)
-                converted = checked(shortValue);
+                converted = shortValue;
             else if (value is ushort ushortValue)
                 converted = checked((short)ushortValue);
             else if (value is sbyte sbyteValue)
                 converted = checked(sbyteValue);
             else if (value is byte byteValue)
-                converted = checked(byteValue);
+                converted = byteValue;
             else
             {
                 converted = default;
@@ -809,6 +838,8 @@ internal static class ParamTypeConverter
         {
             if (value is long longValue)
                 converted = checked((ushort)longValue);
+            else if (value is ulong ulongValue)
+                converted = checked((ushort)ulongValue);
             else if (value is int intValue)
                 converted = checked((ushort)intValue);
             else if (value is uint uintValue)
@@ -816,11 +847,11 @@ internal static class ParamTypeConverter
             else if (value is short shortValue)
                 converted = checked((ushort)shortValue);
             else if (value is ushort ushortValue)
-                converted = checked(ushortValue);
+                converted = ushortValue;
             else if (value is sbyte sbyteValue)
                 converted = checked((ushort)sbyteValue);
             else if (value is byte byteValue)
-                converted = checked(byteValue);
+                converted = byteValue;
             else
             {
                 converted = default;
@@ -828,6 +859,94 @@ internal static class ParamTypeConverter
                     return false;
 
                 converted = checked((ushort)convertedLong);
+            }
+            return true;
+        }
+        catch
+        {
+            converted = default;
+            return false;
+        }
+    }
+
+    public static sbyte ConvertToInt8(object value)
+    {
+        if (!TryConvertToInt8(value, out var converted))
+            throw new InvalidCastException($"Value {value} could not be converted to {typeof(sbyte).Name}");
+        return converted.Value;
+    }
+
+    public static bool TryConvertToInt8(object value, [NotNullWhen(true)] out sbyte? converted)
+    {
+        try
+        {
+            if (value is long longValue)
+                converted = checked((sbyte)longValue);
+            else if (value is ulong ulongValue)
+                converted = checked((sbyte)ulongValue);
+            else if (value is int intValue)
+                converted = checked((sbyte)intValue);
+            else if (value is uint uintValue)
+                converted = checked((sbyte)uintValue);
+            else if (value is short shortValue)
+                converted = checked((sbyte)shortValue);
+            else if (value is ushort ushortValue)
+                converted = checked((sbyte)ushortValue);
+            else if (value is sbyte sbyteValue)
+                converted = sbyteValue;
+            else if (value is byte byteValue)
+                converted = checked((sbyte)byteValue);
+            else
+            {
+                converted = default;
+                if (!TryConvertToInt64(value, out var convertedLong))
+                    return false;
+
+                converted = checked((sbyte)convertedLong);
+            }
+            return true;
+        }
+        catch
+        {
+            converted = default;
+            return false;
+        }
+    }
+
+    public static byte ConvertToUInt8(object value)
+    {
+        if (!TryConvertToUInt8(value, out var converted))
+            throw new InvalidCastException($"Value {value} could not be converted to {typeof(byte).Name}");
+        return converted.Value;
+    }
+
+    public static bool TryConvertToUInt8(object value, [NotNullWhen(true)] out byte? converted)
+    {
+        try
+        {
+            if (value is long longValue)
+                converted = checked((byte)longValue);
+            else if (value is ulong ulongValue)
+                converted = checked((byte)ulongValue);
+            else if (value is int intValue)
+                converted = checked((byte)intValue);
+            else if (value is uint uintValue)
+                converted = checked((byte)uintValue);
+            else if (value is short shortValue)
+                converted = checked((byte)shortValue);
+            else if (value is ushort ushortValue)
+                converted = checked((byte)ushortValue);
+            else if (value is sbyte sbyteValue)
+                converted = checked((byte)sbyteValue);
+            else if (value is byte byteValue)
+                converted = byteValue;
+            else
+            {
+                converted = default;
+                if (!TryConvertToInt64(value, out var convertedLong))
+                    return false;
+
+                converted = checked((byte)convertedLong);
             }
             return true;
         }
@@ -880,8 +999,10 @@ internal static class ParamTypeConverter
         try
         {
             converted = default;
-            if (value is double doubleValue) // all double -> integer types should go through here first
+            if (value is double doubleValue) // all double -> integer types generally go through here first
                 converted = checked((long)Math.Round(doubleValue, MidpointRounding.ToEven));
+            else if (value is float floatValue)
+                converted = checked((long)Math.Round(floatValue, MidpointRounding.ToEven));
             else if (value is long longValue)
                 converted = checked(longValue);
             else if (value is int intValue)
@@ -905,6 +1026,81 @@ internal static class ParamTypeConverter
                 converted = checked((long)Math.Round(convertedDouble, MidpointRounding.ToEven));
             }
 
+            return true;
+        }
+        catch
+        {
+            converted = default;
+            return false;
+        }
+    }
+
+    public static ulong ConvertToUInt64(object value)
+    {
+        if (!TryConvertToUInt64(value, out var converted))
+            throw new InvalidCastException($"Value {value} could not be converted to {typeof(ulong).Name}");
+        return converted.Value;
+    }
+
+    public static bool TryConvertToUInt64(object value, [NotNullWhen(true)] out ulong? converted)
+    {
+        try
+        {
+            converted = default;
+            if (value is double doubleValue)
+                converted = checked((ulong)Math.Round(doubleValue, MidpointRounding.ToEven));
+            else if (value is float floatValue)
+                converted = checked((ulong)Math.Round(floatValue, MidpointRounding.ToEven));
+            else if (value is long longValue)
+                converted = checked((ulong)longValue);
+            else if (value is int intValue)
+                converted = checked((ulong)intValue);
+            else if (value is uint uintValue)
+                converted = checked(uintValue);
+            else if (value is short shortValue)
+                converted = checked((ulong)shortValue);
+            else if (value is ushort ushortValue)
+                converted = checked(ushortValue);
+            else if (value is sbyte sbyteValue)
+                converted = checked((ulong)sbyteValue);
+            else if (value is byte byteValue)
+                converted = checked(byteValue);
+            else
+            {
+                converted = default;
+                if (!TryConvertToDouble(value, out var convertedDouble))
+                    return false;
+
+                converted = checked((ulong)Math.Round(convertedDouble, MidpointRounding.ToEven));
+            }
+
+            return true;
+        }
+        catch
+        {
+            converted = default;
+            return false;
+        }
+    }
+
+    public static float ConvertToSingle(object value)
+    {
+        if (!TryConvertToSingle(value, out var converted))
+            throw new InvalidCastException($"Value {value} could not be converted to {typeof(float).Name}");
+        return converted.Value;
+    }
+
+    public static bool TryConvertToSingle(object value, [NotNullWhen(true)] out float? converted)
+    {
+        if (!TryConvertToDouble(value, out var convertedDouble))
+        {
+            converted = default;
+            return false;
+        }
+
+        try
+        {
+            converted = checked((float)convertedDouble);
             return true;
         }
         catch

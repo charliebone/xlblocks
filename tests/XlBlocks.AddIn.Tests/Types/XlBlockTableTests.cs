@@ -395,7 +395,7 @@ public class XlBlockTableTests
 
     #endregion
 
-    #region Join and Union tests
+    #region Join and Union
 
     [Fact]
     public void Join_InnerJoin_CommonColumns()
