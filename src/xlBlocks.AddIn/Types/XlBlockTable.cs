@@ -558,7 +558,7 @@ internal class XlBlockTable : IXlBlockCopyableObject<XlBlockTable>, IXlBlockArra
         return new XlBlockTable(dataFrame);
     }
 
-    public XlBlockTable GroupBy(XlBlockRange groupColumnNamesRange, string groupByOperation, XlBlockRange? aggregationColumnNamesRange)
+    public XlBlockTable GroupBy(XlBlockRange groupColumnNamesRange, string groupByOperation, XlBlockRange? aggregationColumnNamesRange, XlBlockRange? newColumnNamesRange)
     {
         var groupColumnNames = groupColumnNamesRange.GetAs<string>(false).ToList();
         if (groupColumnNames.Count == 0)
@@ -588,9 +588,14 @@ internal class XlBlockTable : IXlBlockCopyableObject<XlBlockTable>, IXlBlockArra
                 AssertColumnExists(column);
         }
 
+        var newColumnNamesList = newColumnNamesRange?.GetAs<string>(false)?.ToList() ?? new List<string>(aggregationColumnsList);
+        if (newColumnNamesList.Any() && newColumnNamesList.Count != aggregationColumnsList.Count)
+            throw new ArgumentException($"new column names list count ({newColumnNamesList.Count}) does not match aggregation column count ({aggregationColumnsList.Count})");
+
+        DataFrame newDataFrame;
         if (groupColumnNames.Count == 1)
         {
-            return new XlBlockTable(groupByDelegate(_dataFrame.GroupBy(groupColumnNames[0]), aggregationColumnsList.ToArray()));
+            newDataFrame = groupByDelegate(_dataFrame.GroupBy(groupColumnNames[0]), aggregationColumnsList.ToArray());
         }
         else
         {
@@ -616,8 +621,15 @@ internal class XlBlockTable : IXlBlockCopyableObject<XlBlockTable>, IXlBlockArra
                 }
             }
 
-            var newDataFrame = new DataFrame(newColumns);
-            return new XlBlockTable(newDataFrame.Filter(compositeKeyCol.IsDuplicateElement().ElementwiseEquals(false)));
+            newDataFrame = new DataFrame(newColumns);
+            newDataFrame = newDataFrame.Filter(compositeKeyCol.IsDuplicateElement().ElementwiseEquals(false));
         }
+
+        if (newColumnNamesList.Any())
+        {
+            for (var i = 0; i < aggregationColumnsList.Count; i++)
+                newDataFrame[aggregationColumnsList[i]].SetName(newColumnNamesList[i]);
+        }
+        return new XlBlockTable(newDataFrame);
     }
 }

@@ -244,8 +244,9 @@ internal static class DataTypes_Table
        [ExcelArgument(Description = "A table"), CacheContents(AsReference = true)] XlBlockTable table,
        [ExcelArgument(Description = "Names of columns to group by")] XlBlockRange groupByColumns,
        [ExcelArgument(Description = "Group by operation, one of "), Optional] string groupByOperation,
-       [ExcelArgument(Description = "Optional aggregation columns, defaults to all numeric non-group columns"), Optional] XlBlockRange? aggregateColumns)
+       [ExcelArgument(Description = "Optional aggregation columns, defaults to all numeric non-group columns"), Optional] XlBlockRange? aggregateColumns,
+       [ExcelArgument(Description = "Optional new column names"), Optional] XlBlockRange? newColumnNames)
     {
-        return table.GroupBy(groupByColumns, groupByOperation, aggregateColumns);
+        return table.GroupBy(groupByColumns, groupByOperation, aggregateColumns, newColumnNames);
     }
 }
