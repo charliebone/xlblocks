@@ -201,9 +201,10 @@ internal static class DataTypes_Table
         [ExcelArgument(Description = "A dictionary"), CacheContents(AsReference = true)] XlBlockDictionary dictionary,
         [ExcelArgument(Description = "The name of the column used to match the dictionary keys")] string keyColumnName,
         [ExcelArgument(Description = "The name to use for the value column")] string valueColumnName,
-        [ExcelArgument(Description = "Optional, the type to use for the value column")] string? valueColumnType = null)
+        [ExcelArgument(Description = "Optional, the type to use for the value column")] string? valueColumnType = null,
+        [ExcelArgument(Description = "Optional, the value to use for keys not found in dictionary")] object? valueOnMissing = null)
     {
-        return table.AppendColumnFromDictionary(dictionary, keyColumnName, valueColumnName, valueColumnType);
+        return table.AppendColumnFromDictionary(dictionary, keyColumnName, valueColumnName, valueColumnType, valueOnMissing);
     }
 
     [return: CacheContents]
@@ -244,8 +245,9 @@ internal static class DataTypes_Table
        [ExcelArgument(Description = "A table"), CacheContents(AsReference = true)] XlBlockTable table,
        [ExcelArgument(Description = "Names of columns to group by")] XlBlockRange groupByColumns,
        [ExcelArgument(Description = "Group by operation, one of "), Optional] string groupByOperation,
-       [ExcelArgument(Description = "Optional aggregation columns, defaults to all numeric non-group columns"), Optional] XlBlockRange? aggregateColumns)
+       [ExcelArgument(Description = "Optional aggregation columns, defaults to all numeric non-group columns"), Optional] XlBlockRange? aggregateColumns,
+       [ExcelArgument(Description = "Optional new column names"), Optional] XlBlockRange? newColumnNames)
     {
-        return table.GroupBy(groupByColumns, groupByOperation, aggregateColumns);
+        return table.GroupBy(groupByColumns, groupByOperation, aggregateColumns, newColumnNames);
     }
 }
