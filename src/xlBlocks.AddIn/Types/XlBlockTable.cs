@@ -428,7 +428,8 @@ internal class XlBlockTable : IXlBlockCopyableObject<XlBlockTable>, IXlBlockArra
         return new XlBlockTable(dataFrame);
     }
 
-    public XlBlockTable AppendColumnFromDictionary(XlBlockDictionary dictionary, string keyColumnName, string valueColumnName, string? valueType = null)
+    public XlBlockTable AppendColumnFromDictionary(XlBlockDictionary dictionary, string keyColumnName, string valueColumnName, 
+        string? valueType = null, object? valueOnMissing = null)
     {
         AssertColumnExists(keyColumnName);
         AssertColumnNotExists(valueColumnName);
@@ -439,6 +440,15 @@ internal class XlBlockTable : IXlBlockCopyableObject<XlBlockTable>, IXlBlockArra
         var merged = _dataFrame.Merge(rightDataFrame, joinColumns, joinColumns, "_left", "_right", JoinAlgorithm.Left);
         merged.Columns.Remove($"{keyColumnName}_right");
         merged.Columns[$"{keyColumnName}_left"].SetName(keyColumnName);
+
+        if (valueOnMissing != null)
+        {
+            var valueOnMissingColumn = DataFrameUtilities.CreateDataFrameColumn(valueOnMissing, merged.Rows.Count, valueType);
+            var newColumn = merged.Columns[valueColumnName].ElementwiseIsNotNull().ElementwiseIfThenElse(merged.Columns[valueColumnName], valueOnMissingColumn);
+            newColumn.SetName(valueColumnName);
+            merged.Columns.Remove(valueColumnName);
+            merged.Columns.Add(newColumn);
+        }
 
         return new XlBlockTable(merged);
     }

@@ -53,6 +53,11 @@ internal static class DataFrameUtilities
         return CreateDataFrameColumn(typedItems, typeof(T), columnName);
     }
 
+    public static DataFrameColumn CreateDataFrameColumn(object input, long length, string? type = null, string columnName = "constant")
+    {
+        return CreateDataFrameColumn(RepeatLong(input, length), type, columnName);
+    }
+    
     public static DataFrameColumn CreateDataFrameColumn(IEnumerable<object> input, string? type = null, string columnName = "constant")
     {
         if (type != null)

@@ -1235,6 +1235,27 @@ public class XlBlockTableTests
     }
 
     [Fact]
+    public void AppendColumnFromDictionary_MissingKeys_ValueOnMissing()
+    {
+        var dictionary = new XlBlockDictionary(new Dictionary<string, object>
+        {
+            ["Alice"] = 1000,
+            ["Charlie"] = 3000
+        }, typeof(string));
+
+        var result = _employeeTable.AppendColumnFromDictionary(dictionary, "Name", "Salaries", null, 1234d);
+
+        object[,] expectedResult =
+        {
+            { "ID", "Name", "Age", "Salaries" },
+            { 1d, "Alice", 30d, 1000d },
+            { 2d, "Bob", 25d, 1234d },
+            { 3d, "Charlie", 35d, 3000d }
+        };
+        AssertTableMatchesExpected(expectedResult, result);
+    }
+
+    [Fact]
     public void AppendColumnFromDictionary_DuplicateColumnName_ThrowsException()
     {
         var dictionary = new XlBlockDictionary(new Dictionary<string, object>

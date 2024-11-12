@@ -201,9 +201,10 @@ internal static class DataTypes_Table
         [ExcelArgument(Description = "A dictionary"), CacheContents(AsReference = true)] XlBlockDictionary dictionary,
         [ExcelArgument(Description = "The name of the column used to match the dictionary keys")] string keyColumnName,
         [ExcelArgument(Description = "The name to use for the value column")] string valueColumnName,
-        [ExcelArgument(Description = "Optional, the type to use for the value column")] string? valueColumnType = null)
+        [ExcelArgument(Description = "Optional, the type to use for the value column")] string? valueColumnType = null,
+        [ExcelArgument(Description = "Optional, the value to use for keys not found in dictionary")] object? valueOnMissing = null)
     {
-        return table.AppendColumnFromDictionary(dictionary, keyColumnName, valueColumnName, valueColumnType);
+        return table.AppendColumnFromDictionary(dictionary, keyColumnName, valueColumnName, valueColumnType, valueOnMissing);
     }
 
     [return: CacheContents]
