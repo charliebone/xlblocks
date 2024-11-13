@@ -378,6 +378,13 @@ public class ParserTests
     [InlineData("NOT NULL IS NOT NULL", "TRUE")]
     [InlineData("NOT (NULL IS NULL)", "FALSE")]
 
+    // string concatenation
+    [InlineData("1 + '2'", "'12'")]
+    [InlineData("'1' + 2", "'12'")]
+    [InlineData("1 + '2' + 'Three'", "'12Three'")]
+    [InlineData("'One' + '2' + 'Three'", "'One2Three'")]
+    [InlineData("'One' + 2 + 'Three'", "'One2Three'")]
+
     public void OrderOfOperationsAndAssociativity_Literals(string expression, string expected)
     {
         var expressionResult = ParseWithDataFrame(expression, _testData1);
@@ -453,11 +460,21 @@ public class ParserTests
         DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
     }
 
-    #endregion
-
-    #region Function tests
-
     [Fact]
+    public void StringConcat_Tests()
+    {
+        result = ParseWithDataFrame("[Name] + ' aka ' + [Nickname]", _testData1);
+        expected = _testData1.Columns["Name"]
+            .ElementwiseConcat(DataFrameUtilities.CreateConstantDataFrameColumn(" aka ", _testData1.Rows.Count))
+            .ElementwiseConcat(_testData1.Columns["Nickname"]);
+        DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
+    }
+
+        #endregion
+
+        #region Function tests
+
+        [Fact]
     public void Functions_ISNULL_Test()
     {
         result = ParseWithDataFrame("ISNULL([Name], 'Default')", _testData1);

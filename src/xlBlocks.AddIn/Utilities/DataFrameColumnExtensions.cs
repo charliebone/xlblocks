@@ -187,6 +187,18 @@ internal static class DataFrameColumnExtensions
 
     #region String functions
 
+    internal static DataFrameColumn ElementwiseConcat(this DataFrameColumn column, DataFrameColumn otherColumn)
+    {
+        if (column.Length != otherColumn.Length)
+            throw new ArgumentException("Columns have mismatched length");
+
+        var result = new StringDataFrameColumn(column.Name, column.Length);
+        for (var i = 0L; i < column.Length; i++)
+            result[i] = $"{column[i]}{otherColumn[i]}";
+
+        return result;
+    }
+
     internal static DataFrameColumn ElementwiseLength(this DataFrameColumn column)
     {
         if (column is not StringDataFrameColumn strColumn)

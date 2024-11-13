@@ -25,8 +25,8 @@ internal sealed class BinaryColumnExpression : IColumnExpression
 
         try
         {
-            var rightNullColumn = right as NullDataFrameColumn;
             var leftNullColumn = left as NullDataFrameColumn;
+            var rightNullColumn = right as NullDataFrameColumn;
             if (leftNullColumn is not null && rightNullColumn is not null)
             {
                 if (_opToken.TokenID == DataFrameExpressionToken.IS || _opToken.TokenID == DataFrameExpressionToken.COMP_EQUALS)
@@ -57,6 +57,11 @@ internal sealed class BinaryColumnExpression : IColumnExpression
                         return rightNullColumn.IsNull ? left.ElementwiseIsNotNull() : left.ElementwiseIsNull();
                 }
                 throw new DataFrameExpressionException($"'{_opToken.Value}' not valid for null comparison, only equals, not equals and is");
+            }
+
+            if (_opToken.TokenID == DataFrameExpressionToken.ARITH_PLUS && (left is StringDataFrameColumn || right is StringDataFrameColumn))
+            {
+                return left.ElementwiseConcat(right);
             }
 
             return _opToken.TokenID switch
