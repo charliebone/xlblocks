@@ -55,11 +55,20 @@ internal static class ParserFunctions
 
     public static DataFrameColumn Exp(DataFrameContext context, IList<IColumnExpression> argExpressions)
     {
-        CheckArgCount(argExpressions, 2);
+        CheckArgCount(argExpressions, 1, 2);
 
-        var baseColumn = argExpressions[0].Evaluate(context);
-        var exponentColumn = argExpressions[0].Evaluate(context);
-        return baseColumn.ElementwiseExponent(exponentColumn);
+        if (argExpressions.Count == 2)
+        {
+            var baseColumn = argExpressions[0].Evaluate(context);
+            var exponentColumn = argExpressions[1].Evaluate(context);
+            return baseColumn.ElementwiseExponent(exponentColumn);
+        }
+        else
+        {
+            var exponentColumn = argExpressions[0].Evaluate(context);
+            var baseColumn = DataFrameUtilities.CreateConstantDataFrameColumn(Math.E, exponentColumn.Length);
+            return baseColumn.ElementwiseExponent(exponentColumn);
+        }
     }
 
     public static DataFrameColumn Log(DataFrameContext context, IList<IColumnExpression> argExpressions)
@@ -93,12 +102,49 @@ internal static class ParserFunctions
         return expressionColumn.ElementwiseSubstring(startIndexColumn);
     }
 
+    public static DataFrameColumn Left(DataFrameContext context, IList<IColumnExpression> argExpressions)
+    {
+        CheckArgCount(argExpressions, 2);
+
+        var expressionColumn = argExpressions[0].Evaluate(context);
+        var lengthColumn = argExpressions[1].Evaluate(context);
+
+        return expressionColumn.ElementwiseLeft(lengthColumn);
+    }
+
+    public static DataFrameColumn Right(DataFrameContext context, IList<IColumnExpression> argExpressions)
+    {
+        CheckArgCount(argExpressions, 2);
+
+        var expressionColumn = argExpressions[0].Evaluate(context);
+        var lengthColumn = argExpressions[1].Evaluate(context);
+
+        return expressionColumn.ElementwiseRight(lengthColumn);
+    }
+
     public static DataFrameColumn Trim(DataFrameContext context, IList<IColumnExpression> argExpressions)
     {
         CheckArgCount(argExpressions, 1);
 
         var expressionColumn = argExpressions[0].Evaluate(context);
         return expressionColumn.ElementwiseTrim();
+    }
+
+    public static DataFrameColumn Replace(DataFrameContext context, IList<IColumnExpression> argExpressions)
+    {
+        CheckArgCount(argExpressions, 3, 4);
+
+        var expressionColumn = argExpressions[0].Evaluate(context);
+        var oldValueColumn = argExpressions[1].Evaluate(context);
+        var newValueColumn = argExpressions[2].Evaluate(context);
+
+        if (argExpressions.Count == 4)
+        {
+            var caseSensitiveColumn = argExpressions[3].Evaluate(context);
+            return expressionColumn.ElementwiseReplace(oldValueColumn, newValueColumn, caseSensitiveColumn);
+        }
+
+        return expressionColumn.ElementwiseReplace(oldValueColumn, newValueColumn, null);
     }
 
     public static DataFrameColumn Regex_Test(DataFrameContext context, IList<IColumnExpression> argExpressions)
@@ -115,6 +161,18 @@ internal static class ParserFunctions
         }
 
         return expressionColumn.ElementwiseRegexTest(patternColumn, null);
+    }
+
+
+    public static DataFrameColumn Regex_Replace(DataFrameContext context, IList<IColumnExpression> argExpressions)
+    {
+        CheckArgCount(argExpressions, 3);
+
+        var expressionColumn = argExpressions[0].Evaluate(context);
+        var patternColumn = argExpressions[1].Evaluate(context);
+        var replaceColumn = argExpressions[2].Evaluate(context);
+
+        return expressionColumn.ElementwiseRegexReplace(patternColumn, replaceColumn);
     }
 
     #endregion

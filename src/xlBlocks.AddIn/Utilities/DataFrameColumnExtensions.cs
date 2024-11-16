@@ -18,9 +18,9 @@ internal static class DataFrameColumnExtensions
         for (var i = 0L; i < conditionalColumn.Length; i++)
         {
             if (boolConditional[i] == true)
-                result[i] = trueColumn[i];
+                result[i] = result.DataType == typeof(string) ? trueColumn[i]?.ToString() : trueColumn[i];
             else if (boolConditional[i] == false)
-                result[i] = falseColumn[i];
+                result[i] = result.DataType == typeof(string) ? falseColumn[i]?.ToString() : falseColumn[i];
         }
 
         return result;
@@ -248,7 +248,7 @@ internal static class DataFrameColumnExtensions
 
         pattern = EscapeLikePattern(pattern);
         var result = new BooleanDataFrameColumn(column.Name, column.Length);
-        for (var i = 0; i < column.Length; i++)
+        for (var i = 0L; i < column.Length; i++)
             result[i] = IsWildcardMatch(stringColumn[i], pattern, false, caseInsensitive);
 
         return result;
@@ -282,8 +282,11 @@ internal static class DataFrameColumnExtensions
         {
             if (stringColumn[i] is null || startIndexColumn[i] is null)
                 continue;
-            
-            result[i] = stringColumn[i][(int)startIndexColumn[i]..];
+
+            if ((int)startIndexColumn[i] >= stringColumn[i].Length)
+                result[i] = string.Empty;
+            else
+                result[i] = stringColumn[i][(int)startIndexColumn[i]..];
         }
 
         return result;
@@ -301,12 +304,67 @@ internal static class DataFrameColumnExtensions
             throw new ArgumentException("Length must be numeric");
 
         var result = new StringDataFrameColumn(column.Name, column.Length);
-        for (var i = 0; i < stringColumn.Length; i++)
+        for (var i = 0L; i < stringColumn.Length; i++)
         {
             if (stringColumn[i] is null || startIndexColumn[i] is null || lengthColumn[i] is null)
                 continue;
 
-            result[i] = stringColumn[i].Substring((int)startIndexColumn[i], (int)lengthColumn[i]);
+            if ((int)lengthColumn[i] == 0)
+                result[i] = string.Empty;
+            else if ((int)startIndexColumn[i] >= stringColumn[i].Length)
+                result[i] = string.Empty;
+            else
+                result[i] = stringColumn[i].Substring((int)startIndexColumn[i], Math.Min((int)lengthColumn[i], stringColumn[i].Length - (int)startIndexColumn[i]));
+        }
+
+        return result;
+    }
+
+    internal static DataFrameColumn ElementwiseLeft(this DataFrameColumn column, DataFrameColumn lengthColumn)
+    {
+        if (column is not StringDataFrameColumn stringColumn)
+            throw new ArgumentException("Input must be a string");
+
+        if (!lengthColumn.IsNumericColumn())
+            throw new ArgumentException("Length must be numeric");
+
+        var result = new StringDataFrameColumn(column.Name, column.Length);
+        for (var i = 0L; i < stringColumn.Length; i++)
+        {
+            if (stringColumn[i] is null || lengthColumn[i] is null)
+                continue;
+
+            if ((int)lengthColumn[i] == 0)
+                result[i] = string.Empty;
+            else if ((int)lengthColumn[i] >= stringColumn[i].Length)
+                result[i] = stringColumn[i];
+            else
+                result[i] = stringColumn[i][..(int)lengthColumn[i]];
+        }
+
+        return result;
+    }
+
+    internal static DataFrameColumn ElementwiseRight(this DataFrameColumn column, DataFrameColumn lengthColumn)
+    {
+        if (column is not StringDataFrameColumn stringColumn)
+            throw new ArgumentException("Input must be a string");
+
+        if (!lengthColumn.IsNumericColumn())
+            throw new ArgumentException("Length must be numeric");
+
+        var result = new StringDataFrameColumn(column.Name, column.Length);
+        for (var i = 0L; i < stringColumn.Length; i++)
+        {
+            if (stringColumn[i] is null || lengthColumn[i] is null)
+                continue;
+
+            if ((int)lengthColumn[i] == 0)
+                result[i] = string.Empty;
+            else if ((int)lengthColumn[i] >= stringColumn[i].Length)
+                result[i] = stringColumn[i];
+            else
+                result[i] = stringColumn[i][(stringColumn[i].Length - (int)lengthColumn[i])..];
         }
 
         return result;
@@ -320,6 +378,33 @@ internal static class DataFrameColumnExtensions
         var result = new StringDataFrameColumn(column.Name, column.Length);
         for (var i = 0L; i < column.Length; i++)
             result[i] = stringColumn[i]?.Trim();
+
+        return result;
+    }
+
+    internal static DataFrameColumn ElementwiseReplace(this DataFrameColumn column, DataFrameColumn oldValueColumn, DataFrameColumn newValueColumn, DataFrameColumn? caseSensitiveColumn)
+    {
+        if (column is not StringDataFrameColumn stringColumn)
+            throw new ArgumentException("Input must be a string");
+
+        if (oldValueColumn is not StringDataFrameColumn stringOldValueColumn)
+            throw new ArgumentException("Old value must be a string");
+
+        if (newValueColumn is not StringDataFrameColumn stringNewValueColumn)
+            throw new ArgumentException("New Value must be a string");
+
+        caseSensitiveColumn ??= DataFrameUtilities.CreateConstantDataFrameColumn(true, column.Length);
+        if (caseSensitiveColumn is not PrimitiveDataFrameColumn<bool> boolCaseSensitiveColumn)
+            throw new ArgumentException("Is case sensitive must be boolean");
+
+        var result = new StringDataFrameColumn(column.Name, column.Length);
+        for (var i = 0L; i < stringColumn.Length; i++)
+        {
+            if (stringOldValueColumn[i] is null)
+                result[i] = stringColumn[i];
+            else
+                result[i] = stringColumn[i]?.Replace(stringOldValueColumn[i], stringNewValueColumn[i], boolCaseSensitiveColumn[i] == true ? StringComparison.InvariantCultureIgnoreCase : StringComparison.InvariantCulture);
+        }
 
         return result;
     }
@@ -345,9 +430,26 @@ internal static class DataFrameColumnExtensions
         return result;
     }
 
+    internal static DataFrameColumn ElementwiseRegexReplace(this DataFrameColumn column, DataFrameColumn patternColumn, DataFrameColumn replacementColumn)
+    {
+        if (column is not StringDataFrameColumn stringColumn || patternColumn is not StringDataFrameColumn stringPatternColumn || replacementColumn is not StringDataFrameColumn stringReplacementColumn)
+            throw new ArgumentException("Input, pattern and replacement columns must be strings");
+
+        var result = new StringDataFrameColumn(column.Name, column.Length);
+        for (var i = 0L; i < column.Length; i++)
+        {
+            if (stringColumn[i] is null || stringPatternColumn[i] is null)
+                continue;
+
+            result[i] = Regex.Replace(stringColumn[i], stringPatternColumn[i], stringReplacementColumn[i]);
+        }
+
+        return result;
+    }
+
     internal static IEnumerable<string?> ToStringEnumerable(this DataFrameColumn column)
     {
-        for (var i = 0; i < column.Length; i++)
+        for (var i = 0L; i < column.Length; i++)
             yield return column[i]?.ToString();
     }
 
@@ -560,7 +662,7 @@ internal static class DataFrameColumnExtensions
 
         // basically just go for output column that both left and right can be implicitly cast to
         if (left.DataType == typeof(string) || right.DataType == typeof(string))
-            throw new ArgumentException($"Cannot determine output column type for operation between '{left.DataType.Name}' and '{right.DataType.Name}' columns");
+            return typeof(string);
 
         if (left.DataType == typeof(bool) || right.DataType == typeof(bool))
             throw new ArgumentException($"Cannot determine output column type for operation between '{left.DataType.Name}' and '{right.DataType.Name}' columns");
