@@ -13,7 +13,7 @@
 
 ## Description
 
-The XlBlocks Excel Add-In provides users with a powerful set of tools and components for building Excel spreadsheets. 
+The XlBlocks Excel Add-In provides users with a powerful set of tools and components for building Excel spreadsheets.
 
 
 ## License
