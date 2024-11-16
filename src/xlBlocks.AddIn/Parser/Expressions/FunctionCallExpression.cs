@@ -36,13 +36,20 @@ internal sealed class FunctionCallExpression : IColumnExpression
                     return ParserFunctions.Exp(context, _arguments);
                 case "LOG":
                     return ParserFunctions.Log(context, _arguments);
-                case "TRIM":
-                    return ParserFunctions.Trim(context, _arguments);
                 case "SUBSTRING":
                     return ParserFunctions.Substring(context, _arguments);
+                case "LEFT":
+                    return ParserFunctions.Left(context, _arguments);
+                case "RIGHT":
+                    return ParserFunctions.Right(context, _arguments);
+                case "TRIM":
+                    return ParserFunctions.Trim(context, _arguments);
+                case "REPLACE":
+                    return ParserFunctions.Replace(context, _arguments);
                 case "REGEX_TEST":
                     return ParserFunctions.Regex_Test(context, _arguments);
-
+                case "REGEX_REPLACE":
+                    return ParserFunctions.Regex_Replace(context, _arguments);
             }
         }
         catch (Exception ex)

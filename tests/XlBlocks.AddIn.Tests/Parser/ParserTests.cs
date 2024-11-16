@@ -323,7 +323,6 @@ public class ParserTests
     [InlineData("BAD_FUNCTION([Id])", "Unknown function 'BAD_FUNCTION'")]
     [InlineData("ISNULL([Nickname])", "Error evaluating function 'ISNULL': Expected 2 args, got 1")]
     [InlineData("IIF([Nickname], [Id], [Age])", "Error evaluating function 'IIF': Conditional must be boolean")]
-    [InlineData("IIF([Nickname] IS NULL, [Name], [Age])", "Error evaluating function 'IIF': Cannot determine output column type for operation between 'String' and 'Int32' columns")]
     public void EvaluationErrors_InvalidOperations(string expression, string message)
     {
         var ex = Assert.Throws<DataFrameExpressionException>(() => ParseWithDataFrame(expression, _testData1));
@@ -477,6 +476,16 @@ public class ParserTests
         expected = _testData1.Columns["Age"].ElementwiseGreaterThanOrEqual(30).ElementwiseIfThenElse(
             DataFrameUtilities.CreateConstantDataFrameColumn("Over30", _testData1.Rows.Count),
             DataFrameUtilities.CreateConstantDataFrameColumn("Under30", _testData1.Rows.Count));
+        DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
+    }
+
+    [Fact]
+    public void Functions_IIF_MixedTypeToString()
+    {
+        result = ParseWithDataFrame("IIF([Age] >= 30, 'Over30', [Age])", _testData1);
+        expected = _testData1.Columns["Age"].ElementwiseGreaterThanOrEqual(30).ElementwiseIfThenElse(
+            DataFrameUtilities.CreateConstantDataFrameColumn("Over30", _testData1.Rows.Count),
+            _testData1.Columns["Age"]);
         DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
     }
 
