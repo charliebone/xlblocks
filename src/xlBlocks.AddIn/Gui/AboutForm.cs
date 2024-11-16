@@ -1,8 +1,6 @@
 ﻿namespace XlBlocks.AddIn.Gui;
 
 using System;
-using System.Diagnostics;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using ExcelDna.Integration;

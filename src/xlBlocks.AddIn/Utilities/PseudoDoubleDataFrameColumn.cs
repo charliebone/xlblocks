@@ -1,7 +1,6 @@
 ﻿namespace XlBlocks.AddIn.Utilities;
 
 using System.Collections;
-using System.Runtime.CompilerServices;
 using Microsoft.Data.Analysis;
 
 internal class PseudoDoubleDataFrameColumn : DataFrameColumn

@@ -128,7 +128,7 @@ internal class XlBlockRange : IXlBlockArrayableObject, IEnumerable<object>
 
     public XlBlockRange MakeSafeForArrayFormulas()
     {
-        return Count == 1 ? new XlBlockRange(new[,] { { _rangeArray[0, 0] }, { ExcelError.ExcelErrorNA } }) : this; 
+        return Count == 1 ? new XlBlockRange(new[,] { { _rangeArray[0, 0] }, { ExcelError.ExcelErrorNA } }) : this;
     }
 
     public XlBlockRange Shape(int? rowCount, int? columnCount, object fillWith)

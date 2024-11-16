@@ -113,13 +113,13 @@ internal static class DataFrameColumnExtensions
         for (var i = 0L; i < column.Length; i++)
         {
             if (column[i] is null)
-                continue; 
-            
+                continue;
+
             result[i] = !hashSet.Add(column[i]);
         }
         return result;
     }
-    
+
     private static double? Power(double? x, double? y) => (x is not null && y is not null) ? Math.Pow(x.Value, y.Value) : null;
     internal static DataFrameColumn ElementwiseExponent(this DataFrameColumn baseColumn, DataFrameColumn exponentColumn)
     {
@@ -128,7 +128,7 @@ internal static class DataFrameColumnExtensions
 
         if (!baseColumn.IsNumericColumn() || !exponentColumn.IsNumericColumn())
             throw new ArgumentException("Inputs must be numeric");
-        
+
         var doubleColumn = new PseudoDoubleDataFrameColumn(baseColumn);
         var doubleExponentColumn = new PseudoDoubleDataFrameColumn(exponentColumn);
         var result = new DoubleDataFrameColumn("exponent", baseColumn.Length);
