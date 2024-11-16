@@ -26,4 +26,4 @@ jobs:
     - name: Build
       run: msbuild -t:rebuild -property:Configuration=Release
     - name: Run tests
-      run: dotnet test .tests/XlBlocks.AddIn.Tests/XlBlocks.AddIn.Tests.csproj --no-build --verbosity normal
+      run: dotnet test ./tests/XlBlocks.AddIn.Tests/XlBlocks.AddIn.Tests.csproj --no-build --verbosity normal

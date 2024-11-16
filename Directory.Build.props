@@ -5,4 +5,5 @@
     <VersionSuffix Condition="'$(SourceBranchName)' != 'master'">$(SourceBranchName)</VersionSuffix>
     <ArtifactsPath>$(MSBuildThisFileDirectory)artifacts</ArtifactsPath>
   </PropertyGroup>
+  <Import Project="$(MSBuildProjectExtensionsPath)$(MSBuildProjectFile).*.props" />
 </Project>
