@@ -5,6 +5,8 @@ artifacts/
 .vs/
 .vscode/
 
+launchSettings.json
+
 # ignore vs user files
 *.csproj.user
 *.vcxproj.user
