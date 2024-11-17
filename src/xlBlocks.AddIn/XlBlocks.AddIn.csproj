@@ -81,5 +81,8 @@
   <Target Name="CopyNLogConfig" AfterTargets="CopyFilesToOutputDirectory">
     <Copy SourceFiles="$(MSBuildProjectDirectory)\nlog.$(Configuration).config" DestinationFiles="$(OutputPath)\nlog.config" />
   </Target>
-	
+
+  <Target Name="PrepackSystemManagement" BeforeTargets="ExcelDnaPack">
+    <Delete Files="$(OutputPath)\System.Management.dll" />
+  </Target>
 </Project>
