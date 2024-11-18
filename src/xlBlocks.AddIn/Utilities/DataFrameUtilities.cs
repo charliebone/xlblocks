@@ -57,7 +57,7 @@ internal static class DataFrameUtilities
     {
         return CreateDataFrameColumn(RepeatLong(input, length), type, columnName);
     }
-    
+
     public static DataFrameColumn CreateDataFrameColumn(IEnumerable<object> input, string? type = null, string columnName = "constant")
     {
         if (type != null)

@@ -469,11 +469,11 @@ public class ParserTests
         DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
     }
 
-        #endregion
+    #endregion
 
-        #region Function tests
+    #region Function tests
 
-        [Fact]
+    [Fact]
     public void Functions_ISNULL_Test()
     {
         result = ParseWithDataFrame("ISNULL([Name], 'Default')", _testData1);

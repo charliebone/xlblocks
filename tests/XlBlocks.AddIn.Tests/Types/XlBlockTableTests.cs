@@ -1971,7 +1971,7 @@ public class XlBlockTableTests
     {
         var groupColumns = XlBlockRange.Build(new object[,] { { "Category" } });
 
-        var result = _logDataTable.GroupBy(groupColumns, "Max", XlBlockRange.Build(new object[,] { { "ErrorCount", "Average" } }), 
+        var result = _logDataTable.GroupBy(groupColumns, "Max", XlBlockRange.Build(new object[,] { { "ErrorCount", "Average" } }),
             XlBlockRange.Build(new object[,] { { "ErrorMax", "MeanMax" } }));
 
         object[,] expectedResult =

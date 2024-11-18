@@ -1,10 +1,11 @@
 bin/
 obj/
 artifacts/
-packages/
 
 .vs/
 .vscode/
+
+launchSettings.json
 
 # ignore vs user files
 *.csproj.user
