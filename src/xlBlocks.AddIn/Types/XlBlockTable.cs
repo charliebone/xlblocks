@@ -59,6 +59,21 @@ internal class XlBlockTable : IXlBlockCopyableObject<XlBlockTable>, IXlBlockArra
         return $"An XlBlocks table with {RowCount} rows and {ColumnCount} columns";
     }
 
+    public XlBlockList GetColumnAsList(string? columnName)
+    {
+        if (columnName == null)
+            throw new ArgumentNullException(nameof(columnName));
+
+        var column = _dataFrame.Columns[columnName];
+        return XlBlockList.BuildTyped(column.AsEnumerable(), column.DataType);
+    }
+
+    public XlBlockList GetColumnAsList(int columnNumber)
+    {
+        var column = _dataFrame.Columns[columnNumber];
+        return XlBlockList.BuildTyped(column.AsEnumerable(), column.DataType);
+    }
+
     public object[,] AsArray(RangeOrientation orientation = RangeOrientation.ByColumn)
     {
         return AsArray(true, null, null, orientation);

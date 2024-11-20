@@ -6,6 +6,12 @@ using Microsoft.Data.Analysis;
 
 internal static class DataFrameColumnExtensions
 {
+    internal static IEnumerable<object> AsEnumerable(this DataFrameColumn column)
+    {
+        for (var i = 0L; i < column.Length; i++)
+            yield return column[i];
+    }
+
     internal static DataFrameColumn ElementwiseIfThenElse(this DataFrameColumn conditionalColumn, DataFrameColumn trueColumn, DataFrameColumn falseColumn)
     {
         if (conditionalColumn is not PrimitiveDataFrameColumn<bool> boolConditional)
@@ -689,6 +695,138 @@ internal static class DataFrameColumnExtensions
         }
 
         return typeof(double);
+    }
+
+    #endregion
+
+    #region DateTime-aware comparisons
+    /*
+    ElementwiseEquals(right),
+    DataFrameExpressionToken.COMP_NOTEQUALS => left.ElementwiseNotEquals(right),
+    DataFrameExpressionToken.COMP_LT => left.ElementwiseLessThan(right),
+    DataFrameExpressionToken.COMP_GT => left.ElementwiseGreaterThan(right),
+    DataFrameExpressionToken.COMP_LTE => left.ElementwiseLessThanOrEqual(right),
+    DataFrameExpressionToken.COMP_GTE => left.ElementwiseGreaterThanOrEqual(right),
+    */
+
+    internal static DataFrameColumn ElementwiseEqualsDateAware(this DataFrameColumn left, DataFrameColumn right)
+    {
+        if (left is PrimitiveDataFrameColumn<DateTime> leftDateTime && right is PrimitiveDataFrameColumn<DateTime> rightDateTime)
+        {
+            if (left.Length != right.Length)
+                throw new ArgumentException("Columns have mismatched length");
+
+            var result = new BooleanDataFrameColumn("equals", left.Length);
+            for (var i = 0; i < result.Length; i++)
+            {
+                if (leftDateTime[i] is null || rightDateTime[i] is null)
+                    continue;
+
+                result[i] = leftDateTime[i].Equals(rightDateTime[i]);
+            }
+            return result;
+        }
+        return left.ElementwiseEquals(right);
+    }
+
+    internal static DataFrameColumn ElementwiseNotEqualsDateAware(this DataFrameColumn left, DataFrameColumn right)
+    {
+        if (left is PrimitiveDataFrameColumn<DateTime> leftDateTime && right is PrimitiveDataFrameColumn<DateTime> rightDateTime)
+        {
+            if (left.Length != right.Length)
+                throw new ArgumentException("Columns have mismatched length");
+
+            var result = new BooleanDataFrameColumn("equals", left.Length);
+            for (var i = 0; i < result.Length; i++)
+            {
+                if (leftDateTime[i] is null || rightDateTime[i] is null)
+                    continue;
+
+                result[i] = !leftDateTime[i].Equals(rightDateTime[i]);
+            }
+            return result;
+        }
+        return left.ElementwiseNotEquals(right);
+    }
+
+    internal static DataFrameColumn ElementwiseLessThanDateAware(this DataFrameColumn left, DataFrameColumn right)
+    {
+        if (left is PrimitiveDataFrameColumn<DateTime> leftDateTime && right is PrimitiveDataFrameColumn<DateTime> rightDateTime)
+        {
+            if (left.Length != right.Length)
+                throw new ArgumentException("Columns have mismatched length");
+
+            var result = new BooleanDataFrameColumn("equals", left.Length);
+            for (var i = 0; i < result.Length; i++)
+            {
+                if (leftDateTime[i] is null || rightDateTime[i] is null)
+                    continue;
+
+                result[i] = leftDateTime[i] < rightDateTime[i];
+            }
+            return result;
+        }
+        return left.ElementwiseLessThan(right);
+    }
+
+    internal static DataFrameColumn ElementwiseGreaterThanDateAware(this DataFrameColumn left, DataFrameColumn right)
+    {
+        if (left is PrimitiveDataFrameColumn<DateTime> leftDateTime && right is PrimitiveDataFrameColumn<DateTime> rightDateTime)
+        {
+            if (left.Length != right.Length)
+                throw new ArgumentException("Columns have mismatched length");
+
+            var result = new BooleanDataFrameColumn("equals", left.Length);
+            for (var i = 0; i < result.Length; i++)
+            {
+                if (leftDateTime[i] is null || rightDateTime[i] is null)
+                    continue;
+
+                result[i] = leftDateTime[i] > rightDateTime[i];
+            }
+            return result;
+        }
+        return left.ElementwiseGreaterThan(right);
+    }
+
+    internal static DataFrameColumn ElementwiseLessThanOrEqualDateAware(this DataFrameColumn left, DataFrameColumn right)
+    {
+        if (left is PrimitiveDataFrameColumn<DateTime> leftDateTime && right is PrimitiveDataFrameColumn<DateTime> rightDateTime)
+        {
+            if (left.Length != right.Length)
+                throw new ArgumentException("Columns have mismatched length");
+
+            var result = new BooleanDataFrameColumn("equals", left.Length);
+            for (var i = 0; i < result.Length; i++)
+            {
+                if (leftDateTime[i] is null || rightDateTime[i] is null)
+                    continue;
+
+                result[i] = leftDateTime[i] <= rightDateTime[i];
+            }
+            return result;
+        }
+        return left.ElementwiseLessThanOrEqual(right);
+    }
+
+    internal static DataFrameColumn ElementwiseGreaterThanOrEqualDateAware(this DataFrameColumn left, DataFrameColumn right)
+    {
+        if (left is PrimitiveDataFrameColumn<DateTime> leftDateTime && right is PrimitiveDataFrameColumn<DateTime> rightDateTime)
+        {
+            if (left.Length != right.Length)
+                throw new ArgumentException("Columns have mismatched length");
+
+            var result = new BooleanDataFrameColumn("equals", left.Length);
+            for (var i = 0; i < result.Length; i++)
+            {
+                if (leftDateTime[i] is null || rightDateTime[i] is null)
+                    continue;
+
+                result[i] = leftDateTime[i] >= rightDateTime[i];
+            }
+            return result;
+        }
+        return left.ElementwiseGreaterThanOrEqual(right);
     }
 
     #endregion

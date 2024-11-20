@@ -6,6 +6,7 @@ using sly.lexer;
 using sly.parser;
 using sly.parser.generator;
 using sly.parser.parser;
+using XlBlocks.AddIn.Dna;
 using XlBlocks.AddIn.Parser.Expressions;
 
 internal class DataFrameExpressionParser
@@ -114,6 +115,8 @@ internal class DataFrameExpressionParser
     [Production("literal : STRING")]
     public IColumnExpression Literal_STRING(Token<DataFrameExpressionToken> literal)
     {
+        if (ParamTypeConverter.TryConvertToDateTime(literal.StringWithoutQuotes, out var dateTime))
+            return new ConstantColumnExpression<DateTime>(dateTime.Value);
         return new ConstantColumnExpression<string>(literal.StringWithoutQuotes);
     }
 
