@@ -27,13 +27,17 @@ internal class XlBlockList : IXlBlockCopyableObject<XlBlockList>, IXlBlockArraya
         [typeof(object)] = ListGenerator<object>(),
         [typeof(string)] = ListGenerator<string>(),
         [typeof(double)] = ListGenerator<double>(),
+        [typeof(float)] = ListGenerator<float>(),
         [typeof(bool)] = ListGenerator<bool>(),
         [typeof(DateTime)] = ListGenerator<DateTime>(),
         [typeof(int)] = ListGenerator<int>(),
         [typeof(uint)] = ListGenerator<uint>(),
         [typeof(long)] = ListGenerator<long>(),
+        [typeof(ulong)] = ListGenerator<ulong>(),
         [typeof(short)] = ListGenerator<short>(),
         [typeof(ushort)] = ListGenerator<ushort>(),
+        [typeof(sbyte)] = ListGenerator<sbyte>(),
+        [typeof(byte)] = ListGenerator<byte>(),
         [typeof(decimal)] = ListGenerator<decimal>()
     };
 
@@ -49,13 +53,17 @@ internal class XlBlockList : IXlBlockCopyableObject<XlBlockList>, IXlBlockArraya
         [typeof(object)] = GenerateSortDelegate<object>((a, b) => string.Compare(a.ToString(), b.ToString())),
         [typeof(string)] = GenerateSortDelegate<string>(Comparer<string>.Default.Compare),
         [typeof(double)] = GenerateSortDelegate<double>(Comparer<double>.Default.Compare),
+        [typeof(float)] = GenerateSortDelegate<float>(Comparer<float>.Default.Compare),
         [typeof(bool)] = GenerateSortDelegate<bool>(Comparer<bool>.Default.Compare),
         [typeof(DateTime)] = GenerateSortDelegate<DateTime>(Comparer<DateTime>.Default.Compare),
         [typeof(int)] = GenerateSortDelegate<int>(Comparer<int>.Default.Compare),
         [typeof(uint)] = GenerateSortDelegate<uint>(Comparer<uint>.Default.Compare),
         [typeof(long)] = GenerateSortDelegate<long>(Comparer<long>.Default.Compare),
+        [typeof(ulong)] = GenerateSortDelegate<ulong>(Comparer<ulong>.Default.Compare),
         [typeof(short)] = GenerateSortDelegate<short>((a, b) => a.CompareTo(b)),
         [typeof(ushort)] = GenerateSortDelegate<ushort>(Comparer<ushort>.Default.Compare),
+        [typeof(sbyte)] = GenerateSortDelegate<sbyte>(Comparer<sbyte>.Default.Compare),
+        [typeof(byte)] = GenerateSortDelegate<byte>(Comparer<byte>.Default.Compare),
         [typeof(decimal)] = GenerateSortDelegate<decimal>(Comparer<decimal>.Default.Compare)
     };
 
@@ -71,13 +79,17 @@ internal class XlBlockList : IXlBlockCopyableObject<XlBlockList>, IXlBlockArraya
         [typeof(object)] = GenerateTakeSkipDelegate<object>(),
         [typeof(string)] = GenerateTakeSkipDelegate<string>(),
         [typeof(double)] = GenerateTakeSkipDelegate<double>(),
+        [typeof(float)] = GenerateTakeSkipDelegate<float>(),
         [typeof(bool)] = GenerateTakeSkipDelegate<bool>(),
         [typeof(DateTime)] = GenerateTakeSkipDelegate<DateTime>(),
         [typeof(int)] = GenerateTakeSkipDelegate<int>(),
         [typeof(uint)] = GenerateTakeSkipDelegate<uint>(),
         [typeof(long)] = GenerateTakeSkipDelegate<long>(),
+        [typeof(ulong)] = GenerateTakeSkipDelegate<ulong>(),
         [typeof(short)] = GenerateTakeSkipDelegate<short>(),
         [typeof(ushort)] = GenerateTakeSkipDelegate<ushort>(),
+        [typeof(sbyte)] = GenerateTakeSkipDelegate<sbyte>(),
+        [typeof(byte)] = GenerateTakeSkipDelegate<byte>(),
         [typeof(decimal)] = GenerateTakeSkipDelegate<decimal>()
     };
 
@@ -266,6 +278,15 @@ internal class XlBlockList : IXlBlockCopyableObject<XlBlockList>, IXlBlockArraya
 
             typedList.Add(result.ConvertedInput);
         }
+
+        return new XlBlockList(typedList);
+    }
+
+    internal static XlBlockList BuildTyped(IEnumerable<object> items, Type type)
+    {
+        var typedList = _generatorDelegates[type](null);
+        foreach (var item in items)
+            typedList.Add(item);
 
         return new XlBlockList(typedList);
     }

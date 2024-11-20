@@ -384,6 +384,11 @@ public class ParserTests
     [InlineData("'One' + '2' + 'Three'", "'One2Three'")]
     [InlineData("'One' + 2 + 'Three'", "'One2Three'")]
 
+    // date comparisons
+    [InlineData("'2022-01-01' > '2023-01-01'", "FALSE")]
+    [InlineData("'2022-01-01' == '2023-01-01'", "FALSE")]
+    [InlineData("'2022-01-01' <= '2023-01-01'", "TRUE")]
+
     public void OrderOfOperationsAndAssociativity_Literals(string expression, string expected)
     {
         var expressionResult = ParseWithDataFrame(expression, _testData1);

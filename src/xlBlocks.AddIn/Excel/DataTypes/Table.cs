@@ -49,12 +49,25 @@ internal static class DataTypes_Table
     public static object[,] XBTable_GetColumn(
         [ExcelArgument(Description = "A table"), CacheContents(AsReference = true)] XlBlockTable table,
         [ExcelArgument(Description = "The column name or number")] object columnNameOrNumber,
-        [ExcelArgument(Description = "Include header in output (TRUE)")] bool includeHeader = true)
+        [ExcelArgument(Description = "Include header in output (FALSE)")] bool includeHeader = false)
     {
         if (columnNameOrNumber is double columnNumber)
             return table.AsArray(includeHeader, columnNumber: (int)columnNumber);
 
         return table.AsArray(includeHeader, columnName: columnNameOrNumber.ToString());
+    }
+
+    [return: CacheContents]
+    [ExcelFunction(Description = "Get a column in a table as a list", IsThreadSafe = true)]
+    public static XlBlockList XBTable_GetColumnAsList(
+        [ExcelArgument(Description = "A table"), CacheContents(AsReference = true)] XlBlockTable table,
+        [ExcelArgument(Description = "The column name or number")] object columnNameOrNumber,
+        [ExcelArgument(Description = "Include header in output (FALSE)")] bool includeHeader = false)
+    {
+        if (columnNameOrNumber is double columnNumber)
+            return table.GetColumnAsList((int)columnNumber);
+
+        return table.GetColumnAsList(columnNameOrNumber.ToString());
     }
 
     [ExcelFunction(Description = "Get the column names of a table", IsThreadSafe = true)]

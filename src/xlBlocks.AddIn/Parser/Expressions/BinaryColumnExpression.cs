@@ -78,12 +78,12 @@ internal sealed class BinaryColumnExpression : IColumnExpression
                 DataFrameExpressionToken.OR => left.OrSafe(right),
                 DataFrameExpressionToken.XOR => left.XorSafe(right),
 
-                DataFrameExpressionToken.COMP_EQUALS => left.ElementwiseEquals(right),
-                DataFrameExpressionToken.COMP_NOTEQUALS => left.ElementwiseNotEquals(right),
-                DataFrameExpressionToken.COMP_LT => left.ElementwiseLessThan(right),
-                DataFrameExpressionToken.COMP_GT => left.ElementwiseGreaterThan(right),
-                DataFrameExpressionToken.COMP_LTE => left.ElementwiseLessThanOrEqual(right),
-                DataFrameExpressionToken.COMP_GTE => left.ElementwiseGreaterThanOrEqual(right),
+                DataFrameExpressionToken.COMP_EQUALS => left.ElementwiseEqualsDateAware(right),
+                DataFrameExpressionToken.COMP_NOTEQUALS => left.ElementwiseNotEqualsDateAware(right),
+                DataFrameExpressionToken.COMP_LT => left.ElementwiseLessThanDateAware(right),
+                DataFrameExpressionToken.COMP_GT => left.ElementwiseGreaterThanDateAware(right),
+                DataFrameExpressionToken.COMP_LTE => left.ElementwiseLessThanOrEqualDateAware(right),
+                DataFrameExpressionToken.COMP_GTE => left.ElementwiseGreaterThanOrEqualDateAware(right),
                 _ => throw new DataFrameExpressionException($"no binary operation defined for token {_opToken.Label}"),
             };
         }
