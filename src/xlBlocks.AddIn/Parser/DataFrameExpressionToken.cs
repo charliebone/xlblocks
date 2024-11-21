@@ -12,6 +12,10 @@ public enum DataFrameExpressionToken
     IDENTIFIER,
 
     [LexemeLabel("en", "numeric literal")]
+    [Int]
+    INT,
+
+    [LexemeLabel("en", "numeric literal")]
     [Double]
     NUMBER,
 

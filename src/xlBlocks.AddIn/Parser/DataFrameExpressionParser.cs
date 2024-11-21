@@ -98,6 +98,13 @@ internal class DataFrameExpressionParser
     }
 
     [Operand]
+    [Production("literal : INT")]
+    public IColumnExpression Literal_INT(Token<DataFrameExpressionToken> literal)
+    {
+        return new ConstantColumnExpression<double>(literal.IntValue);
+    }
+
+    [Operand]
     [Production("literal : NUMBER")]
     public IColumnExpression Literal_NUMBER(Token<DataFrameExpressionToken> literal)
     {
