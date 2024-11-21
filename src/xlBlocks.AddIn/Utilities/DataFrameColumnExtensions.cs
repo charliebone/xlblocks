@@ -852,13 +852,12 @@ internal static class DataFrameColumnExtensions
             var result = inPlace ? left : left.Clone();
             for (var i = 0; i < result.Length; i++)
             {
-                if (leftPrim[i] == true && rightPrim[i] == true ||
-                    leftPrim[i] is not null && rightPrim[i] == true)
+                if (leftPrim[i] == true && rightPrim[i] == true)
                 {
                     result[i] = true;
                 }
-                else if (leftPrim[i] == false && rightPrim[i] is not null ||
-                    leftPrim[i] is not null && rightPrim[i] == false)
+                else if ((leftPrim[i] == false && rightPrim[i] is not null) ||
+                    (leftPrim[i] is not null && rightPrim[i] == false))
                 {
                     result[i] = false;
                 }
@@ -886,8 +885,8 @@ internal static class DataFrameColumnExtensions
             var result = inPlace ? left : left.Clone();
             for (var i = 0; i < result.Length; i++)
             {
-                if (leftPrim[i] == true && rightPrim[i] is not null ||
-                    leftPrim[i] is not null && rightPrim[i] == true)
+                if ((leftPrim[i] == true && rightPrim[i] is not null) ||
+                    (leftPrim[i] is not null && rightPrim[i] == true))
                 {
                     result[i] = true;
                 }
@@ -919,13 +918,13 @@ internal static class DataFrameColumnExtensions
             var result = inPlace ? left : left.Clone();
             for (var i = 0; i < result.Length; i++)
             {
-                if (leftPrim[i] == true && rightPrim[i] == false ||
-                    leftPrim[i] == false && rightPrim[i] == true)
+                if ((leftPrim[i] == true && rightPrim[i] == false) ||
+                    (leftPrim[i] == false && rightPrim[i] == true))
                 {
                     result[i] = true;
                 }
-                else if (leftPrim[i] == true && rightPrim[i] == true ||
-                    leftPrim[i] == false && rightPrim[i] == false)
+                else if ((leftPrim[i] == true && rightPrim[i] == true) ||
+                    (leftPrim[i] == false && rightPrim[i] == false))
                 {
                     result[i] = false;
                 }
