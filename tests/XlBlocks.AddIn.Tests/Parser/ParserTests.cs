@@ -388,7 +388,6 @@ public class ParserTests
     [InlineData("'2022-01-01' > '2023-01-01'", "FALSE")]
     [InlineData("'2022-01-01' == '2023-01-01'", "FALSE")]
     [InlineData("'2022-01-01' <= '2023-01-01'", "TRUE")]
-
     public void OrderOfOperationsAndAssociativity_Literals(string expression, string expected)
     {
         var expressionResult = ParseWithDataFrame(expression, _testData1);
@@ -517,6 +516,16 @@ public class ParserTests
         expected = _testData1.Columns["Age"].ElementwiseGreaterThanOrEqual(30).ElementwiseIfThenElse(
             DataFrameUtilities.CreateConstantDataFrameColumn("Over30", _testData1.Rows.Count),
             _testData1.Columns["Age"]);
+        DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
+    }
+
+    [Fact]
+    public void Functions_IIF_WithNullLiteral()
+    {
+        result = ParseWithDataFrame("IIF([Age] > 30, 'Over30', NULL)", _testData1);
+        expected = _testData1.Columns["Age"].ElementwiseGreaterThan(30).ElementwiseIfThenElse(
+            DataFrameUtilities.CreateConstantDataFrameColumn("Over30", _testData1.Rows.Count),
+            DataFrameUtilities.CreateConstantDataFrameColumn<string>(null!, _testData1.Rows.Count));
         DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
     }
 
