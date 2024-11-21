@@ -559,7 +559,7 @@ internal class XlBlockTable : IXlBlockCopyableObject<XlBlockTable>, IXlBlockArra
                 var converted = column.Cast<object>().ConvertToProvidedType(type)
                     .Select((x, row) =>
                     {
-                        if (x.Input is null)
+                        if (x.Input is null || (x.Input is string stringInput && string.IsNullOrEmpty(stringInput)))
                             return null;
 
                         if (!x.Success)

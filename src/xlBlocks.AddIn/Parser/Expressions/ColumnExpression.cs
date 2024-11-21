@@ -15,7 +15,7 @@ internal sealed class ColumnExpression : IColumnExpression
 
     public DataFrameColumn Evaluate(DataFrameContext context)
     {
-        return context.DataFrame[_columnName];
+        return context.DataFrame[_columnName].Clone();
     }
 }
 

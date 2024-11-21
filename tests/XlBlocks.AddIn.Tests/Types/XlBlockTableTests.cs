@@ -1876,6 +1876,33 @@ public class XlBlockTableTests
     }
 
     [Fact]
+    public void Project_NullOrBlank_ToDateTime()
+    {
+        var tableWithDates = XlBlockTable.Build(XlBlockRange.Build(
+            new object[,]
+            {
+                { "ID", "Name", "Birthday" },
+                { 1, "Alice", "1980-01-23" },
+                { 2, "Bob", null! },
+                { 3, "Charlie", "" }
+            }));
+
+        var currentColumns = XlBlockRange.Build(new object[,] { { "ID" }, { "Name" }, { "Birthday" } });
+        var newTypes = XlBlockRange.Build(new object[,] { { "integer" }, { "string" }, { "DateTime" } });
+
+        var result = tableWithDates.Project(currentColumns, null, newTypes);
+
+        object[,] expectedResult =
+        {
+            { "ID", "Name", "Birthday" },
+            { 1, "Alice", new DateTime(1980, 1, 23) },
+            { 2, "Bob", null! },
+            { 3, "Charlie", null! }
+        };
+        AssertTableMatchesExpected(expectedResult, result);
+    }
+
+    [Fact]
     public void Project_TypeConversionError_SortTestTable_ThrowsException()
     {
         var currentColumns = XlBlockRange.Build(new object[,] { { "Category" } });
