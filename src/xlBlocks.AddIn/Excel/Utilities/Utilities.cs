@@ -13,8 +13,21 @@ internal static class Utilities
     }
 
     [ExcelFunction(Description = "Get the XlBlocks version string")]
-    public static object? XBUtils_GetVersion()
+    public static string? XBUtils_GetVersion()
     {
         return XlBlocksAddIn.Version;
+    }
+
+    [ExcelFunction(Description = "Get the username of the current user")]
+    public static string XBUtils_GetUsername(
+        [ExcelArgument(Description = "Include the domain name in the username (FALSE)")] bool includeDomain = false)
+    {
+        return $"{(includeDomain ? $"{Environment.UserDomainName}\\" : "")}{Environment.UserName}";
+    }
+
+    [ExcelFunction(Description = "Get the name of the current machine")]
+    public static string XBUtils_GetMachineName()
+    {
+        return Environment.MachineName;
     }
 }

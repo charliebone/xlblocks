@@ -539,6 +539,18 @@ public class ParserTests
         DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
     }
 
+    [Fact]
+    public void Functions_Round_Test()
+    {
+        result = ParseWithDataFrame("ROUND([Age] / 2)", _testData1);
+        expected = _testData2.Columns["Age"].Divide(2d).ElementwiseRound();
+        DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
+
+        result = ParseWithDataFrame("ROUND([Age] / 2, 1)", _testData1);
+        expected = _testData2.Columns["Age"].Divide(2d).ElementwiseRound(DataFrameUtilities.CreateConstantDataFrameColumn(1, _testData1.Rows.Count));
+        DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
+    }
+
     #endregion
 
     #region Misc tests

@@ -36,6 +36,8 @@ internal sealed class FunctionCallExpression : IColumnExpression
                     return ParserFunctions.Exp(context, _arguments);
                 case "LOG":
                     return ParserFunctions.Log(context, _arguments);
+                case "ROUND":
+                    return ParserFunctions.Round(context, _arguments);
                 case "SUBSTRING":
                     return ParserFunctions.Substring(context, _arguments);
                 case "LEFT":
