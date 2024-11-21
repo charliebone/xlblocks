@@ -1,17 +1,6 @@
-﻿namespace XlBlocks.AddIn.Parser.Expressions;
+﻿namespace XlBlocks.AddIn.Utilities;
 
 using Microsoft.Data.Analysis;
-using XlBlocks.AddIn.Parser;
-
-internal sealed class NullExpression : IColumnExpression
-{
-    public NullExpression() { }
-
-    public DataFrameColumn Evaluate(DataFrameContext context)
-    {
-        return new NullDataFrameColumn(true);
-    }
-}
 
 internal sealed class NullDataFrameColumn : PrimitiveDataFrameColumn<bool>
 {

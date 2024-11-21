@@ -3,6 +3,7 @@
 using Microsoft.Data.Analysis;
 using sly.lexer;
 using XlBlocks.AddIn.Parser;
+using XlBlocks.AddIn.Utilities;
 
 internal sealed class UnaryColumnExpression : IColumnExpression
 {

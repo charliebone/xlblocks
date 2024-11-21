@@ -101,7 +101,7 @@ internal class DataFrameExpressionParser
     [Production("literal : INT")]
     public IColumnExpression Literal_INT(Token<DataFrameExpressionToken> literal)
     {
-        return new ConstantColumnExpression<int>(literal.IntValue);
+        return new ConstantColumnExpression<double>(literal.IntValue);
     }
 
     [Operand]

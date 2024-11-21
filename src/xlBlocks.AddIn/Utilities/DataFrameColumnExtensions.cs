@@ -17,16 +17,25 @@ internal static class DataFrameColumnExtensions
         if (conditionalColumn is not PrimitiveDataFrameColumn<bool> boolConditional)
             throw new ArgumentException("Conditional must be boolean");
 
-        if (conditionalColumn.Length != trueColumn.Length || conditionalColumn.Length != falseColumn.Length)
+        if ((trueColumn is not NullDataFrameColumn && conditionalColumn.Length != trueColumn.Length) ||
+            (falseColumn is not NullDataFrameColumn && conditionalColumn.Length != falseColumn.Length))
             throw new ArgumentException("Input columns must be the same length");
 
         var result = GetOutputColumn(trueColumn, falseColumn, "ifthen");
         for (var i = 0L; i < conditionalColumn.Length; i++)
         {
             if (boolConditional[i] == true)
+            {
+                if (trueColumn is NullDataFrameColumn)
+                    continue;
                 result[i] = result.DataType == typeof(string) ? trueColumn[i]?.ToString() : trueColumn[i];
+            }
             else if (boolConditional[i] == false)
+            {
+                if (falseColumn is NullDataFrameColumn)
+                    continue;
                 result[i] = result.DataType == typeof(string) ? falseColumn[i]?.ToString() : falseColumn[i];
+            }
         }
 
         return result;
