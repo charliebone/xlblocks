@@ -200,6 +200,49 @@ internal static class DataFrameColumnExtensions
         return result;
     }
 
+    internal static DataFrameColumn ElementwiseRound(this DataFrameColumn column)
+    {
+        if (!column.IsNumericColumn())
+            throw new ArgumentException("Input must be numeric");
+
+        var doubleColumn = new PseudoDoubleDataFrameColumn(column);
+        var result = new DoubleDataFrameColumn("log", column.Length);
+        for (var i = 0L; i < column.Length; i++)
+        {
+            var doubleValue = doubleColumn[i];
+            if (doubleValue is null)
+                continue;
+
+            result[i] = Math.Round(doubleValue.Value);
+        }
+
+        return result;
+    }
+
+    internal static DataFrameColumn ElementwiseRound(this DataFrameColumn column, DataFrameColumn digitsColumn)
+    {
+        if (column.Length != digitsColumn.Length)
+            throw new ArgumentException("Input columns must be the same length");
+
+        if (!column.IsNumericColumn() || !digitsColumn.IsNumericColumn())
+            throw new ArgumentException("Inputs must be numeric");
+
+        var doubleColumn = new PseudoDoubleDataFrameColumn(column);
+        var doubleDigitsColumn = new PseudoDoubleDataFrameColumn(digitsColumn);
+        var result = new DoubleDataFrameColumn("log", column.Length);
+        for (var i = 0L; i < column.Length; i++)
+        {
+            var doubleValue = doubleColumn[i];
+            var digitsValue = doubleDigitsColumn[i];
+            if (doubleValue is null || digitsValue is null)
+                continue;
+
+            result[i] = Math.Round(doubleValue.Value, (int)digitsValue.Value);
+        }
+
+        return result;
+    }
+
     #region String functions
 
     internal static DataFrameColumn ElementwiseConcat(this DataFrameColumn column, DataFrameColumn otherColumn)
