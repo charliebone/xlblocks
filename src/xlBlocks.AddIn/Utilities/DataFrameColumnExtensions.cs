@@ -159,7 +159,7 @@ internal static class DataFrameColumnExtensions
     }
 
     private static double? Log(double? x) => x is not null ? Math.Log(x.Value) : null;
-    private static double? Log(double? x, double? y) => (x is not null && y is not null) ? Math.Pow(x.Value, y.Value) : null;
+    private static double? Log(double? x, double? y) => (x is not null && y is not null) ? Math.Log(x.Value, y.Value) : null;
     internal static DataFrameColumn ElementwiseLog(this DataFrameColumn column)
     {
         if (!column.IsNumericColumn())
@@ -237,7 +237,10 @@ internal static class DataFrameColumnExtensions
             if (doubleValue is null || digitsValue is null)
                 continue;
 
-            result[i] = Math.Round(doubleValue.Value, (int)digitsValue.Value);
+            if (digitsValue.Value < 0)
+                result[i] = Math.Round(doubleValue.Value / Math.Pow(10, -digitsValue.Value)) * Math.Pow(10, -digitsValue.Value);
+            else
+                result[i] = Math.Round(doubleValue.Value, (int)digitsValue.Value);
         }
 
         return result;
@@ -335,16 +338,19 @@ internal static class DataFrameColumnExtensions
         if (!startIndexColumn.IsNumericColumn())
             throw new ArgumentException("Start index must be numeric");
 
+        var doubleStartIndexColumn = new PseudoDoubleDataFrameColumn(startIndexColumn);
         var result = new StringDataFrameColumn(column.Name, column.Length);
         for (var i = 0L; i < stringColumn.Length; i++)
         {
-            if (stringColumn[i] is null || startIndexColumn[i] is null)
+            var strValue = stringColumn[i];
+            var doubleStartIndex = doubleStartIndexColumn[i];
+            if (strValue is null || doubleStartIndex is null)
                 continue;
 
-            if ((int)startIndexColumn[i] >= stringColumn[i].Length)
+            if ((int)doubleStartIndex.Value >= strValue.Length)
                 result[i] = string.Empty;
             else
-                result[i] = stringColumn[i][(int)startIndexColumn[i]..];
+                result[i] = strValue[(int)doubleStartIndex.Value..];
         }
 
         return result;
@@ -361,18 +367,23 @@ internal static class DataFrameColumnExtensions
         if (!lengthColumn.IsNumericColumn())
             throw new ArgumentException("Length must be numeric");
 
+        var doubleStartIndexColumn = new PseudoDoubleDataFrameColumn(startIndexColumn);
+        var doubleLengthColumn = new PseudoDoubleDataFrameColumn(lengthColumn);
         var result = new StringDataFrameColumn(column.Name, column.Length);
         for (var i = 0L; i < stringColumn.Length; i++)
         {
-            if (stringColumn[i] is null || startIndexColumn[i] is null || lengthColumn[i] is null)
+            var strValue = stringColumn[i];
+            var doubleStartIndex = doubleStartIndexColumn[i];
+            var doubleLength = doubleLengthColumn[i];
+            if (strValue is null || doubleStartIndex is null || doubleLength is null)
                 continue;
 
-            if ((int)lengthColumn[i] == 0)
+            if ((int)doubleLength.Value == 0)
                 result[i] = string.Empty;
-            else if ((int)startIndexColumn[i] >= stringColumn[i].Length)
+            else if ((int)doubleStartIndex.Value >= strValue.Length)
                 result[i] = string.Empty;
             else
-                result[i] = stringColumn[i].Substring((int)startIndexColumn[i], Math.Min((int)lengthColumn[i], stringColumn[i].Length - (int)startIndexColumn[i]));
+                result[i] = strValue.Substring((int)doubleStartIndex.Value, Math.Min((int)doubleLength.Value, strValue.Length - (int)doubleStartIndex.Value));
         }
 
         return result;
@@ -386,18 +397,21 @@ internal static class DataFrameColumnExtensions
         if (!lengthColumn.IsNumericColumn())
             throw new ArgumentException("Length must be numeric");
 
+        var doubleLengthColumn = new PseudoDoubleDataFrameColumn(lengthColumn);
         var result = new StringDataFrameColumn(column.Name, column.Length);
         for (var i = 0L; i < stringColumn.Length; i++)
         {
-            if (stringColumn[i] is null || lengthColumn[i] is null)
+            var strValue = stringColumn[i];
+            var doubleLength = doubleLengthColumn[i];
+            if (strValue is null || doubleLength is null)
                 continue;
 
-            if ((int)lengthColumn[i] == 0)
+            if ((int)doubleLength.Value == 0)
                 result[i] = string.Empty;
-            else if ((int)lengthColumn[i] >= stringColumn[i].Length)
-                result[i] = stringColumn[i];
+            else if ((int)doubleLength.Value >= strValue.Length)
+                result[i] = strValue;
             else
-                result[i] = stringColumn[i][..(int)lengthColumn[i]];
+                result[i] = strValue[..(int)doubleLength.Value];
         }
 
         return result;
@@ -411,18 +425,21 @@ internal static class DataFrameColumnExtensions
         if (!lengthColumn.IsNumericColumn())
             throw new ArgumentException("Length must be numeric");
 
+        var doubleLengthColumn = new PseudoDoubleDataFrameColumn(lengthColumn);
         var result = new StringDataFrameColumn(column.Name, column.Length);
         for (var i = 0L; i < stringColumn.Length; i++)
         {
-            if (stringColumn[i] is null || lengthColumn[i] is null)
+            var strValue = stringColumn[i];
+            var doubleLength = doubleLengthColumn[i];
+            if (strValue is null || doubleLength is null)
                 continue;
 
-            if ((int)lengthColumn[i] == 0)
+            if ((int)doubleLength.Value == 0)
                 result[i] = string.Empty;
-            else if ((int)lengthColumn[i] >= stringColumn[i].Length)
-                result[i] = stringColumn[i];
+            else if ((int)doubleLength.Value >= strValue.Length)
+                result[i] = strValue;
             else
-                result[i] = stringColumn[i][(stringColumn[i].Length - (int)lengthColumn[i])..];
+                result[i] = strValue[(strValue.Length - (int)doubleLength.Value)..];
         }
 
         return result;

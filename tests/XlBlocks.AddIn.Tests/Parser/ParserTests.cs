@@ -540,14 +540,30 @@ public class ParserTests
     }
 
     [Fact]
-    public void Functions_Round_Test()
+    public void Functions_ROUND_Test()
     {
         result = ParseWithDataFrame("ROUND([Age] / 2)", _testData1);
         expected = _testData2.Columns["Age"].Divide(2d).ElementwiseRound();
         DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
 
         result = ParseWithDataFrame("ROUND([Age] / 2, 1)", _testData1);
-        expected = _testData2.Columns["Age"].Divide(2d).ElementwiseRound(DataFrameUtilities.CreateConstantDataFrameColumn(1, _testData1.Rows.Count));
+        expected = _testData2.Columns["Age"].Divide(2d).ElementwiseRound(
+            DataFrameUtilities.CreateConstantDataFrameColumn(1, _testData1.Rows.Count));
+        DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
+    }
+
+    [Fact]
+    public void Functions_SUBSTRING_Test()
+    {
+        result = ParseWithDataFrame("SUBSTRING([Name], 5)", _testData1);
+        expected = _testData2.Columns["Name"].ElementwiseSubstring(
+            DataFrameUtilities.CreateConstantDataFrameColumn(5, _testData1.Rows.Count));
+        DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
+
+        result = ParseWithDataFrame("SUBSTRING([Name], 2, 3)", _testData1);
+        expected = _testData2.Columns["Name"].ElementwiseSubstring(
+            DataFrameUtilities.CreateConstantDataFrameColumn(2, _testData1.Rows.Count),
+            DataFrameUtilities.CreateConstantDataFrameColumn(3, _testData1.Rows.Count));
         DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
     }
 
