@@ -465,11 +465,20 @@ public class ParserTests
     }
 
     [Fact]
-    public void StringConcat_Tests()
+    public void StringTests_Concat()
     {
         result = ParseWithDataFrame("[Name] + ' aka ' + [Nickname]", _testData1);
         expected = _testData1.Columns["Name"]
             .ElementwiseConcat(DataFrameUtilities.CreateConstantDataFrameColumn(" aka ", _testData1.Rows.Count))
+            .ElementwiseConcat(_testData1.Columns["Nickname"]);
+        DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
+    }
+
+    [Fact]
+    public void StringTests_EmptyLiteral()
+    {
+        result = ParseWithDataFrame("[Name] + '' + [Nickname]", _testData1);
+        expected = _testData1.Columns["Name"]
             .ElementwiseConcat(_testData1.Columns["Nickname"]);
         DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
     }
