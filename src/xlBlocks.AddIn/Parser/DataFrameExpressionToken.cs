@@ -11,10 +11,6 @@ public enum DataFrameExpressionToken
     [Lexeme(GenericToken.Identifier, IdentifierType.Custom, "_A-Za-z\\.", "-_0-9A-Za-z\\.")]
     IDENTIFIER,
 
-    [LexemeLabel("en", "integer literal")]
-    [Int]
-    INT,
-
     [LexemeLabel("en", "numeric literal")]
     [Double]
     NUMBER,
