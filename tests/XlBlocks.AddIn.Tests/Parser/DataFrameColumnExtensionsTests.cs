@@ -12,12 +12,12 @@ public class DataFrameColumnExtensionsTests
     private static readonly DataFrame _testData = DataFrameUtilities.ToDataFrame(
             new object[,]
             {
-                { "Id", "Name", "Age", "Nickname", "Email", "Comment" },
-                { 1, "Alice", 30, "Liz", "Liz_O@notarealdomain.org", "This is a comment " },
-                { 2, "Bob", 25, null!, "Bob$t*r@somerandom.tld", " I have a leading space" },
-                { 3, "Charlie", 35, "Chuck", "percent%test@notarealdomain.org", null! }
+                { "Id", "Name", "Age", "Nickname", "Email", "Comment", "Score" },
+                { 1, "Alice", 30, "Liz", "Liz_O@notarealdomain.org", "This is a comment ", 78.92 },
+                { 2, "Bob", 25, null!, "Bob$t*r@somerandom.tld", " I have a leading space", 27.34 },
+                { 3, "Charlie", 35, "Chuck", "percent%test@notarealdomain.org", null!, 98.765 }
             },
-            new[] { typeof(int), typeof(string), typeof(int), typeof(string), typeof(string), typeof(string) });
+            new[] { typeof(int), typeof(string), typeof(int), typeof(string), typeof(string), typeof(string), typeof(double) });
 
     private static DataFrameColumn ConstantColumn<T>(T obj) => DataFrameUtilities.CreateConstantDataFrameColumn(obj, _testData.Rows.Count);
 
@@ -94,6 +94,50 @@ public class DataFrameColumnExtensionsTests
     }
 
     [Fact]
+    public void Elementwise_Len_Tests()
+    {
+        result = _testData["Name"].ElementwiseLength();
+        expected = DataFrameUtilities.CreateDataFrameColumn(new object[] { 5, 3, 7 }, typeof(int));
+        DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
+
+        result = _testData["Nickname"].ElementwiseLength();
+        expected = DataFrameUtilities.CreateDataFrameColumn(new object[] { 3, null!, 5 }, typeof(int));
+        DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
+    }
+
+    [Fact]
+    public void Elementwise_ExpLog_Tests()
+    {
+        result = _testData["Age"].ElementwiseExponent(DataFrameUtilities.CreateConstantDataFrameColumn(2, _testData.Rows.Count));
+        expected = DataFrameUtilities.CreateDataFrameColumn(new[] { Math.Pow(30, 2), Math.Pow(25, 2), Math.Pow(35, 2) });
+        DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
+
+        result = _testData["Age"].ElementwiseLog();
+        expected = DataFrameUtilities.CreateDataFrameColumn(new[] { Math.Log(30), Math.Log(25), Math.Log(35) });
+        DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
+
+        result = _testData["Age"].ElementwiseLog(DataFrameUtilities.CreateConstantDataFrameColumn(10, _testData.Rows.Count));
+        expected = DataFrameUtilities.CreateDataFrameColumn(new[] { Math.Log(30, 10), Math.Log(25, 10), Math.Log(35, 10) });
+        DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
+    }
+
+    [Fact]
+    public void Elementwise_Round_Tests()
+    {
+        result = _testData["Score"].ElementwiseRound();
+        expected = DataFrameUtilities.CreateDataFrameColumn(new[] { Math.Round(78.92), Math.Round(27.34), Math.Round(98.765) });
+        DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
+
+        result = _testData["Score"].ElementwiseRound(DataFrameUtilities.CreateConstantDataFrameColumn(1, _testData.Rows.Count));
+        expected = DataFrameUtilities.CreateDataFrameColumn(new[] { Math.Round(78.92, 1), Math.Round(27.34, 1), Math.Round(98.765, 1) });
+        DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
+
+        result = _testData["Score"].ElementwiseRound(DataFrameUtilities.CreateConstantDataFrameColumn(-1, _testData.Rows.Count));
+        expected = DataFrameUtilities.CreateDataFrameColumn(new[] { 80, 30, 100 });
+        DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
+    }
+
+    [Fact]
     public void Elementwise_Substring_Tests()
     {
         result = _testData["Nickname"].ElementwiseSubstring(ConstantColumn(2));
@@ -138,6 +182,31 @@ public class DataFrameColumnExtensionsTests
 
         result = _testData["Comment"].ElementwiseTrim();
         expected = DataFrameUtilities.CreateDataFrameColumn(new[] { "This is a comment", "I have a leading space", null! });
+        DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
+    }
+
+    [Fact]
+    public void Elementwise_Replace_Tests()
+    {
+        result = _testData["Name"].ElementwiseReplace(
+            DataFrameUtilities.CreateConstantDataFrameColumn("Al", _testData.Rows.Count),
+            DataFrameUtilities.CreateConstantDataFrameColumn("Bc", _testData.Rows.Count),
+            null);
+        expected = DataFrameUtilities.CreateDataFrameColumn(new[] { "Bcice", "Bob", "Charlie" });
+        DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
+
+        result = _testData["Name"].ElementwiseReplace(
+            DataFrameUtilities.CreateConstantDataFrameColumn("al", _testData.Rows.Count),
+            DataFrameUtilities.CreateConstantDataFrameColumn("Bc", _testData.Rows.Count),
+            DataFrameUtilities.CreateConstantDataFrameColumn(false, _testData.Rows.Count));
+        expected = DataFrameUtilities.CreateDataFrameColumn(new[] { "Alice", "Bob", "Charlie" });
+        DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
+
+        result = _testData["Name"].ElementwiseReplace(
+            DataFrameUtilities.CreateConstantDataFrameColumn("li", _testData.Rows.Count),
+            DataFrameUtilities.CreateConstantDataFrameColumn("asdf", _testData.Rows.Count),
+            DataFrameUtilities.CreateConstantDataFrameColumn(true, _testData.Rows.Count));
+        expected = DataFrameUtilities.CreateDataFrameColumn(new[] { "Aasdfce", "Bob", "Charasdfe" });
         DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
     }
 
