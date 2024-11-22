@@ -22,6 +22,9 @@ internal static class DataFrameColumnExtensions
             throw new ArgumentException("Input columns must be the same length");
 
         var result = GetOutputColumn(trueColumn, falseColumn, "ifthen");
+        if (result is NullDataFrameColumn)
+            return new BooleanDataFrameColumn("ifthen", conditionalColumn.Length);
+
         for (var i = 0L; i < conditionalColumn.Length; i++)
         {
             if (boolConditional[i] == true)
@@ -721,7 +724,10 @@ internal static class DataFrameColumnExtensions
     private static DataFrameColumn GetOutputColumn(DataFrameColumn left, DataFrameColumn right, string columnName)
     {
         var outputType = DetermineOutputColumnType(left, right);
-        return DataFrameUtilities.CreateDataFrameColumn(outputType, columnName, left.Length);
+        if (outputType == typeof(NullDataFrameColumn))
+            return new NullDataFrameColumn(true);
+
+        return DataFrameUtilities.CreateDataFrameColumn(outputType, columnName, left is NullDataFrameColumn ? right.Length : left.Length);
     }
 
     private static bool IsIntegerType(Type type)
@@ -732,6 +738,15 @@ internal static class DataFrameColumnExtensions
 
     private static Type DetermineOutputColumnType(DataFrameColumn left, DataFrameColumn right)
     {
+        if (left is NullDataFrameColumn && right is NullDataFrameColumn)
+            return typeof(NullDataFrameColumn);
+
+        if (left is NullDataFrameColumn)
+            return right.DataType;
+
+        if (right is NullDataFrameColumn)
+            return left.DataType;
+
         if (left.DataType == right.DataType)
             return left.DataType;
 

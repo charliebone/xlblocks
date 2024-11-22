@@ -423,7 +423,10 @@ internal class XlBlockTable : IXlBlockCopyableObject<XlBlockTable>, IXlBlockArra
                 throw new ArgumentException($"error parsing expression for column '{columnNames[i]}': {string.Join("|", parsed.Errors.Select(x => x.ErrorMessage))}");
 
             var resultColumn = parsed.Result.Evaluate(context);
-            resultColumn.SetName(columnNames[i]);
+            if (resultColumn is NullDataFrameColumn)
+                resultColumn = new BooleanDataFrameColumn(columnNames[i], dataFrame.Rows.Count);
+            else
+                resultColumn.SetName(columnNames[i]);
 
             dataFrame.Columns.Add(resultColumn);
         }

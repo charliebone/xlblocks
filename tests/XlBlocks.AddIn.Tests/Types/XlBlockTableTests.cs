@@ -1058,6 +1058,42 @@ public class XlBlockTableTests
     }
 
     [Fact]
+    public void AppendColumnsWith_Null_Literals()
+    {
+        var columnNames = XlBlockRange.Build(new object[,] { { "SomethingNull" } });
+        var columnExpressions = XlBlockRange.Build(new object[,] { { "NULL" } });
+
+        var result = _employeeTable.AppendColumnsWith(columnNames, columnExpressions);
+
+        object[,] expectedResult =
+        {
+            { "ID", "Name", "Age", "SomethingNull" },
+            { 1d, "Alice", 30d, null! },
+            { 2d, "Bob", 25d, null! },
+            { 3d, "Charlie", 35d, null! }
+        };
+        AssertTableMatchesExpected(expectedResult, result);
+    }
+
+    [Fact]
+    public void AppendColumnsWith_IIF_NullLiterals()
+    {
+        var columnNames = XlBlockRange.Build(new object[,] { { "JuniorTag" } });
+        var columnExpressions = XlBlockRange.Build(new object[,] { { "IIF([Age] >= 30, NULL, 'Junior')" } });
+
+        var result = _employeeTable.AppendColumnsWith(columnNames, columnExpressions);
+
+        object[,] expectedResult =
+        {
+            { "ID", "Name", "Age", "JuniorTag" },
+            { 1d, "Alice", 30d, null! },
+            { 2d, "Bob", 25d, "Junior" },
+            { 3d, "Charlie", 35d, null! }
+        };
+        AssertTableMatchesExpected(expectedResult, result);
+    }
+
+    [Fact]
     public void AppendColumnsWith_ISNULL()
     {
         var columnNames = XlBlockRange.Build(new object[,] { { "CategoryOrDefault" } });
