@@ -74,9 +74,9 @@ internal sealed class BinaryColumnExpression : IColumnExpression
                 DataFrameExpressionToken.CARET => left.ElementwiseExponent(right),
 
                 // use safe extensions for logical comparisons
-                DataFrameExpressionToken.AND => left.AndSafe(right),
-                DataFrameExpressionToken.OR => left.OrSafe(right),
-                DataFrameExpressionToken.XOR => left.XorSafe(right),
+                DataFrameExpressionToken.AND => left.And(right),
+                DataFrameExpressionToken.OR => left.Or(right),
+                DataFrameExpressionToken.XOR => left.Xor(right),
 
                 DataFrameExpressionToken.COMP_EQUALS => left.ElementwiseEqualsDateAware(right),
                 DataFrameExpressionToken.COMP_NOTEQUALS => left.ElementwiseNotEqualsDateAware(right),

@@ -481,7 +481,7 @@ internal static class DataFrameColumnExtensions
             if (stringOldValueColumn[i] is null)
                 result[i] = stringColumn[i];
             else
-                result[i] = stringColumn[i]?.Replace(stringOldValueColumn[i], stringNewValueColumn[i], boolCaseSensitiveColumn[i] == true ? StringComparison.InvariantCultureIgnoreCase : StringComparison.InvariantCulture);
+                result[i] = stringColumn[i]?.Replace(stringOldValueColumn[i], stringNewValueColumn[i], boolCaseSensitiveColumn[i] == true ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal);
         }
 
         return result;
@@ -914,114 +914,4 @@ internal static class DataFrameColumnExtensions
     }
 
     #endregion
-
-    #region Safe logical comparisons
-
-    /*
-     * these methods are to circumvent bug in boxed DataFrameColumn boolean comparisons: https://github.com/dotnet/machinelearning/issues/7091
-     * it should be fixed in v0.21.2 of Microsoft.Data.Analysis
-     */
-
-    internal static DataFrameColumn AndSafe(this DataFrameColumn left, DataFrameColumn right, bool inPlace = false)
-    {
-        if (left is BooleanDataFrameColumn leftBool && right is BooleanDataFrameColumn rightBool)
-        {
-            return leftBool.And(rightBool, inPlace);
-        }
-        else if (left is PrimitiveDataFrameColumn<bool> leftPrim && right is PrimitiveDataFrameColumn<bool> rightPrim)
-        {
-            if (left.Length != right.Length)
-                throw new ArgumentException("Columns have mismatched length");
-
-            var result = inPlace ? left : left.Clone();
-            for (var i = 0; i < result.Length; i++)
-            {
-                if (leftPrim[i] == true && rightPrim[i] == true)
-                {
-                    result[i] = true;
-                }
-                else if ((leftPrim[i] == false && rightPrim[i] is not null) ||
-                    (leftPrim[i] is not null && rightPrim[i] == false))
-                {
-                    result[i] = false;
-                }
-                else
-                {
-                    result[i] = null;
-                }
-            }
-            return result;
-        }
-        return left.And(right, inPlace);
-    }
-
-    internal static DataFrameColumn OrSafe(this DataFrameColumn left, DataFrameColumn right, bool inPlace = false)
-    {
-        if (left is BooleanDataFrameColumn leftBool && right is BooleanDataFrameColumn rightBool)
-        {
-            return leftBool.Or(rightBool, inPlace);
-        }
-        else if (left is PrimitiveDataFrameColumn<bool> leftPrim && right is PrimitiveDataFrameColumn<bool> rightPrim)
-        {
-            if (left.Length != right.Length)
-                throw new ArgumentException("Columns have mismatched length");
-
-            var result = inPlace ? left : left.Clone();
-            for (var i = 0; i < result.Length; i++)
-            {
-                if ((leftPrim[i] == true && rightPrim[i] is not null) ||
-                    (leftPrim[i] is not null && rightPrim[i] == true))
-                {
-                    result[i] = true;
-                }
-                else if (leftPrim[i] == false && rightPrim[i] == false)
-                {
-                    result[i] = false;
-                }
-                else
-                {
-                    result[i] = null;
-                }
-            }
-            return result;
-        }
-        return left.Or(right, inPlace);
-    }
-
-    internal static DataFrameColumn XorSafe(this DataFrameColumn left, DataFrameColumn right, bool inPlace = false)
-    {
-        if (left is BooleanDataFrameColumn leftBool && right is BooleanDataFrameColumn rightBool)
-        {
-            return leftBool.Xor(rightBool, inPlace);
-        }
-        else if (left is PrimitiveDataFrameColumn<bool> leftPrim && right is PrimitiveDataFrameColumn<bool> rightPrim)
-        {
-            if (left.Length != right.Length)
-                throw new ArgumentException("Columns have mismatched length");
-
-            var result = inPlace ? left : left.Clone();
-            for (var i = 0; i < result.Length; i++)
-            {
-                if ((leftPrim[i] == true && rightPrim[i] == false) ||
-                    (leftPrim[i] == false && rightPrim[i] == true))
-                {
-                    result[i] = true;
-                }
-                else if ((leftPrim[i] == true && rightPrim[i] == true) ||
-                    (leftPrim[i] == false && rightPrim[i] == false))
-                {
-                    result[i] = false;
-                }
-                else
-                {
-                    result[i] = null;
-                }
-            }
-            return result;
-        }
-        return left.Xor(right, inPlace);
-    }
-
-    #endregion
-
 }

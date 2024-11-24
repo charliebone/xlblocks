@@ -29,7 +29,7 @@ internal sealed class InClauseExpression : IColumnExpression
 
         var result = args.Select(x => column.ElementwiseEquals(x))
             .Cast<DataFrameColumn>()
-            .Aggregate((x, y) => x.OrSafe(y));
+            .Aggregate((x, y) => x.Or(y));
 
         return result;
     }

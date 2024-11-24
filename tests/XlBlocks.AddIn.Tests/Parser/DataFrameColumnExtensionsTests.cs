@@ -34,6 +34,32 @@ public class DataFrameColumnExtensionsTests
     }
 
     [Fact]
+    public void Elementwise_BinaryOps()
+    {
+        // check that https://github.com/dotnet/machinelearning/issues/7091 is resolved
+        var dfTest = new DataFrame(
+            new BooleanDataFrameColumn("col1", new[] { true, false, true, false }),
+            new BooleanDataFrameColumn("col2", new[] { false, true, true, false }));
+        result = dfTest["col1"].And(dfTest["col2"]);
+        expected = DataFrameUtilities.CreateDataFrameColumn(new[] { false, false, true, false });
+        DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
+
+        dfTest = new DataFrame(
+            new BooleanDataFrameColumn("col1", new[] { true, false, true, false }),
+            new BooleanDataFrameColumn("col2", new[] { false, true, true, false }));
+        result = dfTest["col1"].Or(dfTest["col2"]);
+        expected = DataFrameUtilities.CreateDataFrameColumn(new[] { true, true, true, false });
+        DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
+
+        dfTest = new DataFrame(
+            new BooleanDataFrameColumn("col1", new[] { true, false, true, false }),
+            new BooleanDataFrameColumn("col2", new[] { false, true, true, false }));
+        result = dfTest["col1"].Xor(dfTest["col2"]);
+        expected = DataFrameUtilities.CreateDataFrameColumn(new[] { true, true, false, false });
+        DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
+    }
+
+    [Fact]
     public void Elementwise_Like_Tests()
     {
         result = _testData["Name"].ElementwiseLike("Bob");

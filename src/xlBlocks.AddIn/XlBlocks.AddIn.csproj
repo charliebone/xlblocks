@@ -42,12 +42,12 @@
     <PackageReference Include="ExcelDna.IntelliSense" Version="1.8.0" />
     <PackageReference Include="ExcelDna.Registration" Version="1.8.0" />
     <PackageReference Include="HexConverter" Version="1.1.1" />
-    <PackageReference Include="Microsoft.Data.Analysis" Version="0.21.1" />
+    <PackageReference Include="Microsoft.Data.Analysis" Version="0.22.0" />
     <PackageReference Include="murmurhash" Version="1.0.3" />
     <PackageReference Include="NLog" Version="5.3.4" />
-    <PackageReference Include="ReaLTaiizor" Version="3.8.0.7" />
-    <PackageReference Include="sly" Version="3.4.0" />
     <PackageReference Include="System.Management" Version="8.0.0" />
+    <PackageReference Include="ReaLTaiizor" Version="3.8.0.8" />
+    <PackageReference Include="sly" Version="3.4.6" />
     <PackageReference Include="System.Reactive" Version="6.0.1" />
   </ItemGroup>
 
