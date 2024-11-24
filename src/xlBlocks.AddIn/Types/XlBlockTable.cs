@@ -3,6 +3,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using ExcelDna.Integration;
 using Microsoft.Data.Analysis;
@@ -198,6 +199,19 @@ internal class XlBlockTable : IXlBlockCopyableObject<XlBlockTable>, IXlBlockArra
         return new XlBlockTable(dataFrame);
     }
 
+    private static Type GuessTypeFunction(IEnumerable<string> columnValues)
+    {
+        var guessConversions = columnValues
+            .Where(x => !string.IsNullOrEmpty(x) && !string.Equals(x, "null", StringComparison.OrdinalIgnoreCase))
+            .ConvertToBestTypes();
+
+        var determinedType = guessConversions.Where(x => !x.IsMissingOrError)
+            .Select(x => x.ConvertedType)
+            .DetermineBestType();
+
+        return determinedType;
+    }
+
     public static XlBlockTable BuildFromCsv(string csvPath, string separator, bool hasHeader, XlBlockRange? columnNameRange = null, XlBlockRange? columnTypeRange = null)
     {
         if (!File.Exists(csvPath))
@@ -212,7 +226,8 @@ internal class XlBlockTable : IXlBlockCopyableObject<XlBlockTable>, IXlBlockArra
         if (columnNames is not null && columnTypes is not null && columnNames.Length != columnTypes.Length)
             throw new ArgumentException("Column names and column types must be same length");
 
-        var dataFrame = DataFrame.LoadCsv(csvPath, separator[0], hasHeader, columnNames, columnTypes, addIndexColumn: false);
+        using var csvStream = new FileStream(csvPath, FileMode.Open);
+        var dataFrame = DataFrame.LoadCsv(csvStream, separator[0], hasHeader, columnNames, columnTypes, addIndexColumn: false, guessTypeFunction: GuessTypeFunction);
         return new XlBlockTable(dataFrame);
     }
 

@@ -3,7 +3,6 @@
 using System.Collections.Generic;
 using Microsoft.Data.Analysis;
 using XlBlocks.AddIn.Parser;
-using XlBlocks.AddIn.Utilities;
 
 internal sealed class InClauseExpression : IColumnExpression
 {
@@ -29,7 +28,7 @@ internal sealed class InClauseExpression : IColumnExpression
 
         var result = args.Select(x => column.ElementwiseEquals(x))
             .Cast<DataFrameColumn>()
-            .Aggregate((x, y) => x.OrSafe(y));
+            .Aggregate((x, y) => x.Or(y));
 
         return result;
     }

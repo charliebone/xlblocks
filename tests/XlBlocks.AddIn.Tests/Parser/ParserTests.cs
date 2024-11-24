@@ -286,16 +286,16 @@ public class ParserTests
 
         result = ParseWithDataFrame("[Name] IN ('Charlie','Gina','Adam','Alice')", _testData1);
         expected = _testData1.Columns["Name"].ElementwiseEquals("Charlie")
-            .OrSafe(_testData1.Columns["Name"].ElementwiseEquals("Gina"))
-            .OrSafe(_testData1.Columns["Name"].ElementwiseEquals("Adam"))
-            .OrSafe(_testData1.Columns["Name"].ElementwiseEquals("Alice"));
+            .Or(_testData1.Columns["Name"].ElementwiseEquals("Gina"))
+            .Or(_testData1.Columns["Name"].ElementwiseEquals("Adam"))
+            .Or(_testData1.Columns["Name"].ElementwiseEquals("Alice"));
         DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
 
         result = ParseWithDataFrame("[Name] IN ('Steve','Gina','Adam','Diane')", _testData1);
         expected = _testData1.Columns["Name"].ElementwiseEquals("Steve")
-            .OrSafe(_testData1.Columns["Name"].ElementwiseEquals("Gina"))
-            .OrSafe(_testData1.Columns["Name"].ElementwiseEquals("Adam"))
-            .OrSafe(_testData1.Columns["Name"].ElementwiseEquals("Diane"));
+            .Or(_testData1.Columns["Name"].ElementwiseEquals("Gina"))
+            .Or(_testData1.Columns["Name"].ElementwiseEquals("Adam"))
+            .Or(_testData1.Columns["Name"].ElementwiseEquals("Diane"));
         DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
     }
 

@@ -3,8 +3,9 @@
 using System.Collections;
 using Microsoft.Data.Analysis;
 
-internal class PseudoDoubleDataFrameColumn : DataFrameColumn
+internal class PseudoDoubleDataFrameColumn : PrimitiveDataFrameColumn<double>
 {
+    // consider inheriting from DataFrameColumn instead once ml.net v0.22 issue fix is release: https://github.com/dotnet/machinelearning/issues/7323
     private readonly PrimitiveDataFrameColumn<double>? _doubleColumn;
     private readonly PrimitiveDataFrameColumn<float>? _floatColumn;
     private readonly PrimitiveDataFrameColumn<decimal>? _decimalColumn;
@@ -29,7 +30,7 @@ internal class PseudoDoubleDataFrameColumn : DataFrameColumn
 
     public new double? this[long rowIndex] => _getValueDelegate(rowIndex);
 
-    public PseudoDoubleDataFrameColumn(DataFrameColumn column) : base(column.Name, column.Length, typeof(double))
+    public PseudoDoubleDataFrameColumn(DataFrameColumn column) : base(column.Name, column.Length)
     {
         _actualType = column.DataType;
 
