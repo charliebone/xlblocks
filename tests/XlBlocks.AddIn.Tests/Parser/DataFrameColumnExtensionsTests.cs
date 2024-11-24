@@ -267,4 +267,26 @@ public class DataFrameColumnExtensionsTests
         expected = DataFrameUtilities.CreateDataFrameColumn(new object[] { "ends in e", "Bob", "ends in e" }, typeof(string));
         DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
     }
+
+    [Fact]
+    public void Elementwise_Format_Tests()
+    {
+        result = _testData["Age"].ElementwiseFormat(ConstantColumn("0.00"));
+        expected = DataFrameUtilities.CreateDataFrameColumn(new[] { "30.00", "25.00", "35.00" });
+        DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
+
+        result = DataFrameUtilities.CreateDataFrameColumn(new[] { new DateTime(2024, 1, 23), new DateTime(2024, 12, 25), new DateTime(2024, 6, 17) })
+            .ElementwiseFormat(DataFrameUtilities.CreateDataFrameColumn("yyyy-MM-dd", result.Length));
+        expected = DataFrameUtilities.CreateDataFrameColumn(new[] { "2024-01-23", "2024-12-25", "2024-06-17" });
+        DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
+    }
+
+    [Fact]
+    public void Elementwise_ToDateTime_Tests()
+    {
+        result = DataFrameUtilities.CreateDataFrameColumn(new[] { "2024-01-23", "2024-12-25", "2024-06-17" })
+            .ElementwiseToDateTime(DataFrameUtilities.CreateDataFrameColumn("yyyy-MM-dd", 3));
+        expected = DataFrameUtilities.CreateDataFrameColumn(new[] { new DateTime(2024, 1, 23), new DateTime(2024, 12, 25), new DateTime(2024, 6, 17) });
+        DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
+    }
 }

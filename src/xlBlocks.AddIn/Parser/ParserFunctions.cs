@@ -190,5 +190,25 @@ internal static class ParserFunctions
         return expressionColumn.ElementwiseRegexReplace(patternColumn, replaceColumn);
     }
 
+    public static DataFrameColumn Format(DataFrameContext context, IList<IColumnExpression> argExpressions)
+    {
+        CheckArgCount(argExpressions, 2);
+
+        var expressionColumn = argExpressions[0].Evaluate(context);
+        var formatColumn = argExpressions[1].Evaluate(context);
+
+        return expressionColumn.ElementwiseFormat(formatColumn);
+    }
+
+    public static DataFrameColumn ToDateTime(DataFrameContext context, IList<IColumnExpression> argExpressions)
+    {
+        CheckArgCount(argExpressions, 2);
+
+        var expressionColumn = argExpressions[0].Evaluate(context);
+        var formatColumn = argExpressions[1].Evaluate(context);
+
+        return expressionColumn.ElementwiseToDateTime(formatColumn);
+    }
+
     #endregion
 }
