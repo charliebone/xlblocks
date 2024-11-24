@@ -296,7 +296,7 @@ public class XlBlockTableTests
         var dataRange = XlBlockRange.Build(new object[,]
         {
             { 1, "test", 3.14 },
-        { ExcelMissing.Value, "another", ExcelError.ExcelErrorNA }
+            { ExcelMissing.Value, "another", ExcelError.ExcelErrorNA }
         });
 
         var typeRange = XlBlockRange.Build(new object[,]
@@ -382,15 +382,18 @@ public class XlBlockTableTests
         var table = XlBlockTable.BuildFromCsv(csvPath, ",", true);
         Assert.Equal(12, table.RowCount);
         Assert.Equal(4, table.ColumnCount);
+        Assert.Equal(new[] { typeof(double), typeof(string), typeof(double), typeof(double) }, table.ColumnTypes);
     }
 
     [Fact]
     public void BuildFromCsv_SpecifiedTypes()
     {
         var csvPath = Path.Combine(Directory.GetCurrentDirectory(), "Types", "logData.csv");
-        var table = XlBlockTable.BuildFromCsv(csvPath, ",", true);
+        var columnTypes = XlBlockRange.Build(new object[,] { { "int", "str", "float", "Double" } });
+        var table = XlBlockTable.BuildFromCsv(csvPath, ",", true, null, columnTypes);
         Assert.Equal(12, table.RowCount);
         Assert.Equal(4, table.ColumnCount);
+        Assert.Equal(new[] { typeof(int), typeof(string), typeof(float), typeof(double) }, table.ColumnTypes);
     }
 
     #endregion

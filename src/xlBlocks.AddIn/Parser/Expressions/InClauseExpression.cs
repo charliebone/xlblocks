@@ -3,7 +3,6 @@
 using System.Collections.Generic;
 using Microsoft.Data.Analysis;
 using XlBlocks.AddIn.Parser;
-using XlBlocks.AddIn.Utilities;
 
 internal sealed class InClauseExpression : IColumnExpression
 {
