@@ -52,6 +52,10 @@ internal sealed class FunctionCallExpression : IColumnExpression
                     return ParserFunctions.Regex_Test(context, _arguments);
                 case "REGEX_REPLACE":
                     return ParserFunctions.Regex_Replace(context, _arguments);
+                case "FORMAT":
+                    return ParserFunctions.Format(context, _arguments);
+                case "TODATE":
+                    return ParserFunctions.ToDateTime(context, _arguments);
             }
         }
         catch (Exception ex)

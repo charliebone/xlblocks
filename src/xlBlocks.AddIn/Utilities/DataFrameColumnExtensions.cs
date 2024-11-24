@@ -1,6 +1,7 @@
 ﻿namespace XlBlocks.AddIn.Utilities;
 
 using System.Diagnostics;
+using System.Globalization;
 using System.Text.RegularExpressions;
 using Microsoft.Data.Analysis;
 
@@ -520,6 +521,63 @@ internal static class DataFrameColumnExtensions
                 continue;
 
             result[i] = Regex.Replace(stringColumn[i], stringPatternColumn[i], stringReplacementColumn[i]);
+        }
+
+        return result;
+    }
+
+    internal static DataFrameColumn ElementwiseFormat(this DataFrameColumn column, DataFrameColumn formatColumn)
+    {
+        if (formatColumn is not StringDataFrameColumn stringFormatColumn)
+            throw new ArgumentException("Format column must be a string");
+
+        var result = new StringDataFrameColumn(column.Name, column.Length);
+        for (var i = 0L; i < column.Length; i++)
+            result[i] = Format(column[i], stringFormatColumn[i]);
+
+        return result;
+    }
+
+    private static string? Format(object obj, string? format)
+    {
+        return obj switch
+        {
+            string stringObj => stringObj,
+            double doubleObject => doubleObject.ToString(format),
+            float floatObject => floatObject.ToString(format),
+            decimal decimalObject => decimalObject.ToString(format),
+            DateTime dateTimeObject => dateTimeObject.ToString(format),
+            int intObject => intObject.ToString(format),
+            uint uintObject => uintObject.ToString(format),
+            long longObject => longObject.ToString(format),
+            ulong ulongObject => ulongObject.ToString(format),
+            short shortObject => shortObject.ToString(format),
+            ushort ushortObject => ushortObject.ToString(format),
+            byte byteObject => byteObject.ToString(format),
+            sbyte sbyteObject => sbyteObject.ToString(format),
+            _ => obj?.ToString()
+        };
+    }
+
+    internal static DataFrameColumn ElementwiseToDateTime(this DataFrameColumn column, DataFrameColumn formatColumn)
+    {
+        if (formatColumn is not StringDataFrameColumn stringFormatColumn)
+            throw new ArgumentException("Format column must be a string");
+
+        var result = new DateTimeDataFrameColumn(column.Name, column.Length);
+        for (var i = 0L; i < column.Length; i++)
+        {
+            var stringValue = column[i]?.ToString();
+            var formatString = stringFormatColumn[i];
+            if (stringValue is null || formatString is null)
+                continue;
+
+            if (DateTime.TryParseExact(stringValue, formatString, CultureInfo.CurrentCulture, DateTimeStyles.None, out var parsedDate))
+                result[i] = parsedDate;
+            else if (DateTime.TryParseExact(stringValue, formatString, CultureInfo.InvariantCulture, DateTimeStyles.None, out parsedDate))
+                result[i] = parsedDate;
+            else
+                throw new Exception($"Could not parse value '{stringValue}' to a DateTime (row {i})");
         }
 
         return result;

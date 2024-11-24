@@ -25,22 +25,22 @@ public class ParserTests
     private static readonly DataFrame _testData1 = DataFrameUtilities.ToDataFrame(
         new object[,]
         {
-            { "Id", "Name", "Age", "Nickname" },
-            { 1, "Alice", 30, "Liz" },
-            { 2, "Bob", 25, null! },
-            { 3, "Charlie", 35, "Chuck" }
+            { "Id", "Name", "Age", "Nickname", "HireDate" },
+            { 1, "Alice", 30, "Liz", new DateTime(2017, 11, 24) },
+            { 2, "Bob", 25, null!, new DateTime(2020, 6, 1) },
+            { 3, "Charlie", 35, "Chuck", new DateTime(2023, 1, 22) }
         },
-        new[] { typeof(int), typeof(string), typeof(int), typeof(string) });
+        new[] { typeof(int), typeof(string), typeof(int), typeof(string), typeof(DateTime) });
 
     private static readonly DataFrame _testData2 = DataFrameUtilities.ToDataFrame(
         new object[,]
         {
-            { "Id", "Name", "Age", "Nickname" },
-            { 1, "Alice", 30, "Liz" },
-            { 2, "Bob", 25, "" },
-            { 3, "Charlie", 35, "Chuck" }
+            { "Id", "Name", "Age", "Nickname", "HireDate" },
+            { 1, "Alice", 30, "Liz", new DateTime(2017, 11, 24) },
+            { 2, "Bob", 25, "", new DateTime(2020, 6, 1) },
+            { 3, "Charlie", 35, "Chuck", new DateTime(2023, 1, 22) }
         },
-        new[] { typeof(int), typeof(string), typeof(int), typeof(string) });
+        new[] { typeof(int), typeof(string), typeof(int), typeof(string), typeof(DateTime) });
 
     #region Helpers
 
@@ -564,6 +564,20 @@ public class ParserTests
         expected = _testData2.Columns["Name"].ElementwiseSubstring(
             DataFrameUtilities.CreateConstantDataFrameColumn(2, _testData1.Rows.Count),
             DataFrameUtilities.CreateConstantDataFrameColumn(3, _testData1.Rows.Count));
+        DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
+    }
+
+    [Fact]
+    public void Functions_FORMAT_Test()
+    {
+        result = ParseWithDataFrame("FORMAT([Age], '0.00')", _testData1);
+        expected = _testData2.Columns["Age"].ElementwiseFormat(
+            DataFrameUtilities.CreateConstantDataFrameColumn("0.00", _testData1.Rows.Count));
+        DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
+
+        result = ParseWithDataFrame("FORMAT([HireDate], 'yyyy-MM-dd')", _testData1);
+        expected = _testData2.Columns["HireDate"].ElementwiseFormat(
+            DataFrameUtilities.CreateConstantDataFrameColumn("yyyy-MM-dd", _testData1.Rows.Count));
         DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
     }
 
