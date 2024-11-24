@@ -5,7 +5,7 @@ using Microsoft.Data.Analysis;
 
 internal class PseudoDoubleDataFrameColumn : PrimitiveDataFrameColumn<double>
 {
-    // consider inheriting from DataFrameColumn instead once ml.net v22 issue is resolved: https://github.com/dotnet/machinelearning/issues/7323
+    // consider inheriting from DataFrameColumn instead once ml.net v0.22 issue fix is release: https://github.com/dotnet/machinelearning/issues/7323
     private readonly PrimitiveDataFrameColumn<double>? _doubleColumn;
     private readonly PrimitiveDataFrameColumn<float>? _floatColumn;
     private readonly PrimitiveDataFrameColumn<decimal>? _decimalColumn;
