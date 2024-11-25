@@ -86,6 +86,42 @@ internal static class ParserFunctions
         return expressionColumn.ElementwiseLog();
     }
 
+    public static DataFrameColumn CumulativeSum(DataFrameContext context, IList<IColumnExpression> argExpressions)
+    {
+        CheckArgCount(argExpressions, 1);
+
+        var expressionColumn = argExpressions[0].Evaluate(context);
+
+        return expressionColumn.CumulativeSum();
+    }
+
+    public static DataFrameColumn CumulativeProduct(DataFrameContext context, IList<IColumnExpression> argExpressions)
+    {
+        CheckArgCount(argExpressions, 1);
+
+        var expressionColumn = argExpressions[0].Evaluate(context);
+
+        return expressionColumn.CumulativeProduct();
+    }
+
+    public static DataFrameColumn CumulativeMin(DataFrameContext context, IList<IColumnExpression> argExpressions)
+    {
+        CheckArgCount(argExpressions, 1);
+
+        var expressionColumn = argExpressions[0].Evaluate(context);
+
+        return expressionColumn.CumulativeMin();
+    }
+
+    public static DataFrameColumn CumulativeMax(DataFrameContext context, IList<IColumnExpression> argExpressions)
+    {
+        CheckArgCount(argExpressions, 1);
+
+        var expressionColumn = argExpressions[0].Evaluate(context);
+
+        return expressionColumn.CumulativeMax();
+    }
+
     public static DataFrameColumn Round(DataFrameContext context, IList<IColumnExpression> argExpressions)
     {
         CheckArgCount(argExpressions, 1, 2);
