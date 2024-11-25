@@ -36,6 +36,14 @@ internal sealed class FunctionCallExpression : IColumnExpression
                     return ParserFunctions.Exp(context, _arguments);
                 case "LOG":
                     return ParserFunctions.Log(context, _arguments);
+                case "CUMSUM":
+                    return ParserFunctions.CumulativeSum(context, _arguments);
+                case "CUMPROD":
+                    return ParserFunctions.CumulativeProduct(context, _arguments);
+                case "CUMMIN":
+                    return ParserFunctions.CumulativeMin(context, _arguments);
+                case "CUMMAX":
+                    return ParserFunctions.CumulativeMax(context, _arguments);
                 case "ROUND":
                     return ParserFunctions.Round(context, _arguments);
                 case "SUBSTRING":

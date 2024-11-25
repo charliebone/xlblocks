@@ -301,6 +301,8 @@ internal static class DataFrameUtilities
             "max" or "maximum" => (GroupBy g, string[] n) => g.Max(n),
             "mean" or "average" or "avg" => (GroupBy g, string[] n) => g.Mean(n),
             "count" => (GroupBy g, string[] n) => g.Count(n),
+            "first" => (GroupBy g, string[] n) => g.First(n),
+            "last" => (GroupBy g, string[] n) => g.Tail(1),
             _ => throw new ArgumentException($"unknown group by operation'{groupByOperation}', must be one of 'sum', 'product', 'min' 'max' 'mean' or 'count'")
         };
     }
