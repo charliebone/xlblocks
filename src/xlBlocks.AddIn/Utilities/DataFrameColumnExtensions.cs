@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using Microsoft.Data.Analysis;
+using XlBlocks.AddIn.Dna;
 
 internal static class DataFrameColumnExtensions
 {
@@ -136,6 +137,59 @@ internal static class DataFrameColumnExtensions
 
             result[i] = !hashSet.Add(column[i]);
         }
+        return result;
+    }
+
+    internal static DataFrameColumn ConvertColumnType(this DataFrameColumn column, Type type)
+    {
+        if (type == column.DataType)
+            return column.Clone();
+
+        var converted = column.Cast<object>().ConvertToProvidedType(type)
+            .Select((x, row) =>
+            {
+                if (x.Input is null || (x.Input is string stringInput && string.IsNullOrEmpty(stringInput)))
+                    return null;
+
+                if (!x.Success)
+                    throw new ArgumentException($"cannot convert value '{x.Input}' into type '{type.Name}' [column '{column.Name}',row {row + 1}]");
+
+                return x.ConvertedInput;
+            });
+
+        return DataFrameUtilities.CreateDataFrameColumn(converted, type, column.Name);
+    }
+
+    internal static DataFrameColumn ElementwiseIsIn(this DataFrameColumn column, params DataFrameColumn[] inColumns)
+    {
+        if (inColumns.Any(x => x.Length != column.Length))
+            throw new ArgumentException("All columns must have same length");
+
+        var convertedColumns = inColumns.Select(x => x.ConvertColumnType(column.DataType)).ToList();
+
+        var result = new BooleanDataFrameColumn("isin", column.Length);
+        for (var i = 0L; i < column.Length; i++)
+        {
+            var found = false;
+            foreach (var inColumn in convertedColumns)
+            {
+                if (column[i] is null)
+                {
+                    if (inColumn[i] is null)
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+                else if (column[i].Equals(inColumn[i]))
+                {
+                    found = true;
+                    break;
+                }
+            }
+            result[i] = found;
+        }
+
         return result;
     }
 

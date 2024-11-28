@@ -297,6 +297,18 @@ public class ParserTests
             .Or(_testData1.Columns["Name"].ElementwiseEquals("Adam"))
             .Or(_testData1.Columns["Name"].ElementwiseEquals("Diane"));
         DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
+
+        result = ParseWithDataFrame("[HireDate] IN ('2020-06-01','2024-09-04')", _testData2);
+        expected = _testData2.Columns["HireDate"].ElementwiseIsIn(
+            DataFrameUtilities.CreateDataFrameColumn(new DateTime(2020, 6, 1), _testData2.Rows.Count),
+            DataFrameUtilities.CreateDataFrameColumn(new DateTime(2024, 9, 4), _testData2.Rows.Count));
+        DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
+
+        result = ParseWithDataFrame("[HireDate] IN (43983,45593)", _testData2);
+        expected = _testData2.Columns["HireDate"].ElementwiseIsIn(
+            DataFrameUtilities.CreateDataFrameColumn(new DateTime(2020, 6, 1), _testData2.Rows.Count),
+            DataFrameUtilities.CreateDataFrameColumn(new DateTime(2024, 9, 4), _testData2.Rows.Count));
+        DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
     }
 
     [Theory]

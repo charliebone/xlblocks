@@ -61,8 +61,7 @@ internal static class DataTypes_Table
     [ExcelFunction(Description = "Get a column in a table as a list", IsThreadSafe = true)]
     public static XlBlockList XBTable_GetColumnAsList(
         [ExcelArgument(Description = "A table"), CacheContents(AsReference = true)] XlBlockTable table,
-        [ExcelArgument(Description = "The column name or number")] object columnNameOrNumber,
-        [ExcelArgument(Description = "Include header in output (FALSE)")] bool includeHeader = false)
+        [ExcelArgument(Description = "The column name or number")] object columnNameOrNumber)
     {
         if (columnNameOrNumber is double columnNumber)
             return table.GetColumnAsList((int)columnNumber);
