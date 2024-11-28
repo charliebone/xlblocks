@@ -3,6 +3,7 @@
 using System.Collections.Generic;
 using Microsoft.Data.Analysis;
 using XlBlocks.AddIn.Parser;
+using XlBlocks.AddIn.Utilities;
 
 internal sealed class InClauseExpression : IColumnExpression
 {
@@ -21,16 +22,12 @@ internal sealed class InClauseExpression : IColumnExpression
     public DataFrameColumn Evaluate(DataFrameContext context)
     {
         var column = _expression.Evaluate(context);
-        var args = _inElements.Select(x => x.Evaluate(context)).ToList();
+        var args = _inElements.Select(x => x.Evaluate(context)).ToArray();
 
-        if (args.Count < 1)
+        if (args.Length < 1)
             throw new DataFrameExpressionException("IN clause requires at least one test expression");
 
-        var result = args.Select(x => column.ElementwiseEquals(x))
-            .Cast<DataFrameColumn>()
-            .Aggregate((x, y) => x.Or(y));
-
-        return result;
+        return column.ElementwiseIsIn(args);
     }
 }
 

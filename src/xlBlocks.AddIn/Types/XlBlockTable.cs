@@ -572,29 +572,9 @@ internal class XlBlockTable : IXlBlockCopyableObject<XlBlockTable>, IXlBlockArra
             var column = _dataFrame[currentColumnName];
             var type = (string.IsNullOrEmpty(columnType) ? column.DataType : ParamTypeConverter.StringToType(columnType)) ?? throw new ArgumentException($"unknown type '{columnType}'");
 
-            if (type != column.DataType)
-            {
-                var converted = column.Cast<object>().ConvertToProvidedType(type)
-                    .Select((x, row) =>
-                    {
-                        if (x.Input is null || (x.Input is string stringInput && string.IsNullOrEmpty(stringInput)))
-                            return null;
-
-                        if (!x.Success)
-                            throw new ArgumentException($"cannot convert value '{x.Input}' into type '{type.Name}' [column '{newColumnName}',row {row + 1}]");
-
-                        return x.ConvertedInput;
-                    });
-
-                var dataColumn = DataFrameUtilities.CreateDataFrameColumn(converted, type, newColumnName);
-                columns.Add(dataColumn);
-            }
-            else
-            {
-                var newColumn = column.Clone();
-                newColumn.SetName(newColumnName);
-                columns.Add(newColumn);
-            }
+            var newColumn = column.ConvertColumnType(type);
+            newColumn.SetName(newColumnName);
+            columns.Add(newColumn);
         }
 
         var dataFrame = new DataFrame(columns);
