@@ -32,9 +32,24 @@ internal static class DataTypes_Table
         [ExcelArgument(Description = "The separator to use, default is ','")] string separator = ",",
         [ExcelArgument(Description = "Optional flag indicating whether the csv has a header row, default is TRUE")] bool hasHeader = true,
         [ExcelArgument(Description = "A range of column names")] XlBlockRange? columnNameRange = null,
-        [ExcelArgument(Description = "A range of column names")] XlBlockRange? columnTypeRange = null)
+        [ExcelArgument(Description = "A range of column names")] XlBlockRange? columnTypeRange = null,
+        [ExcelArgument(Description = "An optional string indicating the file encoding")] string? encoding = null)
     {
-        return XlBlockTable.BuildFromCsv(csvPath, separator, hasHeader, columnNameRange, columnTypeRange);
+        return XlBlockTable.BuildFromCsv(csvPath, separator, hasHeader, columnNameRange, columnTypeRange, encoding);
+    }
+
+    [ExcelFunction(Description = "Build a table from a delimited file", IsThreadSafe = true)]
+    public static bool XBTable_SaveToCsv(
+        [ExcelArgument(Description = "A table"), CacheContents(AsReference = true)] XlBlockTable table,
+        [ExcelArgument(Description = "A range of data to use for the table")] string csvPath,
+        [ExcelArgument(Description = "The separator to use, default is ','")] string separator = ",",
+        [ExcelArgument(Description = "Optional flag indicating whether to include a header row in the csv, default is TRUE")] bool includeHeader = true,
+        [ExcelArgument(Description = "A range of column names")] XlBlockRange? columnNameRange = null,
+        [ExcelArgument(Description = "A range of column names")] XlBlockRange? columnTypeRange = null,
+        [ExcelArgument(Description = "An optional string indicating the file encoding")] string? encoding = null)
+    {
+        table.SaveToCsv(csvPath, separator, includeHeader, encoding);
+        return true;
     }
 
     [ExcelFunction(Description = "Get a table", IsThreadSafe = true)]

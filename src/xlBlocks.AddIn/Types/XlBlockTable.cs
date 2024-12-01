@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using ExcelDna.Integration;
 using Microsoft.Data.Analysis;
 using XlBlocks.AddIn.Dna;
@@ -212,7 +213,8 @@ internal class XlBlockTable : IXlBlockCopyableObject<XlBlockTable>, IXlBlockArra
         return determinedType;
     }
 
-    public static XlBlockTable BuildFromCsv(string csvPath, string separator, bool hasHeader, XlBlockRange? columnNameRange = null, XlBlockRange? columnTypeRange = null)
+    public static XlBlockTable BuildFromCsv(string csvPath, string separator, bool hasHeader, XlBlockRange? columnNameRange = null,
+        XlBlockRange? columnTypeRange = null, string? encoding = null)
     {
         if (!File.Exists(csvPath))
             throw new FileNotFoundException($"file '{csvPath}' was not found");
@@ -227,8 +229,25 @@ internal class XlBlockTable : IXlBlockCopyableObject<XlBlockTable>, IXlBlockArra
             throw new ArgumentException("Column names and column types must be same length");
 
         using var csvStream = new FileStream(csvPath, FileMode.Open);
-        var dataFrame = DataFrame.LoadCsv(csvStream, separator[0], hasHeader, columnNames, columnTypes, addIndexColumn: false, guessTypeFunction: GuessTypeFunction);
+        var dataFrame = DataFrame.LoadCsv(csvStream, separator[0], hasHeader, columnNames, columnTypes,
+            addIndexColumn: false,
+            encoding: !string.IsNullOrEmpty(encoding) ? Encoding.GetEncoding(encoding) : Encoding.UTF8,
+            guessTypeFunction: GuessTypeFunction);
         return new XlBlockTable(dataFrame);
+    }
+
+    public void SaveToCsv(string csvPath, string separator, bool includeHeader, string? encoding = null)
+    {
+        using var csvStream = new FileStream(csvPath, FileMode.Create);
+        SaveToCsv(csvStream, separator, includeHeader, encoding);
+    }
+
+    internal void SaveToCsv(Stream stream, string separator, bool includeHeader, string? encoding = null)
+    {
+        if (separator.Length != 1)
+            throw new ArgumentException("separator must be a single character");
+
+        DataFrame.SaveCsv(_dataFrame, stream, separator[0], includeHeader, encoding: !string.IsNullOrEmpty(encoding) ? Encoding.GetEncoding(encoding) : Encoding.UTF8);
     }
 
     public static XlBlockTable Join(XlBlockTable left, XlBlockTable right, string joinType, XlBlockRange? joinOn,
