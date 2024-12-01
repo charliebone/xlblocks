@@ -1,5 +1,6 @@
 ﻿namespace XlBlocks.AddIn.Tests.Parser;
 
+using ExcelDna.Integration;
 using Microsoft.Data.Analysis;
 using XlBlocks.AddIn.Utilities;
 using Xunit;
@@ -20,6 +21,25 @@ public class DataFrameColumnExtensionsTests
             new[] { typeof(int), typeof(string), typeof(int), typeof(string), typeof(string), typeof(string), typeof(double) });
 
     private static DataFrameColumn ConstantColumn<T>(T obj) => DataFrameUtilities.CreateConstantDataFrameColumn(obj, _testData.Rows.Count);
+
+    private static readonly DataFrame _logDataTable = DataFrameUtilities.ToDataFrame(
+        new object[,]
+        {
+            { "Id", "Category", "ErrorCount", "Average" },
+            { 0, "Trace", ExcelError.ExcelErrorNA, 38.83 },
+            { 1, "Warning", 25, ExcelError.ExcelErrorNA },
+            { 2, ExcelError.ExcelErrorNA, 21, 83.45 },
+            { 3, "Critical", 2, 1.77 },
+            { 4, "Debug", 62, 53.67 },
+            { 5, ExcelError.ExcelErrorNA, 22, ExcelError.ExcelErrorNA },
+            { 6, "Warning", 11, 33.32 },
+            { 7, "Critical", 45, 0.82 },
+            { 8, "Info", 0, ExcelError.ExcelErrorNA },
+            { 9, "Info", 101, ExcelError.ExcelErrorNA },
+            { 10, "Debug", 62, 6.34 },
+            { 11, "Warning", 45, ExcelError.ExcelErrorNA }
+        },
+        new[] { typeof(int), typeof(string), typeof(int), typeof(double) });
 
     [Theory]
     [InlineData(@"test", @"test")]
@@ -307,6 +327,38 @@ public class DataFrameColumnExtensionsTests
         result = DataFrameUtilities.CreateDataFrameColumn(new[] { "2024-01-23", "2024-12-25", "2024-06-17" })
             .ElementwiseToDateTime(DataFrameUtilities.CreateDataFrameColumn("yyyy-MM-dd", 3));
         expected = DataFrameUtilities.CreateDataFrameColumn(new[] { new DateTime(2024, 1, 23), new DateTime(2024, 12, 25), new DateTime(2024, 6, 17) });
+        DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
+    }
+
+    [Fact]
+    public void CumulativeSumIf_Tests()
+    {
+        result = _logDataTable.Columns["Id"].CumulativeSumIf(_logDataTable.Columns["Category"]);
+        expected = DataFrameUtilities.CreateDataFrameColumn(new[] { 0d, 1d, 2d, 3d, 4d, 7d, 7d, 10d, 8d, 17d, 14d, 18d });
+        DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
+    }
+
+    [Fact]
+    public void CumulativeProductIf_Tests()
+    {
+        result = _logDataTable.Columns["Id"].CumulativeProductIf(_logDataTable.Columns["Category"]);
+        expected = DataFrameUtilities.CreateDataFrameColumn(new[] { 0d, 1d, 2d, 3d, 4d, 10d, 6d, 21d, 8d, 72d, 40d, 66d });
+        DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
+    }
+
+    [Fact]
+    public void CumulativeMinIf_Tests()
+    {
+        result = _logDataTable.Columns["Id"].CumulativeMinIf(_logDataTable.Columns["Category"]);
+        expected = DataFrameUtilities.CreateDataFrameColumn(new[] { 0d, 1d, 2d, 3d, 4d, 2d, 1d, 3d, 8d, 8d, 4d, 1d });
+        DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
+    }
+
+    [Fact]
+    public void CumulativeMaxIf_Tests()
+    {
+        result = _logDataTable.Columns["Id"].CumulativeMaxIf(_logDataTable.Columns["Category"]);
+        expected = DataFrameUtilities.CreateDataFrameColumn(new[] { 0d, 1d, 2d, 3d, 4d, 5d, 6d, 7d, 8d, 9d, 10d, 11d });
         DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
     }
 }

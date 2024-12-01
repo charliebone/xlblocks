@@ -304,6 +304,146 @@ internal static class DataFrameColumnExtensions
         return result;
     }
 
+    #region Conditional cumulatives
+
+    internal static DataFrameColumn CumulativeSumIf(this DataFrameColumn column, DataFrameColumn conditionalColumn)
+    {
+        if (column.Length != conditionalColumn.Length)
+            throw new ArgumentException("Input columns must be the same length");
+
+        if (!column.IsNumericColumn())
+            throw new ArgumentException("Column must be numeric");
+
+        var doubleColumn = new PseudoDoubleDataFrameColumn(column);
+        var valueDictionary = DictionaryUtilities.BuildTypedDictionary(conditionalColumn.DataType);
+        var result = new DoubleDataFrameColumn("sum", column.Length);
+        for (var i = 0L; i < column.Length; i++)
+        {
+            var doubleValue = doubleColumn[i];
+            var conditionalValue = conditionalColumn[i];
+            if (doubleValue is null || conditionalValue is null)
+                continue;
+
+            if (valueDictionary.Contains(conditionalValue))
+            {
+                var cumulativeValue = valueDictionary[conditionalValue];
+                result[i] = (double)(cumulativeValue ?? 0d) + doubleValue;
+                valueDictionary[conditionalValue] = result[i];
+            }
+            else
+            {
+                result[i] = doubleValue;
+                valueDictionary.Add(conditionalValue, doubleValue);
+            }
+        }
+
+        return result;
+    }
+
+    internal static DataFrameColumn CumulativeProductIf(this DataFrameColumn column, DataFrameColumn conditionalColumn)
+    {
+        if (column.Length != conditionalColumn.Length)
+            throw new ArgumentException("Input columns must be the same length");
+
+        if (!column.IsNumericColumn())
+            throw new ArgumentException("Column must be numeric");
+
+        var doubleColumn = new PseudoDoubleDataFrameColumn(column);
+        var valueDictionary = DictionaryUtilities.BuildTypedDictionary(conditionalColumn.DataType);
+        var result = new DoubleDataFrameColumn("product", column.Length);
+        for (var i = 0L; i < column.Length; i++)
+        {
+            var doubleValue = doubleColumn[i];
+            var conditionalValue = conditionalColumn[i];
+            if (doubleValue is null || conditionalValue is null)
+                continue;
+
+            if (valueDictionary.Contains(conditionalValue))
+            {
+                var cumulativeValue = valueDictionary[conditionalValue];
+                result[i] = (double)(cumulativeValue ?? 1d) * doubleValue;
+                valueDictionary[conditionalValue] = result[i];
+            }
+            else
+            {
+                result[i] = doubleValue;
+                valueDictionary.Add(conditionalValue, doubleValue);
+            }
+        }
+
+        return result;
+    }
+
+    internal static DataFrameColumn CumulativeMinIf(this DataFrameColumn column, DataFrameColumn conditionalColumn)
+    {
+        if (column.Length != conditionalColumn.Length)
+            throw new ArgumentException("Input columns must be the same length");
+
+        if (!column.IsNumericColumn())
+            throw new ArgumentException("Column must be numeric");
+
+        var doubleColumn = new PseudoDoubleDataFrameColumn(column);
+        var valueDictionary = DictionaryUtilities.BuildTypedDictionary(conditionalColumn.DataType);
+        var result = new DoubleDataFrameColumn("min", column.Length);
+        for (var i = 0L; i < column.Length; i++)
+        {
+            var doubleValue = doubleColumn[i];
+            var conditionalValue = conditionalColumn[i];
+            if (doubleValue is null || conditionalValue is null)
+                continue;
+
+            if (valueDictionary.Contains(conditionalValue))
+            {
+                var cumulativeValue = valueDictionary[conditionalValue];
+                result[i] = Math.Min(cumulativeValue is not null ? (double)cumulativeValue : doubleValue.Value, doubleValue.Value);
+                valueDictionary[conditionalValue] = result[i];
+            }
+            else
+            {
+                result[i] = doubleValue;
+                valueDictionary.Add(conditionalValue, doubleValue);
+            }
+        }
+
+        return result;
+    }
+
+    internal static DataFrameColumn CumulativeMaxIf(this DataFrameColumn column, DataFrameColumn conditionalColumn)
+    {
+        if (column.Length != conditionalColumn.Length)
+            throw new ArgumentException("Input columns must be the same length");
+
+        if (!column.IsNumericColumn())
+            throw new ArgumentException("Column must be numeric");
+
+        var doubleColumn = new PseudoDoubleDataFrameColumn(column);
+        var valueDictionary = DictionaryUtilities.BuildTypedDictionary(conditionalColumn.DataType);
+        var result = new DoubleDataFrameColumn("max", column.Length);
+        for (var i = 0L; i < column.Length; i++)
+        {
+            var doubleValue = doubleColumn[i];
+            var conditionalValue = conditionalColumn[i];
+            if (doubleValue is null || conditionalValue is null)
+                continue;
+
+            if (valueDictionary.Contains(conditionalValue))
+            {
+                var cumulativeValue = valueDictionary[conditionalValue];
+                result[i] = Math.Max(cumulativeValue is not null ? (double)cumulativeValue : doubleValue.Value, doubleValue.Value);
+                valueDictionary[conditionalValue] = result[i];
+            }
+            else
+            {
+                result[i] = doubleValue;
+                valueDictionary.Add(conditionalValue, doubleValue);
+            }
+        }
+
+        return result;
+    }
+
+    #endregion
+
     #region String functions
 
     internal static DataFrameColumn ElementwiseConcat(this DataFrameColumn column, DataFrameColumn otherColumn)
