@@ -1,6 +1,7 @@
 namespace XlBlocks.AddIn.Tests.Types;
 
 using System;
+using System.Text;
 using ExcelDna.Integration;
 using XlBlocks.AddIn.Types;
 
@@ -394,6 +395,27 @@ public class XlBlockTableTests
         Assert.Equal(12, table.RowCount);
         Assert.Equal(4, table.ColumnCount);
         Assert.Equal(new[] { typeof(int), typeof(string), typeof(float), typeof(double) }, table.ColumnTypes);
+    }
+
+    [Fact]
+    public void SaveToCsv_Works()
+    {
+        using var csvStream = new MemoryStream();
+        _employeeTable.SaveToCsv(csvStream, ",", true);
+        var csvString = Encoding.UTF8.GetString(csvStream.ToArray()).Trim(new[] { '\ufeff' }); // remove utf16 bom which ml.net puts in for some reason
+
+        var expected = "ID,Name,Age\r\n1,Alice,30\r\n2,Bob,25\r\n3,Charlie,35\r\n";
+        Assert.Equal(expected, csvString);
+    }
+
+    [Fact]
+    public void SaveToCsv_DifferentEncoding()
+    {
+        using var csvStream = new MemoryStream();
+        _employeeTable.SaveToCsv(csvStream, ",", true, "Latin1");
+
+        var expected = "ID,Name,Age\r\n1,Alice,30\r\n2,Bob,25\r\n3,Charlie,35\r\n";
+        Assert.Equal(expected, Encoding.Latin1.GetString(csvStream.ToArray()));
     }
 
     #endregion
