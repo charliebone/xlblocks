@@ -253,6 +253,26 @@ public class DataFrameColumnExtensionsTests
     }
 
     [Fact]
+    public void Elementwise_Regex_Find_Tests()
+    {
+        result = _testData["Name"].ElementwiseRegexFind(ConstantColumn("al"), null);
+        expected = DataFrameUtilities.CreateDataFrameColumn(new object[] { null!, null!, null! }, typeof(string));
+        DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
+
+        result = _testData["Name"].ElementwiseRegexFind(ConstantColumn("al"), ConstantColumn(false));
+        expected = DataFrameUtilities.CreateDataFrameColumn(new object[] { "Al", null!, null! }, typeof(string));
+        DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
+
+        result = _testData["Name"].ElementwiseRegexFind(ConstantColumn("[Aa]l"), null);
+        expected = DataFrameUtilities.CreateDataFrameColumn(new object[] { "Al", null!, null! }, typeof(string));
+        DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
+
+        result = _testData["Name"].ElementwiseRegexFind(ConstantColumn("\\w+e$"), null);
+        expected = DataFrameUtilities.CreateDataFrameColumn(new object[] { "Alice", null!, "Charlie" }, typeof(string));
+        DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
+    }
+
+    [Fact]
     public void Elementwise_Regex_Replace_Tests()
     {
         result = _testData["Name"].ElementwiseRegexReplace(ConstantColumn("al"), ConstantColumn("_"));

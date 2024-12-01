@@ -58,6 +58,8 @@ internal sealed class FunctionCallExpression : IColumnExpression
                     return ParserFunctions.Replace(context, _arguments);
                 case "REGEX_TEST":
                     return ParserFunctions.Regex_Test(context, _arguments);
+                case "REGEX_FIND":
+                    return ParserFunctions.Regex_Find(context, _arguments);
                 case "REGEX_REPLACE":
                     return ParserFunctions.Regex_Replace(context, _arguments);
                 case "FORMAT":
