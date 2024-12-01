@@ -549,7 +549,7 @@ internal static class DataFrameColumnExtensions
 
         caseSensitiveColumn ??= DataFrameUtilities.CreateConstantDataFrameColumn(true, column.Length);
         if (caseSensitiveColumn is not PrimitiveDataFrameColumn<bool> boolCaseSensitiveColumn)
-            throw new ArgumentException("Is case sensitive must be boolean");
+            throw new ArgumentException("Case sensitive must be boolean");
 
         var result = new BooleanDataFrameColumn(column.Name, column.Length);
         for (var i = 0L; i < column.Length; i++)
@@ -558,6 +558,29 @@ internal static class DataFrameColumnExtensions
                 continue;
 
             result[i] = Regex.IsMatch(stringColumn[i], stringPatternColumn[i], boolCaseSensitiveColumn[i] == false ? RegexOptions.IgnoreCase : RegexOptions.None);
+        }
+
+        return result;
+    }
+
+    internal static DataFrameColumn ElementwiseRegexFind(this DataFrameColumn column, DataFrameColumn patternColumn, DataFrameColumn? caseSensitiveColumn)
+    {
+        if (column is not StringDataFrameColumn stringColumn || patternColumn is not StringDataFrameColumn stringPatternColumn)
+            throw new ArgumentException("Input and pattern must be strings");
+
+        caseSensitiveColumn ??= DataFrameUtilities.CreateConstantDataFrameColumn(true, column.Length);
+        if (caseSensitiveColumn is not PrimitiveDataFrameColumn<bool> boolCaseSensitiveColumn)
+            throw new ArgumentException("Case sensitive must be boolean");
+
+        var result = new StringDataFrameColumn(column.Name, column.Length);
+        for (var i = 0L; i < column.Length; i++)
+        {
+            if (stringColumn[i] is null || stringPatternColumn[i] is null)
+                continue;
+
+            var match = Regex.Match(stringColumn[i], stringPatternColumn[i], boolCaseSensitiveColumn[i] == false ? RegexOptions.IgnoreCase : RegexOptions.None);
+            if (match.Success)
+                result[i] = match.Value;
         }
 
         return result;

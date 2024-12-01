@@ -214,6 +214,21 @@ internal static class ParserFunctions
         return expressionColumn.ElementwiseRegexTest(patternColumn, null);
     }
 
+    public static DataFrameColumn Regex_Find(DataFrameContext context, IList<IColumnExpression> argExpressions)
+    {
+        CheckArgCount(argExpressions, 2, 3);
+
+        var expressionColumn = argExpressions[0].Evaluate(context);
+        var patternColumn = argExpressions[1].Evaluate(context);
+
+        if (argExpressions.Count == 3)
+        {
+            var caseSensitiveColumn = argExpressions[2].Evaluate(context);
+            return expressionColumn.ElementwiseRegexFind(patternColumn, caseSensitiveColumn);
+        }
+
+        return expressionColumn.ElementwiseRegexFind(patternColumn, null);
+    }
 
     public static DataFrameColumn Regex_Replace(DataFrameContext context, IList<IColumnExpression> argExpressions)
     {

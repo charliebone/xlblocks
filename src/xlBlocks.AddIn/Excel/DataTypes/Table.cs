@@ -187,7 +187,7 @@ internal static class DataTypes_Table
 
     [return: CacheContents]
     [ExcelFunction(Description = "Filter a table with an expression", IsThreadSafe = true)]
-    public static XlBlockTable XBTable_AppendWith(
+    public static XlBlockTable XBTable_AppendColumnsWith(
         [ExcelArgument(Description = "A table"), CacheContents(AsReference = true)] XlBlockTable table,
         [ExcelArgument(Description = "Column names")] XlBlockRange columnNames,
         [ExcelArgument(Description = "Column expressions")] XlBlockRange columnExpressions)
