@@ -1,6 +1,7 @@
 ﻿namespace XlBlocks.AddIn.Tests.Parser;
 
 using System;
+using ExcelDna.Integration;
 using Microsoft.Data.Analysis;
 using sly.parser;
 using sly.parser.generator;
@@ -41,6 +42,25 @@ public class ParserTests
             { 3, "Charlie", 35, "Chuck", new DateTime(2023, 1, 22) }
         },
         new[] { typeof(int), typeof(string), typeof(int), typeof(string), typeof(DateTime) });
+
+    private static readonly DataFrame _logDataTable = DataFrameUtilities.ToDataFrame(
+        new object[,]
+        {
+            { "Id", "Category", "ErrorCount", "Average" },
+            { 0, "Trace", ExcelError.ExcelErrorNA, 38.83 },
+            { 1, "Warning", 25, ExcelError.ExcelErrorNA },
+            { 2, ExcelError.ExcelErrorNA, 21, 83.45 },
+            { 3, "Critical", 2, 1.77 },
+            { 4, "Debug", 62, 53.67 },
+            { 5, ExcelError.ExcelErrorNA, 22, ExcelError.ExcelErrorNA },
+            { 6, "Warning", 11, 33.32 },
+            { 7, "Critical", 45, 0.82 },
+            { 8, "Info", 0, ExcelError.ExcelErrorNA },
+            { 9, "Info", 101, ExcelError.ExcelErrorNA },
+            { 10, "Debug", 62, 6.34 },
+            { 11, "Warning", 45, ExcelError.ExcelErrorNA }
+        },
+        new[] { typeof(int), typeof(string), typeof(int), typeof(double) });
 
     #region Helpers
 
@@ -590,6 +610,54 @@ public class ParserTests
         result = ParseWithDataFrame("FORMAT([HireDate], 'yyyy-MM-dd')", _testData1);
         expected = _testData2.Columns["HireDate"].ElementwiseFormat(
             DataFrameUtilities.CreateConstantDataFrameColumn("yyyy-MM-dd", _testData1.Rows.Count));
+        DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
+    }
+
+    [Fact]
+    public void Functions_CUMSUM_Test()
+    {
+        result = ParseWithDataFrame("CUMSUM([Id])", _logDataTable);
+        expected = _logDataTable.Columns["Id"].CumulativeSum();
+        DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
+
+        result = ParseWithDataFrame("CUMSUM([Id], [Category])", _logDataTable);
+        expected = _logDataTable.Columns["Id"].CumulativeSumIf(_logDataTable.Columns["Category"]);
+        DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
+    }
+
+    [Fact]
+    public void Functions_CUMPRODUCT_Test()
+    {
+        result = ParseWithDataFrame("CUMPROD([Id])", _logDataTable);
+        expected = _logDataTable.Columns["Id"].CumulativeProduct();
+        DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
+
+        result = ParseWithDataFrame("CUMPROD([Id], [Category])", _logDataTable);
+        expected = _logDataTable.Columns["Id"].CumulativeProductIf(_logDataTable.Columns["Category"]);
+        DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
+    }
+
+    [Fact]
+    public void Functions_CUMMIN_Test()
+    {
+        result = ParseWithDataFrame("CUMMIN([Id])", _logDataTable);
+        expected = _logDataTable.Columns["Id"].CumulativeMin();
+        DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
+
+        result = ParseWithDataFrame("CUMMIN([Id], [Category])", _logDataTable);
+        expected = _logDataTable.Columns["Id"].CumulativeMinIf(_logDataTable.Columns["Category"]);
+        DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
+    }
+
+    [Fact]
+    public void Functions_CUMMAX_Test()
+    {
+        result = ParseWithDataFrame("CUMMAX([Id])", _logDataTable);
+        expected = _logDataTable.Columns["Id"].CumulativeMax();
+        DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
+
+        result = ParseWithDataFrame("CUMMAX([Id], [Category])", _logDataTable);
+        expected = _logDataTable.Columns["Id"].CumulativeMaxIf(_logDataTable.Columns["Category"]);
         DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
     }
 

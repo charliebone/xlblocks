@@ -88,36 +88,60 @@ internal static class ParserFunctions
 
     public static DataFrameColumn CumulativeSum(DataFrameContext context, IList<IColumnExpression> argExpressions)
     {
-        CheckArgCount(argExpressions, 1);
+        CheckArgCount(argExpressions, 1, 2);
 
         var expressionColumn = argExpressions[0].Evaluate(context);
+
+        if (argExpressions.Count == 2)
+        {
+            var conditionalColumn = argExpressions[1].Evaluate(context);
+            return expressionColumn.CumulativeSumIf(conditionalColumn);
+        }
 
         return expressionColumn.CumulativeSum();
     }
 
     public static DataFrameColumn CumulativeProduct(DataFrameContext context, IList<IColumnExpression> argExpressions)
     {
-        CheckArgCount(argExpressions, 1);
+        CheckArgCount(argExpressions, 1, 2);
 
         var expressionColumn = argExpressions[0].Evaluate(context);
+
+        if (argExpressions.Count == 2)
+        {
+            var conditionalColumn = argExpressions[1].Evaluate(context);
+            return expressionColumn.CumulativeProductIf(conditionalColumn);
+        }
 
         return expressionColumn.CumulativeProduct();
     }
 
     public static DataFrameColumn CumulativeMin(DataFrameContext context, IList<IColumnExpression> argExpressions)
     {
-        CheckArgCount(argExpressions, 1);
+        CheckArgCount(argExpressions, 1, 2);
 
         var expressionColumn = argExpressions[0].Evaluate(context);
+
+        if (argExpressions.Count == 2)
+        {
+            var conditionalColumn = argExpressions[1].Evaluate(context);
+            return expressionColumn.CumulativeMinIf(conditionalColumn);
+        }
 
         return expressionColumn.CumulativeMin();
     }
 
     public static DataFrameColumn CumulativeMax(DataFrameContext context, IList<IColumnExpression> argExpressions)
     {
-        CheckArgCount(argExpressions, 1);
+        CheckArgCount(argExpressions, 1, 2);
 
         var expressionColumn = argExpressions[0].Evaluate(context);
+
+        if (argExpressions.Count == 2)
+        {
+            var conditionalColumn = argExpressions[1].Evaluate(context);
+            return expressionColumn.CumulativeMaxIf(conditionalColumn);
+        }
 
         return expressionColumn.CumulativeMax();
     }
