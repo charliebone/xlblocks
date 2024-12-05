@@ -41,6 +41,17 @@ public class DataFrameColumnExtensionsTests
         },
         new[] { typeof(int), typeof(string), typeof(int), typeof(double) });
 
+    private static readonly DataFrame _transactions = DataFrameUtilities.ToDataFrame(
+        new object[,]
+        {
+            { "Id", "Description", "Amount" },
+            { 1, "Supplies", -77.38 },
+            { 2, "Refund", 25.22 },
+            { 3, "Deposit", 300.00 },
+            { 4, "Food", -133.33 },
+        },
+        new[] { typeof(int), typeof(string), typeof(double) });
+
     [Theory]
     [InlineData(@"test", @"test")]
     [InlineData(@"another_string", @"another.string")]
@@ -180,6 +191,14 @@ public class DataFrameColumnExtensionsTests
 
         result = _testData["Score"].ElementwiseRound(DataFrameUtilities.CreateConstantDataFrameColumn(-1, _testData.Rows.Count));
         expected = DataFrameUtilities.CreateDataFrameColumn(new[] { 80, 30, 100 });
+        DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
+    }
+
+    [Fact]
+    public void Elementwise_Abs_Tests()
+    {
+        result = _transactions["Amount"].ElementwiseAbs();
+        expected = DataFrameUtilities.CreateDataFrameColumn(new[] { 77.38, 25.22, 300.00, 133.33 });
         DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
     }
 
