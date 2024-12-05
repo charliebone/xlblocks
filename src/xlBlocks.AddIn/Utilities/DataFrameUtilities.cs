@@ -332,4 +332,79 @@ internal static class DataFrameUtilities
 
         return new StringDataFrameColumn(dataFrame.GetSafeColumnName("composite"), compositeIndex);
     }
+
+    public static DataFrame Merge(DataFrame left, DataFrame right, string[] leftJoinColumns, string[] rightJoinColumns, string? leftSuffix, string? rightSuffix, JoinAlgorithm joinAlgorithm)
+    {
+        if (joinAlgorithm == JoinAlgorithm.Left || joinAlgorithm == JoinAlgorithm.Right)
+        {
+            // ml.net left and right joins drop rows where the value being joined on is null, which is different than standard sql behavior
+            var retained = joinAlgorithm == JoinAlgorithm.Left ? left.Clone() : right.Clone();
+            var retainedJoinColumns = joinAlgorithm == JoinAlgorithm.Left ? leftJoinColumns : rightJoinColumns;
+            var retainedSuffix = joinAlgorithm == JoinAlgorithm.Left ? leftSuffix : rightSuffix;
+
+            var other = joinAlgorithm == JoinAlgorithm.Left ? right.Clone() : left.Clone();
+            var otherJoinColumns = joinAlgorithm == JoinAlgorithm.Left ? rightJoinColumns : leftJoinColumns;
+            var otherSuffix = joinAlgorithm == JoinAlgorithm.Left ? rightSuffix : leftSuffix;
+
+            var retainedIndexColumn = GetIndexColumn(retained);
+            retained.Columns.Add(retainedIndexColumn);
+            var retainedIndexColumnName = retainedIndexColumn.Name;
+
+            var retainedNullIndex = new BooleanDataFrameColumn("nullIndex", RepeatLong(false, retained.Rows.Count));
+            for (var i = 0L; i < retainedJoinColumns.Length; i++)
+            {
+                retainedNullIndex = PopulateNullIndices(retained[retainedJoinColumns[i]], retainedNullIndex);
+            }
+            var retainedNullRows = retained.Filter(retainedNullIndex);
+            var retainedToJoin = retained.Filter(retainedNullIndex.ElementwiseEquals(false));
+            DataFrame merged;
+            if (joinAlgorithm == JoinAlgorithm.Left)
+            {
+                merged = retainedToJoin.Merge(other, retainedJoinColumns, otherJoinColumns, retainedSuffix, otherSuffix, JoinAlgorithm.Left);
+                for (var i = 0; i < retainedNullRows.Columns.Count; i++)
+                    retainedNullRows.Columns[i].SetName(merged.Columns[i].Name);
+            }
+            else
+            {
+                merged = other.Merge(retainedToJoin, otherJoinColumns, retainedJoinColumns, otherSuffix, retainedSuffix, JoinAlgorithm.Right);
+                for (var i = 0; i < retainedNullRows.Columns.Count; i++)
+                    retainedNullRows.Columns[i].SetName(merged.Columns[i + other.Columns.Count].Name);
+            }
+            merged.Append(retainedNullRows.Rows, true);
+
+            var sortedIndex = merged[retainedIndexColumnName].GetSortIndices();
+            var newColumns = new List<DataFrameColumn>(retained.Columns.Count - 1);
+            for (var i = 0; i < merged.Columns.Count; i++)
+            {
+                var oldColumn = merged.Columns[i];
+                if (oldColumn.Name == retainedIndexColumnName)
+                    continue;
+
+                var newColumn = oldColumn.Clone(sortedIndex, false, 0);
+                newColumns.Add(newColumn);
+            }
+
+            return new DataFrame(newColumns);
+        }
+        return left.Merge(right, leftJoinColumns, rightJoinColumns, leftSuffix, rightSuffix, joinAlgorithm);
+    }
+
+    private static BooleanDataFrameColumn PopulateNullIndices(DataFrameColumn column, BooleanDataFrameColumn nullIndexColumn)
+    {
+        for (var i = 0L; i < column.Length; i++)
+            if (column[i] is null)
+                nullIndexColumn[i] = true;
+
+        return nullIndexColumn;
+    }
+
+    internal static Int64DataFrameColumn GetIndexColumn(DataFrame dataFrame)
+    {
+        if (dataFrame is null || dataFrame.Columns.Count == 0)
+            throw new ArgumentException("Dataframe must have at least one column");
+
+        var column = dataFrame.Columns[0].GetIndexColumn();
+        column.SetName(dataFrame.GetSafeColumnName("rowIndex"));
+        return column;
+    }
 }

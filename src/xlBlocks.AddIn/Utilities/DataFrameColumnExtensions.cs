@@ -835,7 +835,7 @@ internal static class DataFrameColumnExtensions
         }
     }
 
-    private static Int64DataFrameColumn GetIndexColumn(DataFrameColumn column)
+    internal static Int64DataFrameColumn GetIndexColumn(this DataFrameColumn column)
     {
         var indexColumn = new Int64DataFrameColumn("indices", column.Length);
         for (var i = 0L; i < column.Length; i++)
@@ -844,9 +844,20 @@ internal static class DataFrameColumnExtensions
         return indexColumn;
     }
 
+    internal static Int64DataFrameColumn GetSortIndices(this DataFrameColumn column)
+    {
+        // not the most efficient approach
+        var indexList = column.AsEnumerable()
+            .Select((value, index) => new { value, index })
+            .OrderBy(x => x.value)
+            .Select(x => (long)x.index);
+
+        return new Int64DataFrameColumn("sortIndex", indexList);
+    }
+
     internal static Int64DataFrameColumn SortColumn(this DataFrameColumn column, Int64DataFrameColumn indexColumn, bool descending, bool nullsFirst)
     {
-        indexColumn ??= GetIndexColumn(column);
+        indexColumn ??= column.GetIndexColumn();
         if (indexColumn.Length != column.Length)
             throw new ArgumentException("index column and sort column must be same length");
 
@@ -1059,14 +1070,6 @@ internal static class DataFrameColumnExtensions
     #endregion
 
     #region DateTime-aware comparisons
-    /*
-    ElementwiseEquals(right),
-    DataFrameExpressionToken.COMP_NOTEQUALS => left.ElementwiseNotEquals(right),
-    DataFrameExpressionToken.COMP_LT => left.ElementwiseLessThan(right),
-    DataFrameExpressionToken.COMP_GT => left.ElementwiseGreaterThan(right),
-    DataFrameExpressionToken.COMP_LTE => left.ElementwiseLessThanOrEqual(right),
-    DataFrameExpressionToken.COMP_GTE => left.ElementwiseGreaterThanOrEqual(right),
-    */
 
     internal static DataFrameColumn ElementwiseEqualsDateAware(this DataFrameColumn left, DataFrameColumn right)
     {

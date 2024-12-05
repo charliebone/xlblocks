@@ -29,9 +29,31 @@ public class XlBlockTableTests
         new object[,]
         {
             { "DeptID", "StartDate", "EmployeeID" },
-            { 2, new DateTime(2023, 02, 01), 2 },
+            { 2, new DateTime(2023, 2, 01), 2 },
             { 3, new DateTime(2020, 12, 01), 1 },
-            { 2, new DateTime(2022, 07, 10), 5 }
+            { 2, new DateTime(2022, 7, 10), 5 }
+        }));
+
+    private static readonly XlBlockTable _accessLogs = XlBlockTable.Build(XlBlockRange.Build(
+        new object[,]
+        {
+            { "Date", "EmployeeID", "EmployeeName" },
+            { new DateTime(2024, 1, 23), 2, "Bob" },
+            { new DateTime(2024, 2, 13), 1, "Alice" },
+            { new DateTime(2024, 4, 4), null!, "Charlie" },
+            { new DateTime(2024, 4, 8), 5, "Edward" },
+            { new DateTime(2024, 7, 14), 2, null! },
+            { new DateTime(2024, 9, 18), null!, "Alice" },
+            { new DateTime(2024, 10, 10), 3, "Charlie" }
+        }));
+
+    private static readonly XlBlockTable _nicknames = XlBlockTable.Build(XlBlockRange.Build(
+        new object[,]
+        {
+            { "Nickname", "Name" },
+            { "Chuck", "Charlie" },
+            { "Liz", "Alice" },
+            { "Hank", null! }
         }));
 
     private static readonly XlBlockTable _logDataTable = XlBlockTable.BuildWithTypes(XlBlockRange.Build(
@@ -580,6 +602,46 @@ public class XlBlockTableTests
     }
 
     [Fact]
+    public void Join_LeftJoin_NullValues_SingleJoinColumn()
+    {
+        var joinOn = XlBlockRange.Build(new object[,] { { "EmployeeID", "ID" } });
+        var result = XlBlockTable.Join(_accessLogs, _employeeTable, "left", joinOn);
+
+        object[,] expectedResult =
+        {
+            { "Date", "EmployeeID", "EmployeeName", "ID", "Name", "Age" },
+            { new DateTime(2024, 1, 23), 2d, "Bob", 2d, "Bob", 25d },
+            { new DateTime(2024, 2, 13), 1d, "Alice", 1d, "Alice", 30d },
+            { new DateTime(2024, 4, 4), null!, "Charlie", null!, null!, null! },
+            { new DateTime(2024, 4, 8), 5d, "Edward", null!, null!, null! },
+            { new DateTime(2024, 7, 14), 2d, null!, 2d, "Bob", 25d },
+            { new DateTime(2024, 9, 18), null!, "Alice", null!, null!, null! },
+            { new DateTime(2024, 10, 10), 3d, "Charlie", 3d, "Charlie", 35d }
+        };
+        AssertTableMatchesExpected(expectedResult, result);
+    }
+
+    [Fact]
+    public void Join_LeftJoin_NullValues_MultipleJoinColumn()
+    {
+        var joinOn = XlBlockRange.Build(new object[,] { { "EmployeeID", "ID" }, { "EmployeeName", "Name" } });
+        var result = XlBlockTable.Join(_accessLogs, _employeeTable, "left", joinOn);
+
+        object[,] expectedResult =
+        {
+            { "Date", "EmployeeID", "EmployeeName", "ID", "Name", "Age" },
+            { new DateTime(2024, 1, 23), 2d, "Bob", 2d, "Bob", 25d },
+            { new DateTime(2024, 2, 13), 1d, "Alice", 1d, "Alice", 30d },
+            { new DateTime(2024, 4, 4), null!, "Charlie", null!, null!, null! },
+            { new DateTime(2024, 4, 8), 5d, "Edward", null!, null!, null! },
+            { new DateTime(2024, 7, 14), 2d, null!, null!, null!, null! },
+            { new DateTime(2024, 9, 18), null!, "Alice", null!, null!, null! },
+            { new DateTime(2024, 10, 10), 3d, "Charlie", 3d, "Charlie", 35d }
+        };
+        AssertTableMatchesExpected(expectedResult, result);
+    }
+
+    [Fact]
     public void Join_RightJoin_CommonColumns()
     {
         var result = XlBlockTable.Join(_employeeTable, _departmentTable, "right", null);
@@ -659,6 +721,46 @@ public class XlBlockTableTests
             { null!, null!, null!, 2d, new DateTime(2022, 07, 10), 5d },
         };
 
+        AssertTableMatchesExpected(expectedResult, result);
+    }
+
+    [Fact]
+    public void Join_RightJoin_NullValues_SingleJoinColumn()
+    {
+        var joinOn = XlBlockRange.Build(new object[,] { { "ID", "EmployeeID" } });
+        var result = XlBlockTable.Join(_employeeTable, _accessLogs, "right", joinOn);
+
+        object[,] expectedResult =
+        {
+            { "ID", "Name", "Age", "Date", "EmployeeID", "EmployeeName" },
+            { 2d, "Bob", 25d, new DateTime(2024, 1, 23), 2d, "Bob"  },
+            { 1d, "Alice", 30d, new DateTime(2024, 2, 13), 1d, "Alice" },
+            { null!, null!, null!, new DateTime(2024, 4, 4), null!, "Charlie"  },
+            { null!, null!, null!, new DateTime(2024, 4, 8), 5d, "Edward" },
+            { 2d, "Bob", 25d, new DateTime(2024, 7, 14), 2d, null! },
+            { null!, null!, null!, new DateTime(2024, 9, 18), null!, "Alice" },
+            { 3d, "Charlie", 35d, new DateTime(2024, 10, 10), 3d, "Charlie" }
+        };
+        AssertTableMatchesExpected(expectedResult, result);
+    }
+
+    [Fact]
+    public void Join_RightJoin_NullValues_MultipleJoinColumn()
+    {
+        var joinOn = XlBlockRange.Build(new object[,] { { "ID", "EmployeeID" }, { "Name", "EmployeeName" } });
+        var result = XlBlockTable.Join(_employeeTable, _accessLogs, "right", joinOn);
+
+        object[,] expectedResult =
+        {
+            { "ID", "Name", "Age", "Date", "EmployeeID", "EmployeeName" },
+            { 2d, "Bob", 25d, new DateTime(2024, 1, 23), 2d, "Bob"  },
+            { 1d, "Alice", 30d, new DateTime(2024, 2, 13), 1d, "Alice" },
+            { null!, null!, null!, new DateTime(2024, 4, 4), null!, "Charlie"  },
+            { null!, null!, null!, new DateTime(2024, 4, 8), 5d, "Edward" },
+            { null!, null!, null!, new DateTime(2024, 7, 14), 2d, null! },
+            { null!, null!, null!, new DateTime(2024, 9, 18), null!, "Alice" },
+            { 3d, "Charlie", 35d, new DateTime(2024, 10, 10), 3d, "Charlie" }
+        };
         AssertTableMatchesExpected(expectedResult, result);
     }
 
@@ -1384,6 +1486,42 @@ public class XlBlockTableTests
         }, typeof(string));
 
         Assert.Throws<ArgumentException>(() => _employeeTable.AppendColumnFromDictionary(dictionary, "Name", "Amounts", "double"));
+    }
+
+    [Fact]
+    public void AppendColumnFromDictionary_NullNumericKeyColumnValues()
+    {
+        var nameById = _employeeTable.ToDictionary("ID", "Name");
+
+        var result = _accessLogs.AppendColumnFromDictionary(nameById, "EmployeeID", "Name");
+        object[,] expectedResult =
+        {
+            { "Date", "EmployeeID", "EmployeeName", "Name" },
+            { new DateTime(2024, 1, 23), 2d, "Bob", "Bob" },
+            { new DateTime(2024, 2, 13), 1d, "Alice", "Alice" },
+            { new DateTime(2024, 4, 4), null!, "Charlie", null! },
+            { new DateTime(2024, 4, 8), 5d, "Edward", null! },
+            { new DateTime(2024, 7, 14), 2d, null!, "Bob" },
+            { new DateTime(2024, 9, 18), null!, "Alice", null! },
+            { new DateTime(2024, 10, 10), 3d, "Charlie", "Charlie" }
+        };
+        AssertTableMatchesExpected(expectedResult, result);
+    }
+
+    [Fact]
+    public void AppendColumnFromDictionary_NullStringKeyColumnValues()
+    {
+        var idByName = _employeeTable.ToDictionary("Name", "ID");
+
+        var result = _nicknames.AppendColumnFromDictionary(idByName, "Name", "EmployeeID");
+        object[,] expectedResult =
+        {
+            { "Nickname", "Name", "EmployeeID" },
+            { "Chuck", "Charlie", 3d },
+            { "Liz", "Alice", 1d },
+            { "Hank", null!, null! }
+        };
+        AssertTableMatchesExpected(expectedResult, result);
     }
 
     #endregion
