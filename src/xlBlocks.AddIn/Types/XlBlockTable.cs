@@ -267,12 +267,13 @@ internal class XlBlockTable : IXlBlockCopyableObject<XlBlockTable>, IXlBlockArra
             {
                 var leftColumns = joinOn.GetColumnAs<string>(0, false).ToArray();
                 var rightColumns = joinOn.GetColumnAs<string>(1, false).ToArray();
-                return new XlBlockTable(left._dataFrame.Merge(right._dataFrame, leftColumns, rightColumns, leftSuffix, rightSuffix, joinAlgorithm));
+                var merged = DataFrameUtilities.Merge(left._dataFrame, right._dataFrame, leftColumns, rightColumns, leftSuffix, rightSuffix, joinAlgorithm);
+                return new XlBlockTable(merged);
             }
             else
             {
                 var joinColumns = joinOn.GetAs<string>(false).ToArray();
-                var merged = left._dataFrame.Merge(right._dataFrame, joinColumns, joinColumns, leftSuffix, rightSuffix, joinAlgorithm);
+                var merged = DataFrameUtilities.Merge(left._dataFrame, right._dataFrame, joinColumns, joinColumns, leftSuffix, rightSuffix, joinAlgorithm);
                 if (!includeDuplicateJoinColumns && joinAlgorithm != JoinAlgorithm.FullOuter)
                 {
                     foreach (var duplicatedColumn in joinColumns)
@@ -290,7 +291,7 @@ internal class XlBlockTable : IXlBlockCopyableObject<XlBlockTable>, IXlBlockArra
             if (commonColumns.Length == 0)
                 throw new ArgumentException("cannot find common columns to join on and no join columns specified");
 
-            var merged = left._dataFrame.Merge(right._dataFrame, commonColumns, commonColumns, leftSuffix, rightSuffix, joinAlgorithm);
+            var merged = DataFrameUtilities.Merge(left._dataFrame, right._dataFrame, commonColumns, commonColumns, leftSuffix, rightSuffix, joinAlgorithm);
             if (!includeDuplicateJoinColumns && joinAlgorithm != JoinAlgorithm.FullOuter)
             {
                 foreach (var duplicatedColumn in commonColumns)
@@ -489,7 +490,7 @@ internal class XlBlockTable : IXlBlockCopyableObject<XlBlockTable>, IXlBlockArra
         var rightDataFrame = DataFrameUtilities.DictionaryToDataFrame(dictionary, keyColumnName, valueColumnName, valueType);
 
         var joinColumns = new[] { keyColumnName };
-        var merged = _dataFrame.Merge(rightDataFrame, joinColumns, joinColumns, "_left", "_right", JoinAlgorithm.Left);
+        var merged = DataFrameUtilities.Merge(_dataFrame, rightDataFrame, joinColumns, joinColumns, "_left", "_right", JoinAlgorithm.Left);
         merged.Columns.Remove($"{keyColumnName}_right");
         merged.Columns[$"{keyColumnName}_left"].SetName(keyColumnName);
 
