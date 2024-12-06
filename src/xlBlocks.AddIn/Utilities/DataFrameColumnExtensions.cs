@@ -304,6 +304,22 @@ internal static class DataFrameColumnExtensions
         return result;
     }
 
+    internal static DataFrameColumn ElementwiseAbs(this DataFrameColumn column)
+    {
+        var doubleColumn = new PseudoDoubleDataFrameColumn(column);
+        var result = new DoubleDataFrameColumn("abs", column.Length);
+        for (var i = 0L; i < column.Length; i++)
+        {
+            var doubleValue = doubleColumn[i];
+            if (doubleValue is null)
+                continue;
+
+            result[i] = Math.Abs(doubleValue.Value);
+        }
+
+        return result;
+    }
+
     #region Conditional cumulatives
 
     internal static DataFrameColumn CumulativeSumIf(this DataFrameColumn column, DataFrameColumn conditionalColumn)

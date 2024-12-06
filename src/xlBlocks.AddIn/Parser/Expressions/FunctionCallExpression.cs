@@ -46,6 +46,8 @@ internal sealed class FunctionCallExpression : IColumnExpression
                     return ParserFunctions.CumulativeMax(context, _arguments);
                 case "ROUND":
                     return ParserFunctions.Round(context, _arguments);
+                case "ABS":
+                    return ParserFunctions.Abs(context, _arguments);
                 case "SUBSTRING":
                     return ParserFunctions.Substring(context, _arguments);
                 case "LEFT":

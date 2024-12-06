@@ -161,6 +161,15 @@ internal static class ParserFunctions
         return expressionColumn.ElementwiseRound();
     }
 
+    public static DataFrameColumn Abs(DataFrameContext context, IList<IColumnExpression> argExpressions)
+    {
+        CheckArgCount(argExpressions, 1);
+
+        var expressionColumn = argExpressions[0].Evaluate(context);
+
+        return expressionColumn.ElementwiseAbs();
+    }
+
     public static DataFrameColumn Substring(DataFrameContext context, IList<IColumnExpression> argExpressions)
     {
         CheckArgCount(argExpressions, 2, 3);

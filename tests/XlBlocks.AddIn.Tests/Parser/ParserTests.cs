@@ -62,6 +62,18 @@ public class ParserTests
         },
         new[] { typeof(int), typeof(string), typeof(int), typeof(double) });
 
+    private static readonly DataFrame _transactions = DataFrameUtilities.ToDataFrame(
+        new object[,]
+        {
+            { "Id", "Description", "Amount" },
+            { 1, "Supplies", -77.38 },
+            { 2, "Refund", 25.22 },
+            { 3, "Deposit", 300.00 },
+            { 4, "Food", -133.33 },
+        },
+
+        new[] { typeof(int), typeof(string), typeof(double) });
+
     #region Helpers
 
     private static Parser<DataFrameExpressionToken, IColumnExpression> GetParser(ITestOutputHelper outputHelper)
@@ -565,9 +577,9 @@ public class ParserTests
     public void Functions_LEN_Test()
     {
         result = ParseWithDataFrame("IIF(LEN([Nickname]) == 0, 'No nickname', [Nickname])", _testData1);
-        expected = _testData2.Columns["Nickname"].ElementwiseLength().ElementwiseEquals(0).ElementwiseIfThenElse(
-            DataFrameUtilities.CreateConstantDataFrameColumn("No nickname", _testData2.Rows.Count),
-            _testData2.Columns["Nickname"]);
+        expected = _testData1.Columns["Nickname"].ElementwiseLength().ElementwiseEquals(0).ElementwiseIfThenElse(
+            DataFrameUtilities.CreateConstantDataFrameColumn("No nickname", _testData1.Rows.Count),
+            _testData1.Columns["Nickname"]);
         DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
     }
 
@@ -575,12 +587,20 @@ public class ParserTests
     public void Functions_ROUND_Test()
     {
         result = ParseWithDataFrame("ROUND([Age] / 2)", _testData1);
-        expected = _testData2.Columns["Age"].Divide(2d).ElementwiseRound();
+        expected = _testData1.Columns["Age"].Divide(2d).ElementwiseRound();
         DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
 
         result = ParseWithDataFrame("ROUND([Age] / 2, 1)", _testData1);
-        expected = _testData2.Columns["Age"].Divide(2d).ElementwiseRound(
+        expected = _testData1.Columns["Age"].Divide(2d).ElementwiseRound(
             DataFrameUtilities.CreateConstantDataFrameColumn(1, _testData1.Rows.Count));
+        DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
+    }
+
+    [Fact]
+    public void Functions_ABS_Test()
+    {
+        result = ParseWithDataFrame("ABS([Amount])", _transactions);
+        expected = _transactions.Columns["Amount"].ElementwiseAbs();
         DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
     }
 
@@ -588,12 +608,12 @@ public class ParserTests
     public void Functions_SUBSTRING_Test()
     {
         result = ParseWithDataFrame("SUBSTRING([Name], 5)", _testData1);
-        expected = _testData2.Columns["Name"].ElementwiseSubstring(
+        expected = _testData1.Columns["Name"].ElementwiseSubstring(
             DataFrameUtilities.CreateConstantDataFrameColumn(5, _testData1.Rows.Count));
         DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
 
         result = ParseWithDataFrame("SUBSTRING([Name], 2, 3)", _testData1);
-        expected = _testData2.Columns["Name"].ElementwiseSubstring(
+        expected = _testData1.Columns["Name"].ElementwiseSubstring(
             DataFrameUtilities.CreateConstantDataFrameColumn(2, _testData1.Rows.Count),
             DataFrameUtilities.CreateConstantDataFrameColumn(3, _testData1.Rows.Count));
         DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
@@ -603,12 +623,12 @@ public class ParserTests
     public void Functions_FORMAT_Test()
     {
         result = ParseWithDataFrame("FORMAT([Age], '0.00')", _testData1);
-        expected = _testData2.Columns["Age"].ElementwiseFormat(
+        expected = _testData1.Columns["Age"].ElementwiseFormat(
             DataFrameUtilities.CreateConstantDataFrameColumn("0.00", _testData1.Rows.Count));
         DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
 
         result = ParseWithDataFrame("FORMAT([HireDate], 'yyyy-MM-dd')", _testData1);
-        expected = _testData2.Columns["HireDate"].ElementwiseFormat(
+        expected = _testData1.Columns["HireDate"].ElementwiseFormat(
             DataFrameUtilities.CreateConstantDataFrameColumn("yyyy-MM-dd", _testData1.Rows.Count));
         DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
     }
