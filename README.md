@@ -1,3 +1,5 @@
+[![build](https://github.com/charliebone/xlblocks/actions/workflows/build.yml/badge.svg)](https://github.com/charliebone/xlblocks/actions/workflows/build.yml)
+
 <h1 align="center">The XlBlocks Excel Add-In</h1> 
 <br>
 <p align="center">
