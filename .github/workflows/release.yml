@@ -1,17 +1,12 @@
-name: build
+name: release
 
 on:
   push:
-    branches:
-      - add-build-artifact
-  pull_request:
-    branches:
-      - main
-    paths-ignore:
-      - "**/*.md"
+    tags:
+      - '*'
 
 jobs:
-  build:
+  release:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v4
