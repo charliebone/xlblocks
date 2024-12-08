@@ -9,6 +9,7 @@ runs:
       with:
         dotnet-version: '6.0.x'
         cache: true
+        cache-dependency-path: '**/packages.lock.json'
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v2
     - name: Restore 
