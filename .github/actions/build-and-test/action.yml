@@ -13,7 +13,7 @@ runs:
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v2
     - name: Restore 
-      run: msbuild -t:restore /p:RestoreLockedMode=true
+      run: msbuild -t:restore /p:Configuration=Release /p:RestoreLockedMode=true
       shell: pwsh
     - name: Build
       run: msbuild -t:rebuild -property:Configuration=Release
