@@ -3,7 +3,7 @@ name: build
 on:
   push:
     branches:
-      - add-build-artifact-none
+      - add-build-artifact
   pull_request:
     branches:
       - main
