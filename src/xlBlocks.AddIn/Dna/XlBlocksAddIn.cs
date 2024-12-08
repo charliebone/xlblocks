@@ -38,16 +38,11 @@ internal class XlBlocksAddIn : IExcelAddIn
         {
             if (_productVersion == null)
             {
-                var dllDirectory = ExcelDnaUtil.XllPathInfo.Directory;
-                var dllName = Assembly.GetExecutingAssembly().GetName().Name;
-                if (dllDirectory != null && dllName != null)
-                {
-                    var dllPath = Path.Combine(dllDirectory.FullName, $"{dllName}.dll");
-                    var fileVersionInfo = FileVersionInfo.GetVersionInfo(dllPath);
-                    _productVersion = fileVersionInfo.ProductVersion;
-                }
-
-                _productVersion ??= Version?.ToString() ?? string.Empty;
+                var assemblyInfoVersion = Assembly.GetExecutingAssembly()
+                    .GetCustomAttributes<AssemblyInformationalVersionAttribute>()
+                    .Select(x => x?.InformationalVersion)
+                    .FirstOrDefault();
+                _productVersion = assemblyInfoVersion ?? Version?.ToString() ?? string.Empty;
             }
             return _productVersion;
         }
