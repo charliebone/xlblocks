@@ -1,0 +1,21 @@
+name: release
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  release:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    steps:
+    - uses: actions/checkout@v4
+    - name: Build and Test
+      uses: ./.github/actions/build-and-test
+    - name: Release
+      uses: softprops/action-gh-release@v2
+      with:
+        files: |
+          ./artifacts/bin/XlBlocks.AddIn/Release/*-packed.xll

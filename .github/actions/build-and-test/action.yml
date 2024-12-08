@@ -1,0 +1,28 @@
+name: build-and-test
+description: Build and test
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/checkout@v4
+    - name: Setup dotnet
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '6.0.x'
+        cache: true
+        cache-dependency-path: '**/packages.lock.json'
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v2
+    - name: Restore 
+      run: msbuild -t:restore /p:Configuration=Release /p:RestoreLockedMode=true
+      shell: pwsh
+    - name: Build
+      run: msbuild -t:rebuild -property:Configuration=Release
+      shell: pwsh
+    - name: Run tests
+      run: dotnet test ./tests/XlBlocks.AddIn.Tests/XlBlocks.AddIn.Tests.csproj --configuration Release --no-build --verbosity normal
+      shell: pwsh
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: excel-addins
+        path: ./artifacts/bin/XlBlocks.AddIn/Release/*-packed.xll

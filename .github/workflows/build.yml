@@ -8,19 +8,9 @@ on:
       - "**/*.md"
 
 jobs:
-  build-and-test:
+  build:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v4
-    - name: Setup dotnet
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: '6.0.x'
-    - name: Add msbuild to PATH
-      uses: microsoft/setup-msbuild@v2
-    - name: Restore 
-      run: msbuild -t:restore
-    - name: Build
-      run: msbuild -t:rebuild -property:Configuration=Release
-    - name: Run tests
-      run: dotnet test ./tests/XlBlocks.AddIn.Tests/XlBlocks.AddIn.Tests.csproj --configuration Release --no-build --verbosity normal
+    - name: Build and Test
+      uses: ./.github/actions/build-and-test

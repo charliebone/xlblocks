@@ -1,0 +1,158 @@
+{
+  "version": 1,
+  "dependencies": {
+    "net6.0-windows7.0": {
+      "ExcelDna.AddIn": {
+        "type": "Direct",
+        "requested": "[1.8.0, )",
+        "resolved": "1.8.0",
+        "contentHash": "Q+NcNeuzIkE6d21Sc0NGBpfKClKO8QU2ozR/EZ9RE+WjCxwwOUWXPRLev8+DpOCwkUjXtBIKjE7+xxHTac3PHA==",
+        "dependencies": {
+          "ExcelDna.Integration": "[1.8.0]"
+        }
+      },
+      "ExcelDna.IntelliSense": {
+        "type": "Direct",
+        "requested": "[1.8.0, )",
+        "resolved": "1.8.0",
+        "contentHash": "1+7qLn2yL/sO7P6bCTAewNg2j2+4A+W5qq9YKkeM6o8q59LK9jbUTN8q8NopG1Yqc6zfn4ZE7jhLNadsgXz6NQ==",
+        "dependencies": {
+          "ExcelDna.Integration": "[1.8.0]"
+        }
+      },
+      "ExcelDna.Registration": {
+        "type": "Direct",
+        "requested": "[1.8.0, )",
+        "resolved": "1.8.0",
+        "contentHash": "4pIOS+U5AsLGgjqmzoogDMqdn1Znj0IUvAwu4kMPcWtOOfYsLfMzqg0xGJZOPkbuHkR2mMucHOS5l8WxHuiT/A==",
+        "dependencies": {
+          "ExcelDna.Integration": "[1.8.0]"
+        }
+      },
+      "HexConverter": {
+        "type": "Direct",
+        "requested": "[1.1.1, )",
+        "resolved": "1.1.1",
+        "contentHash": "T+QTrFAJOIdmK84GmLXdsd8QhM6p7HxbuVD2VVQUhQx00+fK5fmAh7YZzYsq9PMtnn/Uy6t6Jnvjc9n++HLNXw==",
+        "dependencies": {
+          "System.Memory": "4.5.4"
+        }
+      },
+      "Microsoft.Data.Analysis": {
+        "type": "Direct",
+        "requested": "[0.22.0, )",
+        "resolved": "0.22.0",
+        "contentHash": "LV2sEQ6uevBipFKHPUIuPgHTp4BLkQOnWWHVv2QVIi80t+B1jlIPVUMYWLNV8/AusRPuq02psMVxqmJ3aJYqZQ==",
+        "dependencies": {
+          "Apache.Arrow": "14.0.2",
+          "Microsoft.ML.DataView": "4.0.0",
+          "System.Buffers": "4.6.0",
+          "System.Memory": "4.6.0",
+          "System.Runtime.CompilerServices.Unsafe": "6.1.0"
+        }
+      },
+      "murmurhash": {
+        "type": "Direct",
+        "requested": "[1.0.3, )",
+        "resolved": "1.0.3",
+        "contentHash": "56dW8jgSsvGs/tULn+r1UbS+o0rBvgMj+6Lta6uao4j8Kzx1kVxMf56LPKO070VqjWcGyMB4K4R6M4gVKutG9A=="
+      },
+      "NLog": {
+        "type": "Direct",
+        "requested": "[5.3.4, )",
+        "resolved": "5.3.4",
+        "contentHash": "gLy7+O1hEYJXIlcTr1/VWjGXrZTQFZzYNO18IWasD64pNwz0BreV+nHLxWKXWZzERRzoKnsk2XYtwLkTVk7J1A=="
+      },
+      "ReaLTaiizor": {
+        "type": "Direct",
+        "requested": "[3.8.0.8, )",
+        "resolved": "3.8.0.8",
+        "contentHash": "FE30voqfqr4OjdT6TCCBIhwmsmkHUcqBk+ksKaBnKnV7bUXdTXVvc1MU6aTd5VfAlwPcuB3W7q+uc6c+VHQfUA=="
+      },
+      "sly": {
+        "type": "Direct",
+        "requested": "[3.4.6, )",
+        "resolved": "3.4.6",
+        "contentHash": "auU7wCr6KW6IiQleQcjtMfQQBFBXJP4paJh6Fbxv7vu2+vTLRIB+4Q497cgaZCjaM+ZINWrY3qUjZvZlxrRglQ==",
+        "dependencies": {
+          "Newtonsoft.Json": "13.0.2",
+          "System.Collections.Immutable": "8.0.0",
+          "System.Memory": "4.5.5",
+          "System.ValueTuple": "4.5.0"
+        }
+      },
+      "System.Management": {
+        "type": "Direct",
+        "requested": "[8.0.0, )",
+        "resolved": "8.0.0",
+        "contentHash": "jrK22i5LRzxZCfGb+tGmke2VH7oE0DvcDlJ1HAKYU8cPmD8XnpUT0bYn2Gy98GEhGjtfbR/sxKTVb+dE770pfA==",
+        "dependencies": {
+          "System.CodeDom": "8.0.0"
+        }
+      },
+      "System.Reactive": {
+        "type": "Direct",
+        "requested": "[6.0.1, )",
+        "resolved": "6.0.1",
+        "contentHash": "rHaWtKDwCi9qJ3ObKo8LHPMuuwv33YbmQi7TcUK1C264V3MFnOr5Im7QgCTdLniztP3GJyeiSg5x8NqYJFqRmg=="
+      },
+      "Apache.Arrow": {
+        "type": "Transitive",
+        "resolved": "14.0.2",
+        "contentHash": "2xvo9q2ag/Ze7TKSMsZfcQFMk3zZKWcduttJXoYnoevZD2bv+lKnOPeleyxONuR1ZwhZ00D86pPM9TWx2GMY2w=="
+      },
+      "ExcelDna.Integration": {
+        "type": "Transitive",
+        "resolved": "1.8.0",
+        "contentHash": "Z7UYuY291cTxc8lEESlUT73iI28yZ9LeJnvhPIRpZHBlrjbCN8lnEWvSmUqmUn1lBNGk6p2n0GlPuBhopJuksA=="
+      },
+      "Microsoft.ML.DataView": {
+        "type": "Transitive",
+        "resolved": "4.0.0",
+        "contentHash": "qFLqB+uv+DQvm3xsKeQ83sjw/0Hh9LxZkCDnHOC2lc869yLBXHEtggf+7GccRXYNoB/PnaveRVuWQk3s3uuZKw==",
+        "dependencies": {
+          "System.Collections.Immutable": "8.0.0",
+          "System.Memory": "4.6.0"
+        }
+      },
+      "Newtonsoft.Json": {
+        "type": "Transitive",
+        "resolved": "13.0.2",
+        "contentHash": "R2pZ3B0UjeyHShm9vG+Tu0EBb2lC8b0dFzV9gVn50ofHXh9Smjk6kTn7A/FdAsC8B5cKib1OnGYOXxRBz5XQDg=="
+      },
+      "System.Buffers": {
+        "type": "Transitive",
+        "resolved": "4.6.0",
+        "contentHash": "lN6tZi7Q46zFzAbRYXTIvfXcyvQQgxnY7Xm6C6xQ9784dEL1amjM6S6Iw4ZpsvesAKnRVsM4scrDQaDqSClkjA=="
+      },
+      "System.CodeDom": {
+        "type": "Transitive",
+        "resolved": "8.0.0",
+        "contentHash": "WTlRjL6KWIMr/pAaq3rYqh0TJlzpouaQ/W1eelssHgtlwHAH25jXTkUphTYx9HaIIf7XA6qs/0+YhtLEQRkJ+Q=="
+      },
+      "System.Collections.Immutable": {
+        "type": "Transitive",
+        "resolved": "8.0.0",
+        "contentHash": "AurL6Y5BA1WotzlEvVaIDpqzpIPvYnnldxru8oXJU2yFxFUy3+pNXjXd1ymO+RA0rq0+590Q8gaz2l3Sr7fmqg==",
+        "dependencies": {
+          "System.Runtime.CompilerServices.Unsafe": "6.0.0"
+        }
+      },
+      "System.Memory": {
+        "type": "Transitive",
+        "resolved": "4.6.0",
+        "contentHash": "OEkbBQoklHngJ8UD8ez2AERSk2g+/qpAaSWWCBFbpH727HxDq5ydVkuncBaKcKfwRqXGWx64dS6G1SUScMsitg=="
+      },
+      "System.Runtime.CompilerServices.Unsafe": {
+        "type": "Transitive",
+        "resolved": "6.1.0",
+        "contentHash": "5o/HZxx6RVqYlhKSq8/zronDkALJZUT2Vz0hx43f0gwe8mwlM0y2nYlqdBwLMzr262Bwvpikeb/yEwkAa5PADg=="
+      },
+      "System.ValueTuple": {
+        "type": "Transitive",
+        "resolved": "4.5.0",
+        "contentHash": "okurQJO6NRE/apDIP23ajJ0hpiNmJ+f0BwOlB/cSqTLQlw5upkf+5+96+iG2Jw40G1fCVCyPz/FhIABUjMR+RQ=="
+      }
+    }
+  }
+}

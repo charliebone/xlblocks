@@ -6,6 +6,7 @@
     <Pedantic>true</Pedantic>
     <VerboseOutput>true</VerboseOutput>
     <OutputPath>$(ArtifactsPath)\bin\$(MSBuildProjectName)\$(Configuration)</OutputPath>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="WixToolset.Netfx.wixext" Version="5.0.2" />
