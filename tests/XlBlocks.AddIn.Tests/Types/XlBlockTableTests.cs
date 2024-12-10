@@ -1524,6 +1524,27 @@ public class XlBlockTableTests
         AssertTableMatchesExpected(expectedResult, result);
     }
 
+    [Fact]
+    public void AppendColumnFromDictionary_NullValues()
+    {
+        var dictionary = new XlBlockDictionary(new Dictionary<string, object>
+        {
+            ["Alice"] = null!,
+            ["Bob"] = null!,
+            ["Charlie"] = null!
+        }, typeof(string));
+
+        var result = _nicknames.AppendColumnFromDictionary(dictionary, "Name", "Salaries");
+        object[,] expectedResult =
+        {
+            { "Nickname", "Name", "Salaries" },
+            { "Chuck", "Charlie", null! },
+            { "Liz", "Alice", null! },
+            { "Hank", null!, null! }
+        };
+        AssertTableMatchesExpected(expectedResult, result);
+    }
+
     #endregion
 
     #region Misc

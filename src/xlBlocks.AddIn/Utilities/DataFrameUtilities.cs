@@ -83,7 +83,7 @@ internal static class DataFrameUtilities
 
             var convertedValues = guessConversions.Select(x =>
             {
-                if (x.IsMissingOrError)
+                if (x.IsMissingOrError || x.Input is null)
                     return null;
 
                 if (x.Success && x.ConvertedType == determinedType)
