@@ -176,6 +176,29 @@ public class XlBlockTableTests
     }
 
     [Fact]
+    public void Build_RemovesTrailingInvalidRows()
+    {
+        var dataRange = XlBlockRange.Build(new object[,]
+        {
+            { "Column1", "Column2" },
+            { 1, 2 },
+            { 3, 4 },
+            { ExcelMissing.Value, ExcelMissing.Value },
+            { ExcelError.ExcelErrorNA, ExcelError.ExcelErrorNA }
+        });
+
+        var table = XlBlockTable.Build(dataRange);
+
+        object[,] expectedResult =
+        {
+            { "Column1", "Column2" },
+            { 1d, 2d },
+            { 3d, 4d },
+        };
+        AssertTableMatchesExpected(expectedResult, table);
+    }
+
+    [Fact]
     public void BuildWithTypes_ValidDataRange_CreatesXlBlockTableWithSpecifiedTypes()
     {
         var dataRange = XlBlockRange.Build(new object[,]

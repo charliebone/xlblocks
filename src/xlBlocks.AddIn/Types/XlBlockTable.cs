@@ -154,7 +154,7 @@ internal class XlBlockTable : IXlBlockCopyableObject<XlBlockTable>, IXlBlockArra
             columns.Add(dataColumn);
         }
 
-        var dataFrame = new DataFrame(columns.ToArray());
+        var dataFrame = new DataFrame(columns.ToArray()).TrimNullRows();
         return new XlBlockTable(dataFrame);
     }
 
@@ -190,13 +190,13 @@ internal class XlBlockTable : IXlBlockCopyableObject<XlBlockTable>, IXlBlockArra
             columns.Add(dataColumn);
         }
 
-        var dataFrame = new DataFrame(columns.ToArray());
+        var dataFrame = new DataFrame(columns.ToArray()).TrimNullRows();
         return new XlBlockTable(dataFrame);
     }
 
     public static XlBlockTable BuildFromDictionary(XlBlockDictionary dictionary, string keyColumnName, string valueColumnName, string? valueType = null)
     {
-        var dataFrame = DataFrameUtilities.DictionaryToDataFrame(dictionary, keyColumnName, valueColumnName, valueType);
+        var dataFrame = DataFrameUtilities.DictionaryToDataFrame(dictionary, keyColumnName, valueColumnName, valueType).TrimNullRows();
         return new XlBlockTable(dataFrame);
     }
 
