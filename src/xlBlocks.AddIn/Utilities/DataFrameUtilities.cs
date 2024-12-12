@@ -231,6 +231,32 @@ internal static class DataFrameUtilities
         throw new NotSupportedException($"cannot build data frame column of type '{type.Name}'");
     }
 
+    internal static DataFrame TrimNullRows(this DataFrame dataFrame)
+    {
+        var nonNull = false;
+        var index = new BooleanDataFrameColumn("index", RepeatLong(true, dataFrame.Rows.Count));
+        for (var row = dataFrame.Rows.Count - 1; row >= 0; row--)
+        {
+            foreach (var column in dataFrame.Columns)
+            {
+                if (column[row] != null)
+                {
+                    nonNull = true;
+                    break;
+                }
+            }
+            if (nonNull)
+                break;
+
+            index[row] = false;
+        }
+
+        if (index[dataFrame.Rows.Count - 1] != true)
+            dataFrame = dataFrame[index];
+
+        return dataFrame;
+    }
+
     public static bool IsValidColumnType(Type type)
     {
         return type == typeof(bool) ||
