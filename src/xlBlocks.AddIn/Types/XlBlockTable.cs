@@ -639,6 +639,8 @@ internal class XlBlockTable : IXlBlockCopyableObject<XlBlockTable>, IXlBlockArra
         if (groupColumnNames.Count == 1)
         {
             newDataFrame = groupByDelegate(_dataFrame.GroupBy(groupColumnNames[0]), aggregationColumnsList.ToArray());
+            if (newDataFrame.Columns[0].Name == "key")
+                newDataFrame.Columns[0].SetName(groupColumnNames[0]);
         }
         else
         {

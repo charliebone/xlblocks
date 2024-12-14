@@ -75,6 +75,28 @@ public class XlBlockTableTests
         XlBlockRange.Build(new[] { "int", "string", "int", "double" }),
         XlBlockRange.Build(new[] { "Id", "Category", "ErrorCount", "Average" }));
 
+    private static readonly XlBlockTable _observationsTable = XlBlockTable.BuildWithTypes(XlBlockRange.Build(
+        new object[,]
+        {
+            { "Category1", 28.4, 12.6 },
+            { "Category2", 15.3, 8.1 },
+            { "Category3", 23.4, 7.8 },
+            { "Category1", 34.7, 14.6 },
+            { "Category2", 20.2, 11.3 },
+            { "Category3", 27.6, 10.9 },
+            { "Category1", 31.5, 9.2 },
+            { "Category2", 26.4, 15.3 },
+            { "Category3", 29.7, 12.4 },
+            { "Category1", 29.5, 7.9 },
+            { "Category2", 44.4, 21.3 },
+            { "Category3", 17.1, 32.8 },
+            { "Category1", 11.3, 12.9 },
+            { "Category2", 24.8, 24.3 },
+            { "Category3", 36.5, 7.2 }
+        }),
+        XlBlockRange.Build(new[] { "string", "double", "double" }),
+        XlBlockRange.Build(new[] { "Category", "Duration", "Distance" }));
+
     private static void AssertTableMatchesExpected(object[,] expected, XlBlockTable? actual)
     {
         Assert.NotNull(actual);
@@ -2232,6 +2254,159 @@ public class XlBlockTableTests
             { "Critical", 1.77 },
             { "Debug", 53.67 },
             { "Info", 0d }
+        };
+        AssertTableMatchesExpected(expectedResult, result);
+    }
+
+    [Fact]
+    public void GroupBy_Median()
+    {
+        var groupColumns = XlBlockRange.Build(new object[,] { { "Category" } });
+
+        var result = _observationsTable.GroupBy(groupColumns, "median", XlBlockRange.Build(new object[,] { { "Duration", "Distance" } }), null);
+
+        object[,] expectedResult =
+        {
+            { "Category", "Duration", "Distance" },
+            { "Category1", 29.5, 12.6 },
+            { "Category2", 24.8, 15.3 },
+            { "Category3", 27.6, 10.9 }
+        };
+        AssertTableMatchesExpected(expectedResult, result);
+    }
+
+    [Fact]
+    public void GroupBy_Variance()
+    {
+        var groupColumns = XlBlockRange.Build(new object[,] { { "Category" } });
+
+        var result = _observationsTable.GroupBy(groupColumns, "VAR", XlBlockRange.Build(new object[,] { { "Duration", "Distance" } }), null);
+
+        object[,] expectedResult =
+        {
+            { "Category", "Duration", "Distance" },
+            { "Category1", 83.552, 7.753 },
+            { "Category2", 122.012, 45.488 },
+            { "Category3", 52.193, 112.512 }
+        };
+        AssertTableMatchesExpected(expectedResult, result);
+    }
+
+    [Fact]
+    public void GroupBy_VarianceP()
+    {
+        var groupColumns = XlBlockRange.Build(new object[,] { { "Category" } });
+
+        var result = _observationsTable.GroupBy(groupColumns, "varp", XlBlockRange.Build(new object[,] { { "Duration", "Distance" } }), null);
+
+        object[,] expectedResult =
+        {
+            { "Category", "Duration", "Distance" },
+            { "Category1", 66.8416, 6.2024 },
+            { "Category2", 97.6096, 36.3904 },
+            { "Category3", 41.7544, 90.0096 }
+        };
+        AssertTableMatchesExpected(expectedResult, result);
+    }
+
+    [Fact]
+    public void GroupBy_StdDev()
+    {
+        var groupColumns = XlBlockRange.Build(new object[,] { { "Category" } });
+
+        var result = _observationsTable.GroupBy(groupColumns, "stddev", XlBlockRange.Build(new object[,] { { "Duration", "Distance" } }), null);
+
+        object[,] expectedResult =
+        {
+            { "Category", "Duration", "Distance" },
+            { "Category1", 9.1407, 2.7844 },
+            { "Category2", 11.0459, 6.7445 },
+            { "Category3", 7.2245, 10.6072 }
+        };
+        AssertTableMatchesExpected(expectedResult, result);
+    }
+
+    [Fact]
+    public void GroupBy_StdDevP()
+    {
+        var groupColumns = XlBlockRange.Build(new object[,] { { "Category" } });
+
+        var result = _observationsTable.GroupBy(groupColumns, "StdDevP", XlBlockRange.Build(new object[,] { { "Duration", "Distance" } }), null);
+
+        object[,] expectedResult =
+        {
+            { "Category", "Duration", "Distance" },
+            { "Category1", 8.1757, 2.4905 },
+            { "Category2", 9.8798, 6.0324 },
+            { "Category3", 6.4618, 9.4873 }
+        };
+        AssertTableMatchesExpected(expectedResult, result);
+    }
+
+    [Fact]
+    public void GroupBy_Skew()
+    {
+        var groupColumns = XlBlockRange.Build(new object[,] { { "Category" } });
+
+        var result = _observationsTable.GroupBy(groupColumns, "Skew", XlBlockRange.Build(new object[,] { { "Duration", "Distance" } }), null);
+
+        object[,] expectedResult =
+        {
+            { "Category", "Duration", "Distance" },
+            { "Category1", -1.8463, -0.3739 },
+            { "Category2", 1.3867, 0.1232 },
+            { "Category3", -0.0574, 2.0113 }
+        };
+        AssertTableMatchesExpected(expectedResult, result);
+    }
+
+    [Fact]
+    public void GroupBy_SkewP()
+    {
+        var groupColumns = XlBlockRange.Build(new object[,] { { "Category" } });
+
+        var result = _observationsTable.GroupBy(groupColumns, "SKEWP", XlBlockRange.Build(new object[,] { { "Duration", "Distance" } }), null);
+
+        object[,] expectedResult =
+        {
+            { "Category", "Duration", "Distance" },
+            { "Category1", -1.2385, -0.2508 },
+            { "Category2", 0.9303, 0.0826 },
+            { "Category3", -0.0385, 1.3492 }
+        };
+        AssertTableMatchesExpected(expectedResult, result);
+    }
+
+    [Fact]
+    public void GroupBy_Kurtosis()
+    {
+        var groupColumns = XlBlockRange.Build(new object[,] { { "Category" } });
+
+        var result = _observationsTable.GroupBy(groupColumns, "kurt", XlBlockRange.Build(new object[,] { { "Duration", "Distance" } }), null);
+
+        object[,] expectedResult =
+        {
+            { "Category", "Duration", "Distance" },
+            { "Category1", 3.7813, -2.005 },
+            { "Category2", 2.4769, -2.0239 },
+            { "Category3", 0.2222, 4.1884 }
+        };
+        AssertTableMatchesExpected(expectedResult, result);
+    }
+
+    [Fact]
+    public void GroupBy_KurtosisP()
+    {
+        var groupColumns = XlBlockRange.Build(new object[,] { { "Category" } });
+
+        var result = _observationsTable.GroupBy(groupColumns, "KurtosisP", XlBlockRange.Build(new object[,] { { "Duration", "Distance" } }), null);
+
+        object[,] expectedResult =
+        {
+            { "Category", "Duration", "Distance" },
+            { "Category1", -0.0547, -1.5012 },
+            { "Category2", -0.3808, -1.506 },
+            { "Category3", -0.9444, 0.0471 }
         };
         AssertTableMatchesExpected(expectedResult, result);
     }
