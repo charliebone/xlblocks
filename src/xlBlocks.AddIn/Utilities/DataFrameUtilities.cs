@@ -326,11 +326,86 @@ internal static class DataFrameUtilities
             "min" or "minimum" => (GroupBy g, string[] n) => g.Min(n),
             "max" or "maximum" => (GroupBy g, string[] n) => g.Max(n),
             "mean" or "average" or "avg" => (GroupBy g, string[] n) => g.Mean(n),
+            "med" or "median" => (GroupBy g, string[] n) => g.ToGroupByStatistics().Median(n),
             "count" => (GroupBy g, string[] n) => g.Count(n),
             "first" => (GroupBy g, string[] n) => g.First(n),
             "last" => (GroupBy g, string[] n) => g.Tail(1),
-            _ => throw new ArgumentException($"unknown group by operation'{groupByOperation}', must be one of 'sum', 'product', 'min' 'max' 'mean' or 'count'")
+            "stddev" => (GroupBy g, string[] n) => g.ToGroupByStatistics().StdDev(n, true),
+            "stddevp" => (GroupBy g, string[] n) => g.ToGroupByStatistics().StdDev(n, false),
+            "var" or "variance" => (GroupBy g, string[] n) => g.ToGroupByStatistics().Variance(n, true),
+            "varp" or "variancep" => (GroupBy g, string[] n) => g.ToGroupByStatistics().Variance(n, false),
+            "skew" => (GroupBy g, string[] n) => g.ToGroupByStatistics().Skew(n, true),
+            "skewp" => (GroupBy g, string[] n) => g.ToGroupByStatistics().Skew(n, false),
+            "kurt" or "kurtosis" => (GroupBy g, string[] n) => g.ToGroupByStatistics().Kurtosis(n, true),
+            "kurtp" or "kurtosisp" => (GroupBy g, string[] n) => g.ToGroupByStatistics().Kurtosis(n, false),
+            _ => throw new ArgumentException($"unknown group by operation'{groupByOperation}', must be one of 'sum', 'product', 'min' 'max' 'mean', 'median', 'count', 'first', 'last', 'stddev', 'stddevp', 'var', 'varp', 'skew', 'skewp', 'kurt' or 'kurp'")
         };
+    }
+
+    private static IGroupByStatistics ToGroupByStatistics(this GroupBy groupBy)
+    {
+        if (groupBy is GroupBy<bool> boolGroupBy)
+        {
+            return new GroupByStatistics<bool>(boolGroupBy);
+        }
+        else if (groupBy is GroupBy<double> doubleGroupBy)
+        {
+            return new GroupByStatistics<double>(doubleGroupBy);
+        }
+        else if (groupBy is GroupBy<float> floatGroupBy)
+        {
+            return new GroupByStatistics<float>(floatGroupBy);
+        }
+        else if (groupBy is GroupBy<decimal> decimalGroupBy)
+        {
+            return new GroupByStatistics<decimal>(decimalGroupBy);
+        }
+        else if (groupBy is GroupBy<string> stringGroupBy)
+        {
+            return new GroupByStatistics<string>(stringGroupBy);
+        }
+        else if (groupBy is GroupBy<int> intGroupBy)
+        {
+            return new GroupByStatistics<int>(intGroupBy);
+        }
+        else if (groupBy is GroupBy<uint> uintGroupBy)
+        {
+            return new GroupByStatistics<uint>(uintGroupBy);
+        }
+        else if (groupBy is GroupBy<long> longGroupBy)
+        {
+            return new GroupByStatistics<long>(longGroupBy);
+        }
+        else if (groupBy is GroupBy<ulong> ulongGroupBy)
+        {
+            return new GroupByStatistics<ulong>(ulongGroupBy);
+        }
+        else if (groupBy is GroupBy<short> shortGroupBy)
+        {
+            return new GroupByStatistics<short>(shortGroupBy);
+        }
+        else if (groupBy is GroupBy<ushort> ushortGroupBy)
+        {
+            return new GroupByStatistics<ushort>(ushortGroupBy);
+        }
+        else if (groupBy is GroupBy<char> charGroupBy)
+        {
+            return new GroupByStatistics<char>(charGroupBy);
+        }
+        else if (groupBy is GroupBy<sbyte> sbyteGroupBy)
+        {
+            return new GroupByStatistics<sbyte>(sbyteGroupBy);
+        }
+        else if (groupBy is GroupBy<byte> byteGroupBy)
+        {
+            return new GroupByStatistics<byte>(byteGroupBy);
+        }
+        else if (groupBy is GroupBy<DateTime> dateTimeGroupBy)
+        {
+            return new GroupByStatistics<DateTime>(dateTimeGroupBy);
+        }
+
+        throw new NotSupportedException($"cannot group by column of type");
     }
 
     public static DataFrame DictionaryToDataFrame(XlBlockDictionary dictionary, string keyColumnName, string valueColumnName, string? valueType = null)
