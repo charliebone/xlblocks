@@ -52,7 +52,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build-and-test", "build-and
 		.github\actions\build-and-test\action.yml = .github\actions\build-and-test\action.yml
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{06422753-7D59-41F9-AFBD-7247E6C5E922}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{CBC5BDDE-D035-481F-A4CE-BE6438E0838A}"
 	ProjectSection(SolutionItems) = preProject
 		docs\Gemfile = docs\Gemfile
 		docs\Gemfile.lock = docs\Gemfile.lock
@@ -183,7 +183,6 @@ Global
 		{5A8BBFF7-6593-4883-9092-3C9F5849D185} = {B5885095-A51A-42D1-A16A-358033AEF4C5}
 		{E55FDE72-0B1F-4B29-92D3-69A6BD4692F0} = {B5885095-A51A-42D1-A16A-358033AEF4C5}
 		{A6C3AD05-B054-46DF-935C-3D515A66C9EB} = {E55FDE72-0B1F-4B29-92D3-69A6BD4692F0}
-		{06422753-7D59-41F9-AFBD-7247E6C5E922} = {AEA089AB-5815-4198-A2AF-759632F1B80F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0372DDE4-269D-427B-8BD2-363C0AF3AA6F}
