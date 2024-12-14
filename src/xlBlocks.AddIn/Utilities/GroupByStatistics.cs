@@ -143,6 +143,4 @@ public class GroupByStatistics<TKey> : IGroupByStatistics
             (vals[vals.Count / 2 - 1] + vals[vals.Count / 2 + 1]) / 2d :
             vals[vals.Count / 2];
     }
-
-    
 }
