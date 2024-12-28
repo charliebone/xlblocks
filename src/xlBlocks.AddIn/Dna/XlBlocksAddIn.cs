@@ -91,7 +91,7 @@ internal class XlBlocksAddIn : IExcelAddIn
         IntelliSenseServer.Uninstall();
     }
 
-    private static IEnumerable<ExcelFunctionRegistration> GetExcelFunctions()
+    internal static IEnumerable<ExcelFunctionRegistration> GetExcelFunctions()
     {
         return ExcelIntegration.GetExportedAssemblies()
             .SelectMany(x => x.GetTypes())
