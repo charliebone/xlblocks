@@ -140,7 +140,7 @@ public class GroupByStatistics<TKey> : IGroupByStatistics
             return null;
 
         return vals.Count % 2 == 0 ?
-            (vals[vals.Count / 2 - 1] + vals[vals.Count / 2 + 1]) / 2d :
+            (vals[vals.Count / 2 - 1] + vals[vals.Count / 2]) / 2d :
             vals[vals.Count / 2];
     }
 }

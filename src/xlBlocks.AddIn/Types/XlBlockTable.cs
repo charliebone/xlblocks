@@ -649,21 +649,21 @@ internal class XlBlockTable : IXlBlockCopyableObject<XlBlockTable>, IXlBlockArra
             dataFrame.Columns.Add(compositeKeyCol);
 
             var groupedDataFrame = groupByDelegate(dataFrame.GroupBy(compositeKeyCol.Name), aggregationColumnsList.ToArray());
+            groupedDataFrame.Columns[0].SetName(compositeKeyCol.Name);
             var joined = dataFrame.Merge(groupedDataFrame, new[] { compositeKeyCol.Name }, new[] { compositeKeyCol.Name }, "_left", "_right", JoinAlgorithm.Left);
             var joinedColumnNames = joined.Columns.Select(x => x.Name).ToList();
 
             var newColumns = new List<DataFrameColumn>();
-            foreach (var columnName in dataFrame.Columns.Select(x => x.Name))
+            foreach (var columnName in groupColumnNames)
             {
-                if (groupColumnNames.Contains(columnName))
-                    newColumns.Add(dataFrame[columnName]);
+                newColumns.Add(dataFrame[columnName]);
+            }
 
-                if (aggregationColumnsList.Contains(columnName))
-                {
-                    var aggregationColumn = joined[$"{columnName}_right"];
-                    aggregationColumn.SetName(columnName);
-                    newColumns.Add(aggregationColumn);
-                }
+            foreach (var columnName in aggregationColumnsList)
+            {
+                var aggregationColumn = joined[$"{columnName}_right"];
+                aggregationColumn.SetName(columnName);
+                newColumns.Add(aggregationColumn);
             }
 
             newDataFrame = new DataFrame(newColumns);

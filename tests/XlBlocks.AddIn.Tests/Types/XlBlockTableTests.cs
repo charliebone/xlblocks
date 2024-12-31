@@ -2276,6 +2276,28 @@ public class XlBlockTableTests
     }
 
     [Fact]
+    public void GroupBy_Median_MultipleGroupByColumns()
+    {
+        var columnTags = XlBlockList.Build(XlBlockRange.Build(new[,] { { "A", "A", "A", "A", "A", "A", "A", "A", "A", "B", "B", "B", "B", "B", "B" } }), "drop");
+        var taggedObservations = _observationsTable.AppendColumnFromList(columnTags, "Tag");
+
+        var groupColumns = XlBlockRange.Build(new object[,] { { "Category", "Tag" } });
+        var result = taggedObservations.GroupBy(groupColumns, "median", XlBlockRange.Build(new object[,] { { "Duration", "Distance" } }), null);
+
+        object[,] expectedResult =
+        {
+            { "Category", "Tag", "Duration", "Distance" },
+            { "Category1", "A", 31.5, 12.6 },
+            { "Category2", "A", 20.2, 11.3 },
+            { "Category3", "A", 27.6, 10.9 },
+            { "Category1", "B", 20.4, 10.4 },
+            { "Category2", "B", 34.6, 22.8 },
+            { "Category3", "B", 26.8, 20.0 }
+        };
+        AssertTableMatchesExpected(expectedResult, result);
+    }
+
+    [Fact]
     public void GroupBy_Variance()
     {
         var groupColumns = XlBlockRange.Build(new object[,] { { "Category" } });
