@@ -603,6 +603,19 @@ internal class XlBlockTable : IXlBlockCopyableObject<XlBlockTable>, IXlBlockArra
 
     public XlBlockTable GroupBy(XlBlockRange groupColumnNamesRange, string groupByOperation, XlBlockRange? aggregationColumnNamesRange, XlBlockRange? newColumnNamesRange)
     {
+        return GroupBy(groupColumnNamesRange, new List<string>() { groupByOperation }, aggregationColumnNamesRange, newColumnNamesRange);
+    }
+
+    public XlBlockTable GroupBy(XlBlockRange groupColumnNamesRange, XlBlockRange groupByOperations, XlBlockRange? aggregationColumnNamesRange, XlBlockRange? newColumnNamesRange)
+    {
+        if (groupByOperations.Count == 0)
+            throw new ArgumentException("at least one group by operation must be specified");
+
+        return GroupBy(groupColumnNamesRange, groupByOperations.GetAs<string>(false).ToList(), aggregationColumnNamesRange, newColumnNamesRange);
+    }
+
+    private XlBlockTable GroupBy(XlBlockRange groupColumnNamesRange, List<string> groupByOperations, XlBlockRange? aggregationColumnNamesRange, XlBlockRange? newColumnNamesRange)
+    {
         var groupColumnNames = groupColumnNamesRange.GetAs<string>(false).ToList();
         if (groupColumnNames.Count == 0)
             throw new ArgumentException("at least one group column must be specified");
@@ -610,71 +623,40 @@ internal class XlBlockTable : IXlBlockCopyableObject<XlBlockTable>, IXlBlockArra
         foreach (var column in groupColumnNames)
             AssertColumnExists(column);
 
-        var groupByDelegate = DataFrameUtilities.ParseGroupByOperation(groupByOperation);
-
-        var aggregationColumnsList = aggregationColumnNamesRange?.GetAs<string>(false)?.ToList();
-        if (aggregationColumnsList is null || !aggregationColumnsList.Any())
+        var aggregationColumnNames = aggregationColumnNamesRange?.GetAs<string>(false)?.ToList();
+        if (aggregationColumnNames is null || !aggregationColumnNames.Any())
         {
-            aggregationColumnsList = new List<string>();
+            if (groupByOperations.Count > 1)
+                throw new ArgumentException("multiple group by operations only allowed if aggregation columns are specified");
+
+            aggregationColumnNames = new List<string>();
             foreach (var column in _dataFrame.Columns)
             {
                 if (groupColumnNames.Contains(column.Name))
                     continue;
 
                 if (column.IsNumericColumn())
-                    aggregationColumnsList.Add(column.Name);
+                    aggregationColumnNames.Add(column.Name);
             }
+            groupByOperations = Enumerable.Repeat(groupByOperations[0], aggregationColumnNames.Count).ToList();
         }
         else
         {
-            foreach (var column in aggregationColumnsList)
+            if (groupByOperations.Count == 1)
+                groupByOperations = Enumerable.Repeat(groupByOperations[0], aggregationColumnNames.Count).ToList();
+
+            if (groupByOperations.Count != aggregationColumnNames.Count)
+                throw new ArgumentException("group by operations list must have same length as aggregate columns list");
+
+            foreach (var column in aggregationColumnNames)
                 AssertColumnExists(column);
         }
 
-        var newColumnNamesList = newColumnNamesRange?.GetAs<string>(false)?.ToList() ?? new List<string>(aggregationColumnsList);
-        if (newColumnNamesList.Any() && newColumnNamesList.Count != aggregationColumnsList.Count)
-            throw new ArgumentException($"new column names list count ({newColumnNamesList.Count}) does not match aggregation column count ({aggregationColumnsList.Count})");
+        var newColumnNames = newColumnNamesRange?.GetAs<string>(false)?.ToList() ?? aggregationColumnNames.Zip(groupByOperations).Select(x => $"{x.First}.{x.Second}").ToList();
+        if (newColumnNames.Any() && newColumnNames.Count != aggregationColumnNames.Count)
+            throw new ArgumentException($"new column names list count ({newColumnNames.Count}) does not match aggregation column count ({aggregationColumnNames.Count})");
 
-        DataFrame newDataFrame;
-        if (groupColumnNames.Count == 1)
-        {
-            newDataFrame = groupByDelegate(_dataFrame.GroupBy(groupColumnNames[0]), aggregationColumnsList.ToArray());
-            if (newDataFrame.Columns[0].Name == "key")
-                newDataFrame.Columns[0].SetName(groupColumnNames[0]);
-        }
-        else
-        {
-            var dataFrame = _dataFrame.Clone();
-            var compositeKeyCol = _dataFrame.MakeCompositeColumn(groupColumnNames);
-            dataFrame.Columns.Add(compositeKeyCol);
-
-            var groupedDataFrame = groupByDelegate(dataFrame.GroupBy(compositeKeyCol.Name), aggregationColumnsList.ToArray());
-            groupedDataFrame.Columns[0].SetName(compositeKeyCol.Name);
-            var joined = dataFrame.Merge(groupedDataFrame, new[] { compositeKeyCol.Name }, new[] { compositeKeyCol.Name }, "_left", "_right", JoinAlgorithm.Left);
-            var joinedColumnNames = joined.Columns.Select(x => x.Name).ToList();
-
-            var newColumns = new List<DataFrameColumn>();
-            foreach (var columnName in groupColumnNames)
-            {
-                newColumns.Add(dataFrame[columnName]);
-            }
-
-            foreach (var columnName in aggregationColumnsList)
-            {
-                var aggregationColumn = joined[$"{columnName}_right"];
-                aggregationColumn.SetName(columnName);
-                newColumns.Add(aggregationColumn);
-            }
-
-            newDataFrame = new DataFrame(newColumns);
-            newDataFrame = newDataFrame.Filter(compositeKeyCol.IsDuplicateElement().ElementwiseEquals(false));
-        }
-
-        if (newColumnNamesList.Any())
-        {
-            for (var i = 0; i < aggregationColumnsList.Count; i++)
-                newDataFrame[aggregationColumnsList[i]].SetName(newColumnNamesList[i]);
-        }
+        var newDataFrame = DataFrameUtilities.ComputeGroupAggregations(_dataFrame, groupColumnNames, groupByOperations, aggregationColumnNames, newColumnNames);
         return new XlBlockTable(newDataFrame);
     }
 }

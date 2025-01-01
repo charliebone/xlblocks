@@ -271,7 +271,7 @@ internal static class DataTypes_Table
     public static XlBlockTable XBTable_GroupBy(
        [ExcelArgument(Description = "A table"), CacheContents(AsReference = true)] XlBlockTable table,
        [ExcelArgument(Description = "Names of columns to group by")] XlBlockRange groupByColumns,
-       [ExcelArgument(Description = "Group by operation, one of 'sum', 'product', 'min' 'max' 'mean', 'median', 'count', 'first', 'last', 'stddev', 'stddevp', 'var', 'varp', 'skew', 'skewp', 'kurt' or 'kurp'"), Optional] string groupByOperation,
+       [ExcelArgument(Description = "Group by operation(s), must be either one or the length of aggregateColumns. Valid options are 'sum', 'product', 'min' 'max' 'mean', 'median', 'count', 'first', 'last', 'stddev', 'stddevp', 'var', 'varp', 'skew', 'skewp', 'kurt' or 'kurp'"), Optional] XlBlockRange groupByOperation,
        [ExcelArgument(Description = "Optional aggregation columns, defaults to all numeric non-group columns"), Optional] XlBlockRange? aggregateColumns,
        [ExcelArgument(Description = "Optional new column names"), Optional] XlBlockRange? newColumnNames)
     {

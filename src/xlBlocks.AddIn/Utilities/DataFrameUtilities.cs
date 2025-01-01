@@ -316,6 +316,46 @@ internal static class DataFrameUtilities
         };
     }
 
+    public static DataFrame ComputeGroupAggregations(DataFrame dataFrame, List<string> groupColumnNames, List<string> groupByOperations, List<string> aggregationColumnNames, List<string> newColumnNames)
+    {
+        if (groupByOperations.Count != aggregationColumnNames.Count || groupByOperations.Count != newColumnNames.Count)
+            throw new ArgumentException("group by operations, aggregation columns and new column names must have same lengths");
+
+        var dataFrameWithComposite = dataFrame.Clone();
+        var compositeKeyCol = dataFrame.MakeCompositeColumn(groupColumnNames);
+        dataFrameWithComposite.Columns.Add(compositeKeyCol);
+
+        var newColumns = new List<DataFrameColumn>();
+        foreach (var columnName in groupColumnNames)
+            newColumns.Add(dataFrameWithComposite[columnName]);
+
+        var groupBy = dataFrameWithComposite.GroupBy(compositeKeyCol.Name);
+        var groupBySets = groupByOperations.Zip(aggregationColumnNames, newColumnNames).ToLookup(x => x.First, x => new { AggColumn = x.Second, OutputName = x.Third });
+        foreach (var groupBySet in groupBySets)
+        {
+            var groupByDelegate = ParseGroupByOperation(groupBySet.Key);
+            var groupedDataFrame = groupByDelegate(groupBy, groupBySet.Select(x => x.AggColumn).Distinct().ToArray());
+            groupedDataFrame.Columns[0].SetName(compositeKeyCol.Name);
+            var joined = dataFrameWithComposite.Merge(groupedDataFrame, new[] { compositeKeyCol.Name }, new[] { compositeKeyCol.Name }, "_left", "_right", JoinAlgorithm.Left);
+            var joinedColumnNames = joined.Columns.Select(x => x.Name).ToList();
+
+            foreach (var columnSet in groupBySet)
+            {
+                var aggregationColumn = joined[$"{columnSet.AggColumn}_right"].Clone();
+                aggregationColumn.SetName(newColumns.GetSafeColumnName(columnSet.OutputName)); // cant use column name as it may not be unique, but final name should be??
+                newColumns.Add(aggregationColumn);
+            }
+        }
+
+        var newDataFrame = new DataFrame(newColumns);
+        newDataFrame = newDataFrame.Filter(compositeKeyCol.IsDuplicateElement().ElementwiseEquals(false));
+
+        //for (var i = 0; i < aggregationColumnNames.Count; i++)
+        //    newDataFrame.Columns[i + groupColumnNames.Count].SetName(newDataFrame.GetSafeColumnName(newColumnNames[i]));
+
+        return newDataFrame;
+    }
+
     public delegate DataFrame GroupByOperation(GroupBy groupBy, string[] columnNames);
     public static GroupByOperation ParseGroupByOperation(string groupByOperation)
     {
@@ -325,7 +365,7 @@ internal static class DataFrameUtilities
             "product" or "prod" => (GroupBy g, string[] n) => g.Product(n),
             "min" or "minimum" => (GroupBy g, string[] n) => g.Min(n),
             "max" or "maximum" => (GroupBy g, string[] n) => g.Max(n),
-            "mean" or "average" or "avg" => (GroupBy g, string[] n) => g.Mean(n),
+            "mean" or "average" or "avg" => (GroupBy g, string[] n) => g.ToGroupByStatistics().Mean(n),
             "med" or "median" => (GroupBy g, string[] n) => g.ToGroupByStatistics().Median(n),
             "count" => (GroupBy g, string[] n) => g.Count(n),
             "first" => (GroupBy g, string[] n) => g.First(n),
@@ -416,15 +456,26 @@ internal static class DataFrameUtilities
         return new DataFrame(keyColumn, valueColumn);
     }
 
-    public static string GetSafeColumnName(this DataFrame dataFrame, string baseName)
+    private static string GetSafeColumnName(this DataFrame dataFrame, string baseName)
     {
         var columnName = baseName;
+        var tail = 0;
         while (dataFrame.Columns.IndexOf(columnName) >= 0)
-            columnName = $"{columnName}";
+            columnName = $"{baseName}.{tail++}";
         return columnName;
     }
 
-    public static StringDataFrameColumn MakeCompositeColumn(this DataFrame dataFrame, List<string>? includeColumns = null)
+    private static string GetSafeColumnName(this IList<DataFrameColumn> columns, string baseName)
+    {
+        var columnName = baseName;
+        var tail = 0;
+        var columnNames = columns.Select(x => x.Name).ToHashSet();
+        while (columnNames.Contains(columnName))
+            columnName = $"{baseName}.{tail++}";
+        return columnName;
+    }
+
+    public static DataFrameColumn MakeCompositeColumn(this DataFrame dataFrame, List<string>? includeColumns = null)
     {
         var compositeIndex = dataFrame.Columns
             .Where(x => includeColumns is null || includeColumns.Contains(x.Name))

@@ -819,7 +819,7 @@ internal static class DataFrameColumnExtensions
     internal static IEnumerable<string?> ToStringEnumerable(this DataFrameColumn column)
     {
         for (var i = 0L; i < column.Length; i++)
-            yield return column[i]?.ToString();
+            yield return column[i]?.ToString() ?? "null";
     }
 
     #endregion

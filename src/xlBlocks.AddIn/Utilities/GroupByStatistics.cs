@@ -7,6 +7,7 @@ using XlBlocks.AddIn.Dna;
 
 public interface IGroupByStatistics
 {
+    DataFrame Mean(string[] columnNames);
     DataFrame Variance(string[] columnNames, bool isSample);
     DataFrame StdDev(string[] columnNames, bool isSample);
     DataFrame Skew(string[] columnNames, bool isSample);
@@ -26,11 +27,35 @@ public class GroupByStatistics<TKey> : IGroupByStatistics
         private double _m3 = 0;
         private double _m4 = 0;
 
-        public double Variance(bool isSample) => _m2 / (isSample ? (_n - 1) : _n);
-        public double StdDev(bool isSample) => Math.Sqrt(Variance(isSample));
-        public double Skew(bool isSample) => _m2 == 0d ? double.NaN : (isSample ? (_n * Math.Sqrt(_n - 1) / (_n - 2)) : Math.Sqrt(_n)) * _m3 / Math.Pow(_m2, 1.5);
-        public double Kurtosis(bool isSample) => _m2 == 0d ? double.NaN :
-        (isSample ? (_n * (_n + 1) * (_n - 1) / ((_n - 2) * (_n - 3))) : _n) * _m4 / (_m2 * _m2) - (isSample ? (3 * Math.Pow(_n - 1, 2) / ((_n - 2) * (_n - 3))) : 3);
+        public double? Mean() => _n > 0 ? _m1 : null;
+
+        public double? Variance(bool isSample) => _n > 0 ? _m2 / (isSample ? (_n - 1) : _n) : null;
+
+        public double? StdDev(bool isSample)
+        {
+            if (_n == 0)
+                return null;
+
+            var variance = Variance(isSample);
+            return variance is null ? null : Math.Sqrt(variance.Value);
+        }
+
+        public double? Skew(bool isSample)
+        {
+            if (_n == 0)
+                return null;
+
+            return _m2 == 0d ? double.NaN : (isSample ? (_n * Math.Sqrt(_n - 1) / (_n - 2)) : Math.Sqrt(_n)) * _m3 / Math.Pow(_m2, 1.5);
+        }
+
+        public double? Kurtosis(bool isSample)
+        {
+            if (_n == 0)
+                return null;
+
+            return _m2 == 0d ? double.NaN :
+                (isSample ? (_n * (_n + 1) * (_n - 1) / ((_n - 2) * (_n - 3))) : _n) * _m4 / (_m2 * _m2) - (isSample ? (3 * Math.Pow(_n - 1, 2) / ((_n - 2) * (_n - 3))) : 3);
+        }
 
         private void AddValue(double value)
         {
@@ -91,6 +116,11 @@ public class GroupByStatistics<TKey> : IGroupByStatistics
             }
         }
         return dataFrame;
+    }
+
+    public DataFrame Mean(string[] columnNames)
+    {
+        return EnumerateAndAggregate(columnNames, (columnName, rows) => MomentAggregate.Aggregate(columnName, rows).Mean());
     }
 
     public DataFrame Variance(string[] columnNames, bool isSample)
