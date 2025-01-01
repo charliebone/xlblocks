@@ -601,24 +601,15 @@ internal class XlBlockTable : IXlBlockCopyableObject<XlBlockTable>, IXlBlockArra
         return new XlBlockTable(dataFrame);
     }
 
-    public XlBlockTable GroupBy(XlBlockRange groupColumnNamesRange, string groupByOperation, XlBlockRange? aggregationColumnNamesRange, XlBlockRange? newColumnNamesRange)
-    {
-        return GroupBy(groupColumnNamesRange, new List<string>() { groupByOperation }, aggregationColumnNamesRange, newColumnNamesRange);
-    }
-
-    public XlBlockTable GroupBy(XlBlockRange groupColumnNamesRange, XlBlockRange groupByOperations, XlBlockRange? aggregationColumnNamesRange, XlBlockRange? newColumnNamesRange)
-    {
-        if (groupByOperations.Count == 0)
-            throw new ArgumentException("at least one group by operation must be specified");
-
-        return GroupBy(groupColumnNamesRange, groupByOperations.GetAs<string>(false).ToList(), aggregationColumnNamesRange, newColumnNamesRange);
-    }
-
-    private XlBlockTable GroupBy(XlBlockRange groupColumnNamesRange, List<string> groupByOperations, XlBlockRange? aggregationColumnNamesRange, XlBlockRange? newColumnNamesRange)
+    public XlBlockTable GroupBy(XlBlockRange groupColumnNamesRange, XlBlockRange groupByOperationsRange, XlBlockRange? aggregationColumnNamesRange, XlBlockRange? newColumnNamesRange)
     {
         var groupColumnNames = groupColumnNamesRange.GetAs<string>(false).ToList();
         if (groupColumnNames.Count == 0)
             throw new ArgumentException("at least one group column must be specified");
+
+        var groupByOperations = groupByOperationsRange.GetAs<string>(false).ToList();
+        if (groupByOperations.Count == 0)
+            throw new ArgumentException("at least one group by operation must be specified");
 
         foreach (var column in groupColumnNames)
             AssertColumnExists(column);

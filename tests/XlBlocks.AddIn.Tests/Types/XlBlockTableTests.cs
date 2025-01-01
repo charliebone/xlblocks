@@ -2187,12 +2187,12 @@ public class XlBlockTableTests
         object[,] expectedResult =
         {
             { "Category", "Id.Count", "ErrorCount.Count", "Average.Count" },
-            { "Trace", 1L, 0L, 1L },
-            { "Warning", 3L, 3L, 1L },
-            { null!, 2L, 2L, 1L },
-            { "Critical", 2L, 2L, 2L },
-            { "Debug", 2L, 2L, 2L },
-            { "Info", 2L, 2L, 0L }
+            { "Trace", 1, 0, 1 },
+            { "Warning", 3, 3, 1 },
+            { null!, 2, 2, 1 },
+            { "Critical", 2, 2, 2 },
+            { "Debug", 2, 2, 2 },
+            { "Info", 2, 2, 0 }
         };
         AssertTableMatchesExpected(expectedResult, result);
     }
@@ -2203,7 +2203,7 @@ public class XlBlockTableTests
         var groupColumns = XlBlockRange.Build(new object[,] { { "Category" }, { "ErrorCount" } });
         var operations = XlBlockRange.Build(new object[,] { { "Sum" } });
         var aggregateColumns = XlBlockRange.Build(new object[,] { { "Average" } });
-        
+
         var result = _logDataTable.GroupBy(groupColumns, operations, aggregateColumns, null);
 
         object[,] expectedResult =
@@ -2251,19 +2251,19 @@ public class XlBlockTableTests
     {
         var groupColumns = XlBlockRange.Build(new object[,] { { "Category" } });
         var operations = XlBlockRange.Build(new object[,] { { "Max" } });
-        var aggregateColumns = XlBlockRange.Build(new object[,] { { "Average" } });
+        var aggregateColumns = XlBlockRange.Build(new object[,] { { "ErrorCount", "Average" } });
 
         var result = _logDataTable.GroupBy(groupColumns, operations, aggregateColumns, null);
 
         object[,] expectedResult =
         {
-            { "Category", "Average.Max" },
-            { "Trace", 38.83 },
-            { "Warning", 33.32 },
-            { null!, 83.45 },
-            { "Critical", 1.77 },
-            { "Debug", 53.67 },
-            { "Info", 0d }
+            { "Category", "ErrorCount.Max", "Average.Max" },
+            { "Trace", null!, 38.83 },
+            { "Warning", 45, 33.32 },
+            { null!, 22, 83.45 },
+            { "Critical", 45, 1.77 },
+            { "Debug", 62, 53.67 },
+            { "Info", 101, null! }
         };
         AssertTableMatchesExpected(expectedResult, result);
     }
@@ -2273,19 +2273,19 @@ public class XlBlockTableTests
     {
         var groupColumns = XlBlockRange.Build(new object[,] { { "Category" } });
         var operations = XlBlockRange.Build(new object[,] { { "MIN" } });
-        var aggregateColumns = XlBlockRange.Build(new object[,] { { "Average" } });
+        var aggregateColumns = XlBlockRange.Build(new object[,] { { "ErrorCount", "Average" } });
 
         var result = _logDataTable.GroupBy(groupColumns, operations, aggregateColumns, null);
 
         object[,] expectedResult =
         {
-            { "Category", "Average.MIN" },
-            { "Trace", 38.83 },
-            { "Warning", 0d },
-            { null!, 0d },
-            { "Critical", 0.82 },
-            { "Debug", 6.34 },
-            { "Info", 0d }
+            { "Category", "ErrorCount.MIN", "Average.MIN" },
+            { "Trace", null!, 38.83 },
+            { "Warning", 11, 33.32 },
+            { null!, 21, 83.45 },
+            { "Critical", 2, 0.82 },
+            { "Debug", 62, 6.34 },
+            { "Info", 0, null! }
         };
         AssertTableMatchesExpected(expectedResult, result);
     }
@@ -2316,7 +2316,7 @@ public class XlBlockTableTests
         var taggedObservations = _observationsTable.AppendColumnFromList(columnTags, "Tag");
 
         var groupColumns = XlBlockRange.Build(new object[,] { { "Category", "Tag" } });
-        var operations = XlBlockRange.Build(new object[,] { { "median" } }); 
+        var operations = XlBlockRange.Build(new object[,] { { "median" } });
         var aggregateColumns = XlBlockRange.Build(new object[,] { { "Duration", "Distance" } });
 
         var result = taggedObservations.GroupBy(groupColumns, operations, aggregateColumns, null);
@@ -2330,6 +2330,138 @@ public class XlBlockTableTests
             { "Category1", "B", 20.4, 10.4 },
             { "Category2", "B", 34.6, 22.8 },
             { "Category3", "B", 26.8, 20.0 }
+        };
+        AssertTableMatchesExpected(expectedResult, result);
+    }
+
+    [Fact]
+    public void GroupBy_First()
+    {
+        var groupColumns = XlBlockRange.Build(new object[,] { { "Category" } });
+        var operations = XlBlockRange.Build(new object[,] { { "FIRST" } });
+        var aggregateColumns = XlBlockRange.Build(new object[,] { { "ErrorCount", "Average" } });
+
+        var result = _logDataTable.GroupBy(groupColumns, operations, aggregateColumns, null);
+
+        object[,] expectedResult =
+        {
+            { "Category", "ErrorCount.FIRST", "Average.FIRST" },
+            { "Trace", null!, 38.83 },
+            { "Warning", 25, 33.32 },
+            { null!, 21, 83.45 },
+            { "Critical", 2, 1.77 },
+            { "Debug", 62, 53.67 },
+            { "Info", 0, null! }
+        };
+        AssertTableMatchesExpected(expectedResult, result);
+    }
+
+    [Fact]
+    public void GroupBy_FirstA()
+    {
+        var groupColumns = XlBlockRange.Build(new object[,] { { "Category" } });
+        var operations = XlBlockRange.Build(new object[,] { { "firsta" } });
+        var aggregateColumns = XlBlockRange.Build(new object[,] { { "ErrorCount", "Average" } });
+
+        var result = _logDataTable.GroupBy(groupColumns, operations, aggregateColumns, null);
+
+        object[,] expectedResult =
+        {
+            { "Category", "ErrorCount.firsta", "Average.firsta" },
+            { "Trace", null!, 38.83 },
+            { "Warning", 25, null! },
+            { null!, 21, 83.45 },
+            { "Critical", 2, 1.77 },
+            { "Debug", 62, 53.67 },
+            { "Info", 0, null! }
+        };
+        AssertTableMatchesExpected(expectedResult, result);
+    }
+
+    [Fact]
+    public void GroupBy_Last()
+    {
+        var groupColumns = XlBlockRange.Build(new object[,] { { "Category" } });
+        var operations = XlBlockRange.Build(new object[,] { { "last" } });
+        var aggregateColumns = XlBlockRange.Build(new object[,] { { "ErrorCount", "Average" } });
+
+        var result = _logDataTable.GroupBy(groupColumns, operations, aggregateColumns, null);
+
+        object[,] expectedResult =
+        {
+            { "Category", "ErrorCount.last", "Average.last" },
+            { "Trace", null!, 38.83 },
+            { "Warning", 45, 33.32 },
+            { null!, 22, 83.45 },
+            { "Critical", 45, 0.82 },
+            { "Debug", 62, 6.34 },
+            { "Info", 101, null! }
+        };
+        AssertTableMatchesExpected(expectedResult, result);
+    }
+
+    [Fact]
+    public void GroupBy_LastA()
+    {
+        var groupColumns = XlBlockRange.Build(new object[,] { { "Category" } });
+        var operations = XlBlockRange.Build(new object[,] { { "LastA" } });
+        var aggregateColumns = XlBlockRange.Build(new object[,] { { "ErrorCount", "Average" } });
+
+        var result = _logDataTable.GroupBy(groupColumns, operations, aggregateColumns, null);
+
+        object[,] expectedResult =
+        {
+            { "Category", "ErrorCount.LastA", "Average.LastA" },
+            { "Trace", null!, 38.83 },
+            { "Warning", 45, null! },
+            { null!, 22, null! },
+            { "Critical", 45, 0.82 },
+            { "Debug", 62, 6.34 },
+            { "Info", 101, null! }
+        };
+        AssertTableMatchesExpected(expectedResult, result);
+    }
+
+    [Fact]
+    public void GroupBy_Count()
+    {
+        var groupColumns = XlBlockRange.Build(new object[,] { { "Category" } });
+        var operations = XlBlockRange.Build(new object[,] { { "Count" } });
+        var aggregateColumns = XlBlockRange.Build(new object[,] { { "ErrorCount", "Average" } });
+
+        var result = _logDataTable.GroupBy(groupColumns, operations, aggregateColumns, null);
+
+        object[,] expectedResult =
+        {
+            { "Category", "ErrorCount.Count", "Average.Count" },
+            { "Trace", 0, 1 },
+            { "Warning", 3, 1 },
+            { null!, 2, 1 },
+            { "Critical", 2, 2 },
+            { "Debug", 2, 2 },
+            { "Info", 2, 0 }
+        };
+        AssertTableMatchesExpected(expectedResult, result);
+    }
+
+    [Fact]
+    public void GroupBy_CountA()
+    {
+        var groupColumns = XlBlockRange.Build(new object[,] { { "Category" } });
+        var operations = XlBlockRange.Build(new object[,] { { "CountA" } });
+        var aggregateColumns = XlBlockRange.Build(new object[,] { { "ErrorCount", "Average" } });
+
+        var result = _logDataTable.GroupBy(groupColumns, operations, aggregateColumns, null);
+
+        object[,] expectedResult =
+        {
+            { "Category", "ErrorCount.CountA", "Average.CountA" },
+            { "Trace", 1, 1 },
+            { "Warning", 3, 3 },
+            { null!, 2, 2 },
+            { "Critical", 2, 2 },
+            { "Debug", 2, 2 },
+            { "Info", 2, 2 }
         };
         AssertTableMatchesExpected(expectedResult, result);
     }
@@ -2395,7 +2527,7 @@ public class XlBlockTableTests
     public void GroupBy_StdDevP()
     {
         var groupColumns = XlBlockRange.Build(new object[,] { { "Category" } });
-        var operations = XlBlockRange.Build(new object[,] { { "StdDevP" } }); 
+        var operations = XlBlockRange.Build(new object[,] { { "StdDevP" } });
         var aggregateColumns = XlBlockRange.Build(new object[,] { { "Duration", "Distance" } });
 
         var result = _observationsTable.GroupBy(groupColumns, operations, aggregateColumns, null);
@@ -2498,12 +2630,12 @@ public class XlBlockTableTests
         object[,] expectedResult =
         {
             { "Category", "ErrorMax", "MeanMax" },
-            { "Trace", 0, 38.83 },
+            { "Trace", null!, 38.83 },
             { "Warning", 45, 33.32 },
             { null!, 22, 83.45 },
             { "Critical", 45, 1.77 },
             { "Debug", 62, 53.67 },
-            { "Info", 101, 0d }
+            { "Info", 101, null! }
         };
         AssertTableMatchesExpected(expectedResult, result);
     }
@@ -2521,11 +2653,11 @@ public class XlBlockTableTests
         {
             { "Category", "Average.min", "Average.max", "ErrorCount.mean" },
             { "Trace", 38.83, 38.83, null! },
-            { "Warning", 0d, 33.32, 27d },
-            { null!, 0d, 83.45, 21.5 },
+            { "Warning", 33.32, 33.32, 27d },
+            { null!, 83.45, 83.45, 21.5 },
             { "Critical", 0.82, 1.77, 23.5 },
             { "Debug", 6.34, 53.67, 62d },
-            { "Info", 0d, 0d, 50.5 }
+            { "Info", null!, null!, 50.5 }
         };
         AssertTableMatchesExpected(expectedResult, result);
     }
@@ -2543,11 +2675,11 @@ public class XlBlockTableTests
         {
             { "Category", "Average.min", "Average.min.0", "Average.min.1" },
             { "Trace", 38.83, 38.83, 38.83 },
-            { "Warning", 0d, 0d, 0d },
-            { null!, 0d, 0d, 0d },
+            { "Warning", 33.32, 33.32, 33.32 },
+            { null!, 83.45, 83.45, 83.45 },
             { "Critical", 0.82, 0.82, 0.82 },
             { "Debug", 6.34, 6.34, 6.34 },
-            { "Info", 0d, 0d, 0d }
+            { "Info", null!, null!, null! }
         };
         AssertTableMatchesExpected(expectedResult, result);
     }
