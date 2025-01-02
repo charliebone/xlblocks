@@ -2210,16 +2210,16 @@ public class XlBlockTableTests
         {
             { "Category", "ErrorCount", "Average.Sum" },
             { "Trace", null!, 38.83 },
-            { "Warning", 25, 0d },
+            { "Warning", 25, null! },
             { null!, 21, 83.45 },
             { "Critical", 2, 1.77 },
             { "Debug", 62, 60.01 },
-            { null!, 22, 0d },
+            { null!, 22, null! },
             { "Warning", 11, 33.32 },
             { "Critical", 45, 0.82 },
-            { "Info", 0, 0d },
-            { "Info", 101, 0d },
-            { "Warning", 45, 0d }
+            { "Info", 0, null! },
+            { "Info", 101, null! },
+            { "Warning", 45, null! }
         };
         AssertTableMatchesExpected(expectedResult, result);
     }
