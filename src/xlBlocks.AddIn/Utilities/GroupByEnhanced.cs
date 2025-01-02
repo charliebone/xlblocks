@@ -7,6 +7,7 @@ using XlBlocks.AddIn.Dna;
 
 public interface IGroupByEnhanced
 {
+    DataFrame Sum(string[] columnNames);
     DataFrame Product(string[] columnNames);
     DataFrame Min(string[] columnNames);
     DataFrame Max(string[] columnNames);
@@ -131,6 +132,11 @@ public class GroupByEnhanced<TKey> : IGroupByEnhanced
         return dataFrame;
     }
 
+    public DataFrame Sum(string[] columnNames)
+    {
+        return EnumerateAndAggregate(columnNames, (columnName, rows) => Sum(columnName, rows));
+    }
+
     public DataFrame Product(string[] columnNames)
     {
         return EnumerateAndAggregate(columnNames, (columnName, rows) => Product(columnName, rows));
@@ -234,15 +240,29 @@ public class GroupByEnhanced<TKey> : IGroupByEnhanced
         }
     }
 
+    private double? Sum(string columnName, IEnumerable<DataFrameRow> rows)
+    {
+        var vals = GetColumnValuesAsDouble(columnName, rows);
+        if (!vals.Any())
+            return null;
+
+        double? sum = null;
+        foreach (var val in vals)
+            if (val is not null)
+                sum = sum is null ? val : sum + val;
+        return sum;
+    }
+
     private double? Product(string columnName, IEnumerable<DataFrameRow> rows)
     {
         var vals = GetColumnValuesAsDouble(columnName, rows);
         if (!vals.Any())
             return null;
 
-        var product = 1d;
+        double? product = null;
         foreach (var val in vals)
-            product *= val ?? 1d;
+            if (val is not null)
+                product = product is null ? val : product * val;
         return product;
     }
 

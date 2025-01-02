@@ -429,7 +429,7 @@ internal static class DataFrameUtilities
     {
         return groupByOperation.ToLower() switch
         {
-            "sum" => groupBy.Sum(columnNames),
+            "sum" => groupBy.ToGroupByEnhanced(dataFrame).Sum(columnNames),
             "product" or "prod" => groupBy.ToGroupByEnhanced(dataFrame).Product(columnNames),
             "min" or "minimum" => groupBy.ToGroupByEnhanced(dataFrame).Min(columnNames),
             "max" or "maximum" => groupBy.ToGroupByEnhanced(dataFrame).Max(columnNames),
