@@ -66,6 +66,9 @@ internal static class DataFrameUtilities
             var convertedValues = input.ConvertToProvidedType(type)
                 .Select(x =>
                 {
+                    if (x.Input is null)
+                        return null;
+
                     if (!x.IsMissingOrError && x.Success)
                         return x.ConvertedInput;
 

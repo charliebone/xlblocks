@@ -1236,6 +1236,29 @@ public class XlBlockDictionaryTests
         Assert.Equal(2, newTable.ColumnCount);
     }
 
+    [Fact]
+    public void ToDictionary_ToTable_NullColumn()
+    {
+        var table = XlBlockTable.BuildWithTypes(
+            XlBlockRange.Build(new object[,] {
+                { "key1", ExcelError.ExcelErrorNA },
+                { "key2", ExcelError.ExcelErrorNA }
+            }),
+            XlBlockRange.Build(new object[,] { { "string", "double" } }),
+            XlBlockRange.Build(new object[,] { { "Key", "Value" } }));
+
+        var dict = table.ToDictionary("Key", "Value");
+        Assert.Equal(2, dict.Count);
+        Assert.Equal(typeof(string), dict.KeyType);
+        Assert.Null(dict["key1"]);
+        Assert.Null(dict["key2"]);
+
+        var newTable = XlBlockTable.BuildFromDictionary(dict, "Key", "Value", "double");
+        Assert.Equal(2, newTable.RowCount);
+        Assert.Equal(2, newTable.ColumnCount);
+        Assert.Equal(new[] { typeof(string), typeof(double) }, newTable.ColumnTypes);
+    }
+
     #endregion
 
     #region IEnumerable and keys and values properties
