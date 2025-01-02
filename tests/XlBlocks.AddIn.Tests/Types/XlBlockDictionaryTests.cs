@@ -1218,6 +1218,26 @@ public class XlBlockDictionaryTests
 
     #endregion
 
+    #region Misc tests
+
+    [Fact]
+    public void ToDictionary_ToTable_EmptyDict()
+    {
+        var table = XlBlockTable.BuildWithTypes(
+            XlBlockRange.Build(new object[,] { { ExcelError.ExcelErrorNA, ExcelError.ExcelErrorNA } }),
+            XlBlockRange.Build(new object[,] { { "string", "double" } }),
+            XlBlockRange.Build(new object[,] { { "Key", "Value" } }));
+
+        var dict = table.ToDictionary("Key", "Value");
+        Assert.Equal(0, dict.Count);
+
+        var newTable = XlBlockTable.BuildFromDictionary(dict, "Key", "Value");
+        Assert.Equal(0, newTable.RowCount);
+        Assert.Equal(2, newTable.ColumnCount);
+    }
+
+    #endregion
+
     #region IEnumerable and keys and values properties
 
     [Fact]

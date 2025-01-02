@@ -306,6 +306,9 @@ internal static class DataFrameUtilities
 
     internal static DataFrame TrimNullRows(this DataFrame dataFrame)
     {
+        if (dataFrame.Rows.Count == 0)
+            return dataFrame;
+
         var nonNull = false;
         var index = new BooleanDataFrameColumn("index", RepeatLong(true, dataFrame.Rows.Count));
         for (var row = dataFrame.Rows.Count - 1; row >= 0; row--)
