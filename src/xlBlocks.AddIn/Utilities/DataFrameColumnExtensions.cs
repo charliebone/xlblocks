@@ -320,6 +320,84 @@ internal static class DataFrameColumnExtensions
         return result;
     }
 
+    internal static DataFrameColumn ElementwiseMin(this DataFrameColumn column, DataFrameColumn other)
+    {
+        var doubleColumn = new PseudoDoubleDataFrameColumn(column);
+        var doubleOtherColumn = new PseudoDoubleDataFrameColumn(other);
+        var result = new DoubleDataFrameColumn("min", column.Length);
+        for (var i = 0L; i < column.Length; i++)
+        {
+            var doubleValue = doubleColumn[i];
+            var doubleOtherValue = doubleOtherColumn[i];
+            if (doubleValue is null && doubleOtherValue is null)
+                continue;
+
+            if (doubleValue is null)
+                result[i] = doubleOtherValue;
+            else if (doubleOtherValue is null)
+                result[i] = doubleValue;
+            else
+                result[i] = Math.Min(doubleValue.Value, doubleOtherValue.Value);
+        }
+
+        return result;
+    }
+
+    internal static DataFrameColumn ElementwiseMax(this DataFrameColumn column, DataFrameColumn other)
+    {
+        var doubleColumn = new PseudoDoubleDataFrameColumn(column);
+        var doubleOtherColumn = new PseudoDoubleDataFrameColumn(other);
+        var result = new DoubleDataFrameColumn("max", column.Length);
+        for (var i = 0L; i < column.Length; i++)
+        {
+            var doubleValue = doubleColumn[i];
+            var doubleOtherValue = doubleOtherColumn[i];
+            if (doubleValue is null && doubleOtherValue is null)
+                continue;
+
+            if (doubleValue is null)
+                result[i] = doubleOtherValue;
+            else if (doubleOtherValue is null)
+                result[i] = doubleValue;
+            else
+                result[i] = Math.Max(doubleValue.Value, doubleOtherValue.Value);
+        }
+
+        return result;
+    }
+
+    internal static DataFrameColumn ElementwiseFloor(this DataFrameColumn column)
+    {
+        var doubleColumn = new PseudoDoubleDataFrameColumn(column);
+        var result = new DoubleDataFrameColumn("floor", column.Length);
+        for (var i = 0L; i < column.Length; i++)
+        {
+            var doubleValue = doubleColumn[i];
+            if (doubleValue is null)
+                continue;
+
+            result[i] = Math.Floor(doubleValue.Value);
+        }
+
+        return result;
+    }
+
+    internal static DataFrameColumn ElementwiseCeiling(this DataFrameColumn column)
+    {
+        var doubleColumn = new PseudoDoubleDataFrameColumn(column);
+        var result = new DoubleDataFrameColumn("ceiling", column.Length);
+        for (var i = 0L; i < column.Length; i++)
+        {
+            var doubleValue = doubleColumn[i];
+            if (doubleValue is null)
+                continue;
+
+            result[i] = Math.Ceiling(doubleValue.Value);
+        }
+
+        return result;
+    }
+
     #region Conditional cumulatives
 
     internal static DataFrameColumn CumulativeSumIf(this DataFrameColumn column, DataFrameColumn conditionalColumn)

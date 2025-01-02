@@ -170,6 +170,44 @@ internal static class ParserFunctions
         return expressionColumn.ElementwiseAbs();
     }
 
+    public static DataFrameColumn Min(DataFrameContext context, IList<IColumnExpression> argExpressions)
+    {
+        CheckArgCount(argExpressions, 2);
+
+        var expressionColumn = argExpressions[0].Evaluate(context);
+        var otherColumn = argExpressions[1].Evaluate(context);
+
+        return expressionColumn.ElementwiseMin(otherColumn);
+    }
+
+    public static DataFrameColumn Max(DataFrameContext context, IList<IColumnExpression> argExpressions)
+    {
+        CheckArgCount(argExpressions, 2);
+
+        var expressionColumn = argExpressions[0].Evaluate(context);
+        var otherColumn = argExpressions[1].Evaluate(context);
+
+        return expressionColumn.ElementwiseMax(otherColumn);
+    }
+
+    public static DataFrameColumn Floor(DataFrameContext context, IList<IColumnExpression> argExpressions)
+    {
+        CheckArgCount(argExpressions, 1);
+
+        var expressionColumn = argExpressions[0].Evaluate(context);
+
+        return expressionColumn.ElementwiseFloor();
+    }
+
+    public static DataFrameColumn Ceiling(DataFrameContext context, IList<IColumnExpression> argExpressions)
+    {
+        CheckArgCount(argExpressions, 1);
+
+        var expressionColumn = argExpressions[0].Evaluate(context);
+
+        return expressionColumn.ElementwiseCeiling();
+    }
+
     public static DataFrameColumn Substring(DataFrameContext context, IList<IColumnExpression> argExpressions)
     {
         CheckArgCount(argExpressions, 2, 3);
