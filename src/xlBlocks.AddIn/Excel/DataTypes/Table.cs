@@ -136,7 +136,7 @@ internal static class DataTypes_Table
         [ExcelArgument(Description = "The left table to join"), CacheContents(AsReference = true)] XlBlockTable leftTable,
         [ExcelArgument(Description = "The right table to join"), CacheContents(AsReference = true)] XlBlockTable rightTable,
         [ExcelArgument(Description = "The join type, one of 'full', 'inner', 'right' or 'left'")] string joinType,
-        [ExcelArgument(Description = "The keys to join on. Optional, defaults to all common columns'")] XlBlockRange? joinOn,
+        [ExcelArgument(Description = "The keys to join on. Optional, defaults to all common columns'")] XlBlockRange? joinOn = null,
         [ExcelArgument(Description = "The suffix to apply to shared non-key columns from the left table. Optional ('.left')'")] string? leftSuffix = ".left",
         [ExcelArgument(Description = "The suffix to apply to shared non-key columns from the right table. Optional ('.left')")] string? rightSuffix = ".right",
         [ExcelArgument(Description = "Include both sets of identical joined columns in output (FALSE)")] bool includeDuplicateJoinColumns = false)
