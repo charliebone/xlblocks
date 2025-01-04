@@ -304,10 +304,34 @@ internal class XlBlockTable : IXlBlockCopyableObject<XlBlockTable>, IXlBlockArra
         }
     }
 
+    public static XlBlockTable UnionSuperset(params XlBlockTable[] tables)
+    {
+        if (tables.Length == 0)
+            throw new ArgumentException("Must provide at least one table to union");
+
+        var dataFrame = tables[0]._dataFrame.Clone();
+        var columnNamesSet = dataFrame.Columns.Select(x => x.Name).ToHashSet();
+        foreach (var table in tables.Skip(1))
+        {
+            foreach (var column in table._dataFrame.Columns)
+            {
+                if (!columnNamesSet.Contains(column.Name))
+                {
+                    dataFrame.Columns.Add(DataFrameUtilities.CreateDataFrameColumn(column.DataType, column.Name, dataFrame.Rows.Count));
+                    columnNamesSet.Add(column.Name);
+                }
+            }
+
+            dataFrame.Append(table, true);
+        }
+
+        return new XlBlockTable(dataFrame);
+    }
+
     public static XlBlockTable UnionAll(params XlBlockTable[] tables)
     {
         if (tables.Length == 0)
-            throw new ArgumentException("Must provide at least one table to append rows from");
+            throw new ArgumentException("Must provide at least one table to union");
 
         var dataFrame = tables[0]._dataFrame.Clone();
         var columnNamesSet = dataFrame.Columns.Select(x => x.Name).ToHashSet();

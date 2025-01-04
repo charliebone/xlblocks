@@ -161,6 +161,14 @@ internal static class DataTypes_Table
     }
 
     [return: CacheContents]
+    [ExcelFunction(Description = "Combine multiple tables, returning a table with the superset of all columns", IsThreadSafe = true)]
+    public static XlBlockTable XBTable_UnionSuperset(
+        [ExcelArgument(Name = "table", Description = "A table"), CacheContents(AsReference = true)] params XlBlockTable[] tables)
+    {
+        return XlBlockTable.UnionSuperset(tables);
+    }
+
+    [return: CacheContents]
     [ExcelFunction(Description = "Drop rows containing nulls from a table", IsThreadSafe = true)]
     public static XlBlockTable XBTable_DropNulls(
         [ExcelArgument(Description = "A table"), CacheContents(AsReference = true)] XlBlockTable table,
