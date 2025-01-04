@@ -13,13 +13,29 @@ internal static class RegistrationUtilities
         {
             foreach (var parameterRegistration in functionRegistration.ParameterRegistrations)
             {
-                if (parameterRegistration.CustomAttributes.OfType<OptionalAttribute>().Any() || parameterRegistration.CustomAttributes.OfType<DefaultParameterValueAttribute>().Any())
+                var defaultAttribute = parameterRegistration.CustomAttributes.OfType<DefaultParameterValueAttribute>().FirstOrDefault();
+                if (defaultAttribute is not null || parameterRegistration.CustomAttributes.OfType<OptionalAttribute>().Any())
                 {
                     parameterRegistration.ArgumentAttribute.Name = $"[{parameterRegistration.ArgumentAttribute.Name}]";
-                    parameterRegistration.ArgumentAttribute.Description = $"[Optional] {parameterRegistration.ArgumentAttribute.Description}";
+
+                    var defaultStr = GetDefaultDescriptionString(defaultAttribute?.Value);
+                    parameterRegistration.ArgumentAttribute.Description = $"(Optional{defaultStr}) {parameterRegistration.ArgumentAttribute.Description}";
                 }
             }
         }
         return functionRegistrations;
+    }
+
+    private static string? GetDefaultDescriptionString(object? defaultValue)
+    {
+        var defaultStr = defaultValue switch
+        {
+            string stringValue => $"'{stringValue}'",
+            bool boolValue => $"{(boolValue ? "TRUE" : "FALSE")}",
+            DateTime dateValue => $"{dateValue:yyyy-mm-dd}",
+            _ => defaultValue?.ToString() ?? string.Empty
+        };
+
+        return string.IsNullOrEmpty(defaultStr) ? "" : $", default {defaultStr}";
     }
 }

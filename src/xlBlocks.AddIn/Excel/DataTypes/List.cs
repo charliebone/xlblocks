@@ -11,7 +11,7 @@ internal static class DataTypes_List
     [ExcelFunction(Description = "Build a list", IsThreadSafe = true)]
     public static XlBlockList XBList_Build(
         [ExcelArgument(Description = "A range of data to include in the list")] XlBlockRange range,
-        [ExcelArgument(Description = "Error handling ('drop', 'keep', or 'error'). Default is 'drop'")] string onErrors = "drop")
+        [ExcelArgument(Description = "Error handling ('drop', 'keep', or 'error')")] string onErrors = "drop")
     {
         return XlBlockList.Build(range, onErrors);
     }
@@ -21,7 +21,7 @@ internal static class DataTypes_List
     public static XlBlockList XBList_BuildTyped(
         [ExcelArgument(Description = "A range of data to include in the list")] XlBlockRange items,
         [ExcelArgument(Description = "The data type of the list")] string type,
-        [ExcelArgument(Description = "Error handling ('drop', 'keep', or 'error'). Default is 'drop'")] string onErrors = "drop")
+        [ExcelArgument(Description = "Error handling ('drop', 'keep', or 'error')")] string onErrors = "drop")
     {
         return XlBlockList.BuildTyped(items, type, onErrors);
     }
@@ -31,8 +31,8 @@ internal static class DataTypes_List
     public static XlBlockList XBList_BuildFromString(
         [ExcelArgument(Description = "A string")] string str,
         [ExcelArgument(Description = "A delimiter")] string delimiter,
-        [ExcelArgument(Description = "Trim strings, optional (FALSE)")] bool trimStrings = false,
-        [ExcelArgument(Description = "Ignore empty strings (TRUE)")] bool ignoreEmpty = true)
+        [ExcelArgument(Description = "Trim strings")] bool trimStrings = false,
+        [ExcelArgument(Description = "Ignore empty strings")] bool ignoreEmpty = true)
     {
         return XlBlockList.BuildFromString(str, delimiter, trimStrings, ignoreEmpty);
     }
@@ -42,11 +42,10 @@ internal static class DataTypes_List
     public static XlBlockList XBList_BuildFromFile(
         [ExcelArgument(Description = "A filepath")] string filepath,
         [ExcelArgument(Description = "A delimiter")] string delimiter,
-        [ExcelArgument(Description = "Trim strings, optional (FALSE)")] bool trimStrings = false,
-        [ExcelArgument(Description = "Ignore empty strings (TRUE)")] bool ignoreEmpty = true)
+        [ExcelArgument(Description = "Trim strings")] bool trimStrings = false,
+        [ExcelArgument(Description = "Ignore empty strings")] bool ignoreEmpty = true)
     {
-        //var fileContents = XBList_ReadFromFile(filepath);
-        var fileContents = "this,is,a,3,file,of,342";
+        var fileContents = File.ReadAllText(filepath);
         return XlBlockList.BuildFromString(fileContents, delimiter, trimStrings, ignoreEmpty);
     }
 
@@ -60,7 +59,7 @@ internal static class DataTypes_List
 
     [ExcelFunction(Description = "Get the contents of a list as a range", IsThreadSafe = true)]
     public static XlBlockList XBList_Get(
-        [ExcelArgument(Description = "The list"), CacheContents(AsReference = true)] XlBlockList list)
+        [ExcelArgument(Description = "A list"), CacheContents(AsReference = true)] XlBlockList list)
     {
         return list;
     }
@@ -95,7 +94,7 @@ internal static class DataTypes_List
     public static XlBlockList XBList_Add(
         [ExcelArgument(Description = "A list"), CacheContents] XlBlockList list,
         [ExcelArgument(Description = "One or more items to be removed")] XlBlockRange items,
-        [ExcelArgument(Description = "Error handling ('drop', 'keep', or 'error'). Default is 'drop'")] string onErrors = "drop")
+        [ExcelArgument(Description = "Error handling ('drop', 'keep', or 'error')")] string onErrors = "drop")
     {
         list.Add(items, onErrors);
         return list;
@@ -115,7 +114,7 @@ internal static class DataTypes_List
     [ExcelFunction(Description = "Sort a list", IsThreadSafe = true)]
     public static XlBlockList XBList_Sort(
         [ExcelArgument(Description = "A list"), CacheContents] XlBlockList list,
-        [ExcelArgument(Description = "Descending sort (FALSE)")] bool descending = false)
+        [ExcelArgument(Description = "Descending sort")] bool descending = false)
     {
         list.Sort(descending);
         return list;

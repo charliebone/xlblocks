@@ -39,7 +39,7 @@ internal static class BaseParameterConversion
         if (defaultAttribute is not null || inputParamRegistration.CustomAttributes.OfType<OptionalAttribute>().Any())
         {
             // this parameter is to be considered optional so Missing or Empty values are okay and will be converted into the default
-            var defaultValue = defaultAttribute == null || defaultAttribute.Value is System.Reflection.Missing ?
+            var defaultValue = defaultAttribute is null || defaultAttribute.Value is System.Reflection.Missing ?
                 ParamTypeConverter.GetDefault(inputType) :
                 defaultAttribute.Value;
             return OptionalInputParameterConversion(inputType, inputParamRegistration, defaultValue);

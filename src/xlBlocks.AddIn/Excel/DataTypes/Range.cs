@@ -9,7 +9,7 @@ internal static class DataTypes_Range
     [ExcelFunction(Description = "Clean a range: normalize its shape, remove missing values and optionally handle error values", IsThreadSafe = true)]
     public static XlBlockRange XBRange_Clean(
         [ExcelArgument(Description = "A range")] XlBlockRange range,
-        [ExcelArgument(Description = "Error handling ('drop', 'keep', or 'error'). Default is 'drop'")] string onErrors = "drop")
+        [ExcelArgument(Description = "Error handling ('drop', 'keep', or 'error')")] string onErrors = "drop")
     {
         return range.Clean(onErrors).MakeSafeForArrayFormulas();
     }
@@ -40,7 +40,7 @@ internal static class DataTypes_Range
         [ExcelArgument(Description = "A range")] XlBlockRange range,
         [ExcelArgument(Description = "Number of rows in new range")] int? rowCount = null,
         [ExcelArgument(Description = "Number of columns in new range")] int? columnCount = null,
-        [ExcelArgument(Description = "Padding value for any added elements (NA)")] object? fillWith = null)
+        [ExcelArgument(Description = "Value to use for any added elements")] object? fillWith = null)
     {
         fillWith ??= ExcelError.ExcelErrorNA;
         return range.Shape(rowCount, columnCount, fillWith);
@@ -63,9 +63,9 @@ internal static class DataTypes_Range
     [ExcelFunction(Description = "Concatenate cells of a range into a single string", IsThreadSafe = true)]
     public static string XBRange_Concatenate(
         [ExcelArgument(Description = "A range")] XlBlockRange range,
-        [ExcelArgument(Description = "A delimiter. Default is ','")] string delimiter = ",",
-        [ExcelArgument(Description = "A prefix to prepend at the beginning of the returned string. Default is nothing")] string prefix = "",
-        [ExcelArgument(Description = "A suffix to append to the end of the returned string. Default is nothing")] string suffix = "")
+        [ExcelArgument(Description = "A delimiter")] string delimiter = ",",
+        [ExcelArgument(Description = "A prefix to prepend at the beginning of the returned string")] string prefix = "",
+        [ExcelArgument(Description = "A suffix to append to the end of the returned string")] string suffix = "")
     {
         return $"{prefix}{range.GetAs<string>(true).Aggregate((x, y) => $"{x}{delimiter}{y}")}{suffix}";
     }

@@ -20,7 +20,7 @@ internal static class Utilities
 
     [ExcelFunction(Description = "Get the username of the current user")]
     public static string XBUtils_GetUsername(
-        [ExcelArgument(Description = "Include the domain name in the username (FALSE)")] bool includeDomain = false)
+        [ExcelArgument(Description = "Include the domain name with the username")] bool includeDomain = false)
     {
         return $"{(includeDomain ? $"{Environment.UserDomainName}\\" : "")}{Environment.UserName}";
     }
