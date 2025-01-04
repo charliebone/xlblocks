@@ -931,6 +931,68 @@ public class XlBlockTableTests
         AssertTableMatchesExpected(expectedResult, result);
     }
 
+    [Fact]
+    public void UnionSuperset_DifferentTables()
+    {
+        var result = XlBlockTable.UnionSuperset(_employeeTable, _departmentTable);
+
+        object[,] expectedResult =
+        {
+            { "ID", "Name", "Age", "Department" },
+            { 1d, "Alice", 30d, null! },
+            { 2d, "Bob", 25d, null! },
+            { 3d, "Charlie", 35d, null! },
+            { 2d, null!, 3d, "HR" },
+            { 3d, null!, 4d, "Engineering" },
+            { 4d, null!, 5d, "Marketing" }
+        };
+
+        AssertTableMatchesExpected(expectedResult, result);
+    }
+
+    [Fact]
+    public void UnionSuperset_DifferentTables_MismatchedTypes_CantConvert()
+    {
+        var stringIdsTable = XlBlockTable.Build(XlBlockRange.Build(
+            new object[,]
+            {
+                { "ID", "City" },
+                { "A", "Atlanta" },
+                { "B", "Boise" },
+                { "C", "Charlotte" }
+            }));
+
+        Assert.Throws<FormatException>(() => XlBlockTable.UnionSuperset(_employeeTable, stringIdsTable));
+    }
+
+    [Fact]
+    public void UnionSuperset_DifferentTables_MismatchedTypes_CanConvert()
+    {
+        var stringIdsTable = XlBlockTable.Build(XlBlockRange.Build(
+            new object[,]
+            {
+                { "ID", "City" },
+                { "A", "Atlanta" },
+                { "B", "Boise" },
+                { "C", "Charlotte" }
+            }));
+
+        var result = XlBlockTable.UnionSuperset(stringIdsTable, _employeeTable);
+
+        object[,] expectedResult =
+        {
+            { "ID", "City" , "Name", "Age" },
+            { "A", "Atlanta", null!, null! },
+            { "B", "Boise", null!, null! },
+            { "C", "Charlotte", null!, null! },
+            { "1", null!, "Alice", 30d },
+            { "2", null!, "Bob", 25d },
+            { "3", null!, "Charlie", 35d },
+        };
+
+        AssertTableMatchesExpected(expectedResult, result);
+    }
+
     #endregion
 
     #region Sorting

@@ -48,6 +48,14 @@ internal sealed class FunctionCallExpression : IColumnExpression
                     return ParserFunctions.Round(context, _arguments);
                 case "ABS":
                     return ParserFunctions.Abs(context, _arguments);
+                case "MIN":
+                    return ParserFunctions.Min(context, _arguments);
+                case "MAX":
+                    return ParserFunctions.Max(context, _arguments);
+                case "FLOOR":
+                    return ParserFunctions.Floor(context, _arguments);
+                case "CEILING":
+                    return ParserFunctions.Ceiling(context, _arguments);
                 case "SUBSTRING":
                     return ParserFunctions.Substring(context, _arguments);
                 case "LEFT":
