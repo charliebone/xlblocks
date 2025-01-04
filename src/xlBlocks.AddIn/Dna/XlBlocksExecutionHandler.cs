@@ -65,7 +65,7 @@ internal class XlBlocksExecutionHandler : FunctionExecutionHandler
 
     public override void OnEntry(FunctionExecutionArgs args)
     {
-        _logger.Trace($"{args.FunctionName} :: OnEntry - Args: {string.Join(",", args.Arguments.Select(arg => arg.ToString()))}");
+        _logger.Trace($"{args.FunctionName} :: OnEntry - Args: {string.Join(",", args.Arguments.Select(arg => $"{arg ?? "null"}"))}");
     }
 
     public override void OnSuccess(FunctionExecutionArgs args)
