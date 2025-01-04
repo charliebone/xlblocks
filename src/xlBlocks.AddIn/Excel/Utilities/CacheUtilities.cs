@@ -31,7 +31,7 @@ internal static class CacheUtilities
 
     [ExcelFunction(Description = "Get a cache handle for a cell", IsThreadSafe = true)]
     public static object XBCache_Handle(
-        [ExcelArgument(AllowReference = true, Description = "The cell for which to get the cache handle. Optional, defaults to current cell"), Optional] object cell)
+        [ExcelArgument(AllowReference = true, Description = "The cell for which to get the cache handle, defaults to current cell"), Optional] object cell)
     {
         string reference;
         if (cell is not null && cell is ExcelReference excelReference)

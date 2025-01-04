@@ -20,7 +20,7 @@ internal static class Utilities
 
     [ExcelFunction(Description = "Get the username of the current user")]
     public static string XBUtils_GetUsername(
-        [ExcelArgument(Description = "Include the domain name in the username (FALSE)")] bool includeDomain = false)
+        [ExcelArgument(Description = "Include the domain name with the username")] bool includeDomain = false)
     {
         return $"{(includeDomain ? $"{Environment.UserDomainName}\\" : "")}{Environment.UserName}";
     }
@@ -29,5 +29,11 @@ internal static class Utilities
     public static string XBUtils_GetMachineName()
     {
         return Environment.MachineName;
+    }
+
+    [ExcelFunction(Description = "Get the name of the current machine")]
+    public static object XBUtils_RegInfo()
+    {
+        return ExcelIntegration.GetRegistrationInfo(ExcelDnaUtil.XllPath, 0);
     }
 }

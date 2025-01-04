@@ -74,6 +74,7 @@ internal class XlBlocksAddIn : IExcelAddIn
             .ProcessCacheAwareParamsRegistrations()
             .ProcessParameterConversions(GetReturnParameterConversions())
             .ProcessFunctionExecutionHandlers(GetFunctionExecutionHandlerConfig())
+            .EnrichRegistrations()
             .RegisterFunctions();
 
         // start intellisense server
@@ -91,14 +92,15 @@ internal class XlBlocksAddIn : IExcelAddIn
         IntelliSenseServer.Uninstall();
     }
 
-    private static IEnumerable<ExcelFunctionRegistration> GetExcelFunctions()
+    private static IList<ExcelFunctionRegistration> GetExcelFunctions()
     {
         return ExcelIntegration.GetExportedAssemblies()
             .SelectMany(x => x.GetTypes())
             .SelectMany(x => x.GetMethods(BindingFlags.Public | BindingFlags.Static))
             .Where(x => x.GetCustomAttribute<ExcelFunctionAttribute>() is not null)
             .Where(x => ShouldRegisterTestFunctions || x.GetCustomAttribute<IntegrationTestExcelFunctionAttribute>() is null)
-            .Select(x => new ExcelFunctionRegistration(x));
+            .Select(x => new ExcelFunctionRegistration(x))
+            .ToList();
     }
 
     private static ParameterConversionConfiguration GetInputParameterConversions()
