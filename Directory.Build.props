@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project>
   <PropertyGroup>
-    <VersionPrefix>1.0.7</VersionPrefix>
+    <VersionPrefix>1.0.8</VersionPrefix>
     <VersionSuffix Condition="'$(SourceBranchName)' != 'main'">$(SourceBranchName)</VersionSuffix>
     <ArtifactsPath>$(MSBuildThisFileDirectory)artifacts</ArtifactsPath>
   </PropertyGroup>

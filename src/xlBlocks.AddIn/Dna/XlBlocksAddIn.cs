@@ -69,12 +69,11 @@ internal class XlBlocksAddIn : IExcelAddIn
 
         // register excel functions with parameter conversions and function handlers
         _logger.Debug($"Register test functions: {ShouldRegisterTestFunctions}");
-        GetExcelFunctions()
+        RegistrationUtilities.GetExcelFunctions(ShouldRegisterTestFunctions)
             .ProcessParameterConversions(GetInputParameterConversions())
             .ProcessCacheAwareParamsRegistrations()
             .ProcessParameterConversions(GetReturnParameterConversions())
             .ProcessFunctionExecutionHandlers(GetFunctionExecutionHandlerConfig())
-            .EnrichRegistrations()
             .RegisterFunctions();
 
         // start intellisense server
@@ -90,17 +89,6 @@ internal class XlBlocksAddIn : IExcelAddIn
 
         // stop intellisense server
         IntelliSenseServer.Uninstall();
-    }
-
-    private static IList<ExcelFunctionRegistration> GetExcelFunctions()
-    {
-        return ExcelIntegration.GetExportedAssemblies()
-            .SelectMany(x => x.GetTypes())
-            .SelectMany(x => x.GetMethods(BindingFlags.Public | BindingFlags.Static))
-            .Where(x => x.GetCustomAttribute<ExcelFunctionAttribute>() is not null)
-            .Where(x => ShouldRegisterTestFunctions || x.GetCustomAttribute<IntegrationTestExcelFunctionAttribute>() is null)
-            .Select(x => new ExcelFunctionRegistration(x))
-            .ToList();
     }
 
     private static ParameterConversionConfiguration GetInputParameterConversions()
