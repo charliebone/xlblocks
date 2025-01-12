@@ -28,27 +28,28 @@ internal static class DataTypes_Table
     [return: CacheContents]
     [ExcelFunction(Description = "Build a table from a delimited file", IsThreadSafe = true)]
     public static XlBlockTable? XBTable_BuildFromCsv(
-        [ExcelArgument(Description = "A range of data to use for the table")] string csvPath,
-        [ExcelArgument(Description = "The separator to use")] string separator = ",",
+        [ExcelArgument(Description = "A filepath")] string filePath,
+        [ExcelArgument(Description = "The delimiter to use")] string delimiter = ",",
         [ExcelArgument(Description = "Flag indicating whether the csv has a header row")] bool hasHeader = true,
         [ExcelArgument(Description = "A range of column names")] XlBlockRange? columnNameRange = null,
         [ExcelArgument(Description = "A range of column names")] XlBlockRange? columnTypeRange = null,
-        [ExcelArgument(Description = "The file encoding")] string? encoding = null)
+        [ExcelArgument(Description = "The file encoding")] string encoding = "utf-8")
     {
-        return XlBlockTable.BuildFromCsv(csvPath, separator, hasHeader, columnNameRange, columnTypeRange, encoding);
+        return XlBlockTable.BuildFromCsv(filePath, delimiter, hasHeader, columnNameRange, columnTypeRange, encoding);
     }
 
-    [ExcelFunction(Description = "Build a table from a delimited file", IsThreadSafe = true)]
+    [ExcelFunction(Description = "Save a table to a delimited file", IsThreadSafe = true)]
     public static bool XBTable_SaveToCsv(
         [ExcelArgument(Description = "A table"), CacheContents(AsReference = true)] XlBlockTable table,
-        [ExcelArgument(Description = "A range of data to use for the table")] string csvPath,
-        [ExcelArgument(Description = "The separator to use")] string separator = ",",
+        [ExcelArgument(Description = "A filepath")] string filePath,
+        [ExcelArgument(Description = "The delimiter to use")] string delimiter = ",",
         [ExcelArgument(Description = "Include a header row")] bool includeHeader = true,
         [ExcelArgument(Description = "A range of column names")] XlBlockRange? columnNameRange = null,
         [ExcelArgument(Description = "A range of column names")] XlBlockRange? columnTypeRange = null,
-        [ExcelArgument(Description = "The file encoding")] string? encoding = null)
+        [ExcelArgument(Description = "The file encoding")] string encoding = "utf-8",
+        [ExcelArgument(Description = "A relative or absolute path to a directory in which to save a timestamped copy of an existing original file")] string? archivePath = null)
     {
-        table.SaveToCsv(csvPath, separator, includeHeader, encoding);
+        table.SaveToCsv(filePath, delimiter, includeHeader, encoding, archivePath);
         return true;
     }
 

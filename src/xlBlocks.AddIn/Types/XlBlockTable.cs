@@ -213,14 +213,14 @@ internal class XlBlockTable : IXlBlockCopyableObject<XlBlockTable>, IXlBlockArra
         return determinedType;
     }
 
-    public static XlBlockTable BuildFromCsv(string csvPath, string separator, bool hasHeader, XlBlockRange? columnNameRange = null,
-        XlBlockRange? columnTypeRange = null, string? encoding = null)
+    public static XlBlockTable BuildFromCsv(string filePath, string delimiter, bool hasHeader, XlBlockRange? columnNameRange = null,
+        XlBlockRange? columnTypeRange = null, string encoding = "utf-8")
     {
-        if (!File.Exists(csvPath))
-            throw new FileNotFoundException($"file '{csvPath}' was not found");
+        if (!File.Exists(filePath))
+            throw new FileNotFoundException($"file '{filePath}' was not found");
 
-        if (separator.Length != 1)
-            throw new ArgumentException("separator must be a single character");
+        if (delimiter.Length != 1)
+            throw new ArgumentException("delimiter must be a single character");
 
         var columnNames = columnNameRange?.GetAs<string>(false).ToArray();
         var columnTypes = columnTypeRange?.GetAs<string>(false).Select(ParamTypeConverter.StringToType).ToArray();
@@ -228,26 +228,35 @@ internal class XlBlockTable : IXlBlockCopyableObject<XlBlockTable>, IXlBlockArra
         if (columnNames is not null && columnTypes is not null && columnNames.Length != columnTypes.Length)
             throw new ArgumentException("Column names and column types must be same length");
 
-        using var csvStream = new FileStream(csvPath, FileMode.Open);
-        var dataFrame = DataFrame.LoadCsv(csvStream, separator[0], hasHeader, columnNames, columnTypes,
+        using var csvStream = new FileStream(filePath, FileMode.Open);
+        var dataFrame = DataFrame.LoadCsv(csvStream, delimiter[0], hasHeader, columnNames, columnTypes,
             addIndexColumn: false,
-            encoding: !string.IsNullOrEmpty(encoding) ? Encoding.GetEncoding(encoding) : Encoding.UTF8,
+            encoding: Encoding.GetEncoding(encoding),
             guessTypeFunction: GuessTypeFunction);
         return new XlBlockTable(dataFrame);
     }
 
-    public void SaveToCsv(string csvPath, string separator, bool includeHeader, string? encoding = null)
+    public void SaveToCsv(string filePath, string delimiter, bool includeHeader, string encoding = "utf-8", string? archivePath = null)
     {
-        using var csvStream = new FileStream(csvPath, FileMode.Create);
-        SaveToCsv(csvStream, separator, includeHeader, encoding);
+        if (archivePath is not null && File.Exists(filePath))
+        {
+            var fullArchivePath = Path.IsPathFullyQualified(archivePath) ? archivePath : Path.Combine(Path.GetDirectoryName(filePath) ?? "", archivePath);
+            if (!Directory.Exists(fullArchivePath))
+                Directory.CreateDirectory(fullArchivePath);
+
+            File.Copy(filePath, Path.Combine(fullArchivePath, $"{Path.GetFileNameWithoutExtension(filePath)}_{DateTime.Now:yyyyMMdd_HHmmss}.{Path.GetExtension(filePath)}"));
+        }
+
+        using var csvStream = new FileStream(filePath, FileMode.Create);
+        SaveToCsv(csvStream, delimiter, includeHeader, encoding);
     }
 
-    internal void SaveToCsv(Stream stream, string separator, bool includeHeader, string? encoding = null)
+    internal void SaveToCsv(Stream stream, string delimiter, bool includeHeader, string encoding = "utf-8")
     {
-        if (separator.Length != 1)
+        if (delimiter.Length != 1)
             throw new ArgumentException("separator must be a single character");
 
-        DataFrame.SaveCsv(_dataFrame, stream, separator[0], includeHeader, encoding: !string.IsNullOrEmpty(encoding) ? Encoding.GetEncoding(encoding) : Encoding.UTF8);
+        DataFrame.SaveCsv(_dataFrame, stream, delimiter[0], includeHeader, encoding: Encoding.GetEncoding(encoding));
     }
 
     public static XlBlockTable Join(XlBlockTable left, XlBlockTable right, string joinType, XlBlockRange? joinOn,
