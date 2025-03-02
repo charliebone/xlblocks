@@ -14,6 +14,7 @@ public interface IGroupByEnhanced
     DataFrame Median(string[] columnNames);
     DataFrame First(string[] columnNames, bool includeNulls);
     DataFrame Last(string[] columnNames, bool includeNulls);
+    DataFrame All(string[] columnNames, bool includeNulls);
     DataFrame Count(string[] columnNames, bool includeNulls);
     DataFrame Mean(string[] columnNames);
     DataFrame Variance(string[] columnNames, bool isSample);
@@ -167,6 +168,11 @@ public class GroupByEnhanced<TKey> : IGroupByEnhanced
         return EnumerateAndAggregate(columnNames, (columnName, rows) => Last(columnName, rows, includeNulls));
     }
 
+    public DataFrame All(string[] columnNames, bool includeNulls)
+    {
+        return EnumerateAndAggregate(columnNames, (columnName, rows) => All(columnName, rows, includeNulls));
+    }
+
     public DataFrame Count(string[] columnNames, bool includeNulls)
     {
         return EnumerateAndAggregate(columnNames, (columnName, rows) => Count(columnName, rows, includeNulls));
@@ -299,6 +305,13 @@ public class GroupByEnhanced<TKey> : IGroupByEnhanced
     {
         var vals = GetColumnValuesAsColumnType(columnName, rows, includeNulls);
         return vals.LastOrDefault();
+    }
+
+    private object? All(string columnName, IEnumerable<DataFrameRow> rows, bool includeNulls)
+    {
+        var vals = GetColumnValuesAsColumnType(columnName, rows, includeNulls);
+        var firstVal = vals.FirstOrDefault();
+        return vals.All(x => x is null ? firstVal is null : x.Equals(firstVal)) ? firstVal : null;
     }
 
     private int? Count(string columnName, IEnumerable<DataFrameRow> rows, bool includeNulls)
