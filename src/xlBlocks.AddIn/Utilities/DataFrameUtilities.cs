@@ -447,6 +447,8 @@ internal static class DataFrameUtilities
             "firsta" => groupBy.ToGroupByEnhanced(dataFrame).First(columnNames, true),
             "last" => groupBy.ToGroupByEnhanced(dataFrame).Last(columnNames, false),
             "lasta" => groupBy.ToGroupByEnhanced(dataFrame).Last(columnNames, true),
+            "all" => groupBy.ToGroupByEnhanced(dataFrame).All(columnNames, false),
+            "alla" => groupBy.ToGroupByEnhanced(dataFrame).All(columnNames, true),
             "stddev" => groupBy.ToGroupByEnhanced(dataFrame).StdDev(columnNames, true),
             "stddevp" => groupBy.ToGroupByEnhanced(dataFrame).StdDev(columnNames, false),
             "var" or "variance" => groupBy.ToGroupByEnhanced(dataFrame).Variance(columnNames, true),
