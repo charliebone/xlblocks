@@ -35,6 +35,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="XlBlocks.AddIn.DocGen" />
     <InternalsVisibleTo Include="XlBlocks.AddIn.Tests" />
   </ItemGroup>
   

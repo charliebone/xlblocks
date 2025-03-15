@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Grynwald.MarkdownGenerator" Version="3.0.106" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\XlBlocks.AddIn\XlBlocks.AddIn.csproj" />
+  </ItemGroup>
+
+</Project>

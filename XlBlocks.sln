@@ -41,6 +41,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{5A8BBFF7-6593-4883-9092-3C9F5849D185}"
 	ProjectSection(SolutionItems) = preProject
 		.github\workflows\build.yml = .github\workflows\build.yml
+		.github\workflows\pages.yml = .github\workflows\pages.yml
 		.github\workflows\release.yml = .github\workflows\release.yml
 	EndProjectSection
 EndProject
@@ -50,6 +51,16 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build-and-test", "build-and
 	ProjectSection(SolutionItems) = preProject
 		.github\actions\build-and-test\action.yml = .github\actions\build-and-test\action.yml
 	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{CBC5BDDE-D035-481F-A4CE-BE6438E0838A}"
+	ProjectSection(SolutionItems) = preProject
+		docs\Gemfile = docs\Gemfile
+		docs\Gemfile.lock = docs\Gemfile.lock
+		docs\index.md = docs\index.md
+		docs\_config.yml = docs\_config.yml
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XlBlocks.AddIn.DocGen", "src\XlBlocks.AddIn.DocGen\XlBlocks.AddIn.DocGen.csproj", "{C16B7B2A-AA59-43B6-ABA1-A53DC83ED189}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -159,6 +170,22 @@ Global
 		{E7F9C852-0319-4DA9-A810-E566428A65B8}.Release|x64.Build.0 = Release|x64
 		{E7F9C852-0319-4DA9-A810-E566428A65B8}.Release|x86.ActiveCfg = Release|Win32
 		{E7F9C852-0319-4DA9-A810-E566428A65B8}.Release|x86.Build.0 = Release|Win32
+		{C16B7B2A-AA59-43B6-ABA1-A53DC83ED189}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C16B7B2A-AA59-43B6-ABA1-A53DC83ED189}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C16B7B2A-AA59-43B6-ABA1-A53DC83ED189}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{C16B7B2A-AA59-43B6-ABA1-A53DC83ED189}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{C16B7B2A-AA59-43B6-ABA1-A53DC83ED189}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{C16B7B2A-AA59-43B6-ABA1-A53DC83ED189}.Debug|x64.Build.0 = Debug|Any CPU
+		{C16B7B2A-AA59-43B6-ABA1-A53DC83ED189}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C16B7B2A-AA59-43B6-ABA1-A53DC83ED189}.Debug|x86.Build.0 = Debug|Any CPU
+		{C16B7B2A-AA59-43B6-ABA1-A53DC83ED189}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C16B7B2A-AA59-43B6-ABA1-A53DC83ED189}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C16B7B2A-AA59-43B6-ABA1-A53DC83ED189}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{C16B7B2A-AA59-43B6-ABA1-A53DC83ED189}.Release|ARM64.Build.0 = Release|Any CPU
+		{C16B7B2A-AA59-43B6-ABA1-A53DC83ED189}.Release|x64.ActiveCfg = Release|Any CPU
+		{C16B7B2A-AA59-43B6-ABA1-A53DC83ED189}.Release|x64.Build.0 = Release|Any CPU
+		{C16B7B2A-AA59-43B6-ABA1-A53DC83ED189}.Release|x86.ActiveCfg = Release|Any CPU
+		{C16B7B2A-AA59-43B6-ABA1-A53DC83ED189}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -174,6 +201,7 @@ Global
 		{5A8BBFF7-6593-4883-9092-3C9F5849D185} = {B5885095-A51A-42D1-A16A-358033AEF4C5}
 		{E55FDE72-0B1F-4B29-92D3-69A6BD4692F0} = {B5885095-A51A-42D1-A16A-358033AEF4C5}
 		{A6C3AD05-B054-46DF-935C-3D515A66C9EB} = {E55FDE72-0B1F-4B29-92D3-69A6BD4692F0}
+		{C16B7B2A-AA59-43B6-ABA1-A53DC83ED189} = {012EE499-EE81-48B5-BD71-0F231CBB948F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0372DDE4-269D-427B-8BD2-363C0AF3AA6F}
