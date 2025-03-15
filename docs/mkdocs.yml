@@ -1,0 +1,5 @@
+site_name: XlBlocks
+site_url: https://xlblocks.net
+repo_url: https://github.com/charliebone/xlblocks
+theme:
+    name: material
