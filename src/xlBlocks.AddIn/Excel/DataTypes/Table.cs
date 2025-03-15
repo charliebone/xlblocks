@@ -28,34 +28,35 @@ internal static class DataTypes_Table
     [return: CacheContents]
     [ExcelFunction(Description = "Build a table from a delimited file", IsThreadSafe = true)]
     public static XlBlockTable? XBTable_BuildFromCsv(
-        [ExcelArgument(Description = "A range of data to use for the table")] string csvPath,
-        [ExcelArgument(Description = "The separator to use, default is ','")] string separator = ",",
-        [ExcelArgument(Description = "Optional flag indicating whether the csv has a header row, default is TRUE")] bool hasHeader = true,
+        [ExcelArgument(Description = "A filepath")] string filePath,
+        [ExcelArgument(Description = "The delimiter to use")] string delimiter = ",",
+        [ExcelArgument(Description = "Flag indicating whether the csv has a header row")] bool hasHeader = true,
         [ExcelArgument(Description = "A range of column names")] XlBlockRange? columnNameRange = null,
         [ExcelArgument(Description = "A range of column names")] XlBlockRange? columnTypeRange = null,
-        [ExcelArgument(Description = "An optional string indicating the file encoding")] string? encoding = null)
+        [ExcelArgument(Description = "The file encoding")] string encoding = "utf-8")
     {
-        return XlBlockTable.BuildFromCsv(csvPath, separator, hasHeader, columnNameRange, columnTypeRange, encoding);
+        return XlBlockTable.BuildFromCsv(filePath, delimiter, hasHeader, columnNameRange, columnTypeRange, encoding);
     }
 
-    [ExcelFunction(Description = "Build a table from a delimited file", IsThreadSafe = true)]
+    [ExcelFunction(Description = "Save a table to a delimited file", IsThreadSafe = true)]
     public static bool XBTable_SaveToCsv(
         [ExcelArgument(Description = "A table"), CacheContents(AsReference = true)] XlBlockTable table,
-        [ExcelArgument(Description = "A range of data to use for the table")] string csvPath,
-        [ExcelArgument(Description = "The separator to use, default is ','")] string separator = ",",
-        [ExcelArgument(Description = "Optional flag indicating whether to include a header row in the csv, default is TRUE")] bool includeHeader = true,
+        [ExcelArgument(Description = "A filepath")] string filePath,
+        [ExcelArgument(Description = "The delimiter to use")] string delimiter = ",",
+        [ExcelArgument(Description = "Include a header row")] bool includeHeader = true,
         [ExcelArgument(Description = "A range of column names")] XlBlockRange? columnNameRange = null,
         [ExcelArgument(Description = "A range of column names")] XlBlockRange? columnTypeRange = null,
-        [ExcelArgument(Description = "An optional string indicating the file encoding")] string? encoding = null)
+        [ExcelArgument(Description = "The file encoding")] string encoding = "utf-8",
+        [ExcelArgument(Description = "A relative or absolute path to a directory in which to save a timestamped copy of an existing original file")] string? archivePath = null)
     {
-        table.SaveToCsv(csvPath, separator, includeHeader, encoding);
+        table.SaveToCsv(filePath, delimiter, includeHeader, encoding, archivePath);
         return true;
     }
 
     [ExcelFunction(Description = "Get a table", IsThreadSafe = true)]
     public static object[,] XBTable_Get(
         [ExcelArgument(Description = "A table"), CacheContents(AsReference = true)] XlBlockTable table,
-        [ExcelArgument(Description = "Include header in output (TRUE)")] bool includeHeader = true)
+        [ExcelArgument(Description = "Include header in output")] bool includeHeader = true)
     {
         return table.AsArray(includeHeader);
     }
@@ -64,7 +65,7 @@ internal static class DataTypes_Table
     public static object[,] XBTable_GetColumn(
         [ExcelArgument(Description = "A table"), CacheContents(AsReference = true)] XlBlockTable table,
         [ExcelArgument(Description = "The column name or number")] object columnNameOrNumber,
-        [ExcelArgument(Description = "Include header in output (FALSE)")] bool includeHeader = false)
+        [ExcelArgument(Description = "Include header in output")] bool includeHeader = false)
     {
         if (columnNameOrNumber is double columnNumber)
             return table.AsArray(includeHeader, columnNumber: (int)columnNumber);
@@ -125,7 +126,7 @@ internal static class DataTypes_Table
         [ExcelArgument(Description = "The name of the column in which to look up the value")] string lookupColumn,
         [ExcelArgument(Description = "The value to search for")] object lookupValue,
         [ExcelArgument(Description = "The name of the column in the matching row to return a value from")] string valueColumn,
-        [ExcelArgument(Description = "Behavior on multiple matching rows, one of 'error', 'first' or 'last'. Default is 'error'")] string onMultipleMatches = "error")
+        [ExcelArgument(Description = "Behavior on multiple matching rows, one of 'error', 'first' or 'last'")] string onMultipleMatches = "error")
     {
         return table.LookupValue(lookupColumn, lookupValue, valueColumn, onMultipleMatches);
     }
@@ -136,10 +137,10 @@ internal static class DataTypes_Table
         [ExcelArgument(Description = "The left table to join"), CacheContents(AsReference = true)] XlBlockTable leftTable,
         [ExcelArgument(Description = "The right table to join"), CacheContents(AsReference = true)] XlBlockTable rightTable,
         [ExcelArgument(Description = "The join type, one of 'full', 'inner', 'right' or 'left'")] string joinType,
-        [ExcelArgument(Description = "The keys to join on. Optional, defaults to all common columns'")] XlBlockRange? joinOn,
-        [ExcelArgument(Description = "The suffix to apply to shared non-key columns from the left table. Optional ('.left')'")] string? leftSuffix = ".left",
-        [ExcelArgument(Description = "The suffix to apply to shared non-key columns from the right table. Optional ('.left')")] string? rightSuffix = ".right",
-        [ExcelArgument(Description = "Include both sets of identical joined columns in output (FALSE)")] bool includeDuplicateJoinColumns = false)
+        [ExcelArgument(Description = "The keys to join on, defaults to all common columns'")] XlBlockRange? joinOn = null,
+        [ExcelArgument(Description = "The suffix to apply to shared non-key columns from the left table'")] string? leftSuffix = ".left",
+        [ExcelArgument(Description = "The suffix to apply to shared non-key columns from the right table")] string? rightSuffix = ".right",
+        [ExcelArgument(Description = "Include both sets of identical joined columns in output")] bool includeDuplicateJoinColumns = false)
     {
         return XlBlockTable.Join(leftTable, rightTable, joinType, joinOn, leftSuffix, rightSuffix, includeDuplicateJoinColumns);
     }
@@ -161,6 +162,14 @@ internal static class DataTypes_Table
     }
 
     [return: CacheContents]
+    [ExcelFunction(Description = "Combine multiple tables, returning a table with the superset of all columns", IsThreadSafe = true)]
+    public static XlBlockTable XBTable_UnionSuperset(
+        [ExcelArgument(Name = "table", Description = "A table"), CacheContents(AsReference = true)] params XlBlockTable[] tables)
+    {
+        return XlBlockTable.UnionSuperset(tables);
+    }
+
+    [return: CacheContents]
     [ExcelFunction(Description = "Drop rows containing nulls from a table", IsThreadSafe = true)]
     public static XlBlockTable XBTable_DropNulls(
         [ExcelArgument(Description = "A table"), CacheContents(AsReference = true)] XlBlockTable table,
@@ -174,8 +183,8 @@ internal static class DataTypes_Table
     public static XlBlockTable XBTable_Sort(
         [ExcelArgument(Description = "A table"), CacheContents(AsReference = true)] XlBlockTable table,
         [ExcelArgument(Description = "Columns to sort on")] XlBlockRange sortColumns,
-        [ExcelArgument(Description = "Optional range to sort in descending order. (FALSE)"), Optional] XlBlockRange? descending,
-        [ExcelArgument(Description = "Optional flag to sort null values first, (FALSE)"), Optional] XlBlockRange? nullsFirst)
+        [ExcelArgument(Description = "Sort in descending order"), Optional] XlBlockRange? descending,
+        [ExcelArgument(Description = "Sort null values first"), Optional] XlBlockRange? nullsFirst)
     {
         return table.Sort(sortColumns, descending, nullsFirst);
     }
@@ -186,7 +195,7 @@ internal static class DataTypes_Table
         [ExcelArgument(Description = "A table"), CacheContents(AsReference = true)] XlBlockTable table,
         [ExcelArgument(Description = "Column to filter on")] string filterColumn,
         [ExcelArgument(Description = "The value to filter on")] object filterValue,
-        [ExcelArgument(Description = "Optional flag indicating whether filter is inclusive (TRUE)")] bool inclusive = true)
+        [ExcelArgument(Description = "Use inclusive filtering")] bool inclusive = true)
     {
         return table.Filter(filterColumn, filterValue, inclusive);
     }
@@ -216,7 +225,7 @@ internal static class DataTypes_Table
         [ExcelArgument(Description = "A table"), CacheContents(AsReference = true)] XlBlockTable table,
         [ExcelArgument(Description = "A list"), CacheContents(AsReference = true)] XlBlockList list,
         [ExcelArgument(Description = "The name to use for the new column")] string columnName,
-        [ExcelArgument(Description = "Optional, the type to use for the new column column")] string? columnType = null)
+        [ExcelArgument(Description = "The type to use for the new column column")] string? columnType = null)
     {
         return table.AppendColumnFromList(list, columnName, columnType);
     }
@@ -228,8 +237,8 @@ internal static class DataTypes_Table
         [ExcelArgument(Description = "A dictionary"), CacheContents(AsReference = true)] XlBlockDictionary dictionary,
         [ExcelArgument(Description = "The name of the column used to match the dictionary keys")] string keyColumnName,
         [ExcelArgument(Description = "The name to use for the value column")] string valueColumnName,
-        [ExcelArgument(Description = "Optional, the type to use for the value column")] string? valueColumnType = null,
-        [ExcelArgument(Description = "Optional, the value to use for keys not found in dictionary")] object? valueOnMissing = null)
+        [ExcelArgument(Description = "The type to use for the value column")] string? valueColumnType = null,
+        [ExcelArgument(Description = "The value to use for keys not found in dictionary")] object? valueOnMissing = null)
     {
         return table.AppendColumnFromDictionary(dictionary, keyColumnName, valueColumnName, valueColumnType, valueOnMissing);
     }
@@ -240,7 +249,7 @@ internal static class DataTypes_Table
         [ExcelArgument(Description = "A table"), CacheContents(AsReference = true)] XlBlockTable table,
         [ExcelArgument(Description = "The name of the column to use for keys")] string keyColumnName,
         [ExcelArgument(Description = "The name of the column to use for values")] string valueColumnName,
-        [ExcelArgument(Description = "Behavior on duplicate keys, one of 'error', 'first' or 'last'. Default is 'error'")] string onDuplicateKeys = "error")
+        [ExcelArgument(Description = "Behavior on duplicate keys, one of 'error', 'first' or 'last'")] string onDuplicateKeys = "error")
     {
         return table.ToDictionary(keyColumnName, valueColumnName, onDuplicateKeys);
     }
@@ -250,7 +259,7 @@ internal static class DataTypes_Table
     public static XlBlockDictionary XBTable_ToDictofDicts(
         [ExcelArgument(Description = "A table"), CacheContents(AsReference = true)] XlBlockTable table,
         [ExcelArgument(Description = "The name of the key column")] string keyColumnName,
-        [ExcelArgument(Description = "Behavior on duplicate keys, one of 'error', 'first' or 'last'. Default is 'error'")] string onDuplicateKeys = "error")
+        [ExcelArgument(Description = "Behavior on duplicate keys, one of 'error', 'first' or 'last'")] string onDuplicateKeys = "error")
     {
         return table.ToDictionaryOfDictionaries(keyColumnName, onDuplicateKeys);
     }
@@ -260,8 +269,8 @@ internal static class DataTypes_Table
     public static XlBlockTable XBTable_Projection(
         [ExcelArgument(Description = "A table"), CacheContents(AsReference = true)] XlBlockTable table,
         [ExcelArgument(Description = "Names of columns to include in the projection")] XlBlockRange currentColumnNames,
-        [ExcelArgument(Description = "Optional names to use to rename the columns in the projection"), Optional] XlBlockRange? newColumnNames,
-        [ExcelArgument(Description = "Optional types to use to convert the columns in the projection"), Optional] XlBlockRange? newColumnTypes)
+        [ExcelArgument(Description = "Names to use to rename the columns in the projection"), Optional] XlBlockRange? newColumnNames,
+        [ExcelArgument(Description = "Types to use to convert the columns in the projection"), Optional] XlBlockRange? newColumnTypes)
     {
         return table.Project(currentColumnNames, newColumnNames, newColumnTypes);
     }
@@ -271,9 +280,9 @@ internal static class DataTypes_Table
     public static XlBlockTable XBTable_GroupBy(
        [ExcelArgument(Description = "A table"), CacheContents(AsReference = true)] XlBlockTable table,
        [ExcelArgument(Description = "Names of columns to group by")] XlBlockRange groupByColumns,
-       [ExcelArgument(Description = "Group by operation, one of 'sum', 'product', 'min' 'max' 'mean', 'median', 'count', 'first', 'last', 'stddev', 'stddevp', 'var', 'varp', 'skew', 'skewp', 'kurt' or 'kurp'"), Optional] string groupByOperation,
-       [ExcelArgument(Description = "Optional aggregation columns, defaults to all numeric non-group columns"), Optional] XlBlockRange? aggregateColumns,
-       [ExcelArgument(Description = "Optional new column names"), Optional] XlBlockRange? newColumnNames)
+       [ExcelArgument(Description = "Group by operation(s), one or more of 'sum', 'product', 'min' 'max' 'mean', 'median', 'count', 'counta', 'first', 'firsta', 'last', 'lasta', 'stddev', 'stddevp', 'var', 'varp', 'skew', 'skewp', 'kurt' or 'kurp'"), Optional] XlBlockRange groupByOperation,
+       [ExcelArgument(Description = "Names of columns to aggregate, defaults to all numeric non-group columns"), Optional] XlBlockRange? aggregateColumns,
+       [ExcelArgument(Description = "Names to use for the aggregate output columns, defaults to '[ColumnName].[Operation]'"), Optional] XlBlockRange? newColumnNames)
     {
         return table.GroupBy(groupByColumns, groupByOperation, aggregateColumns, newColumnNames);
     }

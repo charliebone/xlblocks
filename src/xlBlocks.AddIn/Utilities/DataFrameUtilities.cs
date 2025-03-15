@@ -66,6 +66,9 @@ internal static class DataFrameUtilities
             var convertedValues = input.ConvertToProvidedType(type)
                 .Select(x =>
                 {
+                    if (x.Input is null)
+                        return null;
+
                     if (!x.IsMissingOrError && x.Success)
                         return x.ConvertedInput;
 
@@ -231,8 +234,84 @@ internal static class DataFrameUtilities
         throw new NotSupportedException($"cannot build data frame column of type '{type.Name}'");
     }
 
+    public static void SetTypedValue(this DataFrame dataFrame, string columnName, long index, object? value)
+    {
+        var column = dataFrame[columnName];
+        if (value is null)
+        {
+            column[index] = null;
+        }
+        else if (column.DataType == typeof(bool) && value is bool boolValue)
+        {
+            column[index] = boolValue;
+        }
+        else if (column.DataType == typeof(double) && value is double doubleValue)
+        {
+            column[index] = doubleValue;
+        }
+        else if (column.DataType == typeof(float) && value is float floatValue)
+        {
+            column[index] = floatValue;
+        }
+        else if (column.DataType == typeof(decimal) && value is decimal decimalValue)
+        {
+            column[index] = decimalValue;
+        }
+        else if (column.DataType == typeof(string) && value is string stringValue)
+        {
+            column[index] = stringValue;
+        }
+        else if (column.DataType == typeof(int) && value is int intValue)
+        {
+            column[index] = intValue;
+        }
+        else if (column.DataType == typeof(uint) && value is uint uintValue)
+        {
+            column[index] = uintValue;
+        }
+        else if (column.DataType == typeof(long) && value is long longValue)
+        {
+            column[index] = longValue;
+        }
+        else if (column.DataType == typeof(ulong) && value is ulong ulongValue)
+        {
+            column[index] = ulongValue;
+        }
+        else if (column.DataType == typeof(short) && value is short shortValue)
+        {
+            column[index] = shortValue;
+        }
+        else if (column.DataType == typeof(ushort) && value is ushort ushortValue)
+        {
+            column[index] = ushortValue;
+        }
+        else if (column.DataType == typeof(char) && value is char charValue)
+        {
+            column[index] = charValue;
+        }
+        else if (column.DataType == typeof(sbyte) && value is sbyte sbyteValue)
+        {
+            column[index] = sbyteValue;
+        }
+        else if (column.DataType == typeof(byte) && value is byte byteValue)
+        {
+            column[index] = byteValue;
+        }
+        else if (column.DataType == typeof(DateTime) && value is DateTime dateTimeValue)
+        {
+            column[index] = dateTimeValue;
+        }
+        else
+        {
+            throw new NotSupportedException($"value type '{value.GetType().Name}' does not match column type '{column.DataType.Name}'");
+        }
+    }
+
     internal static DataFrame TrimNullRows(this DataFrame dataFrame)
     {
+        if (dataFrame.Rows.Count == 0)
+            return dataFrame;
+
         var nonNull = false;
         var index = new BooleanDataFrameColumn("index", RepeatLong(true, dataFrame.Rows.Count));
         for (var row = dataFrame.Rows.Count - 1; row >= 0; row--)
@@ -316,93 +395,133 @@ internal static class DataFrameUtilities
         };
     }
 
-    public delegate DataFrame GroupByOperation(GroupBy groupBy, string[] columnNames);
-    public static GroupByOperation ParseGroupByOperation(string groupByOperation)
+    public static DataFrame ComputeGroupAggregations(DataFrame dataFrame, List<string> groupColumnNames, List<string> groupByOperations, List<string> aggregationColumnNames, List<string> newColumnNames)
     {
-        return groupByOperation.ToLowerInvariant() switch
+        if (groupByOperations.Count != aggregationColumnNames.Count || groupByOperations.Count != newColumnNames.Count)
+            throw new ArgumentException("group by operations, aggregation columns and new column names must have same lengths");
+
+        var dataFrameWithComposite = dataFrame.Clone();
+        var compositeKeyCol = dataFrame.MakeCompositeColumn(groupColumnNames);
+        dataFrameWithComposite.Columns.Add(compositeKeyCol);
+
+        var newColumns = new List<DataFrameColumn>();
+        foreach (var columnName in groupColumnNames)
+            newColumns.Add(dataFrameWithComposite[columnName]);
+
+        var groupBy = dataFrameWithComposite.GroupBy(compositeKeyCol.Name);
+        var groupBySets = groupByOperations.Zip(aggregationColumnNames, newColumnNames).ToLookup(x => x.First, x => new { AggColumn = x.Second, OutputName = x.Third });
+        foreach (var groupBySet in groupBySets)
         {
-            "sum" => (GroupBy g, string[] n) => g.Sum(n),
-            "product" or "prod" => (GroupBy g, string[] n) => g.Product(n),
-            "min" or "minimum" => (GroupBy g, string[] n) => g.Min(n),
-            "max" or "maximum" => (GroupBy g, string[] n) => g.Max(n),
-            "mean" or "average" or "avg" => (GroupBy g, string[] n) => g.Mean(n),
-            "med" or "median" => (GroupBy g, string[] n) => g.ToGroupByStatistics().Median(n),
-            "count" => (GroupBy g, string[] n) => g.Count(n),
-            "first" => (GroupBy g, string[] n) => g.First(n),
-            "last" => (GroupBy g, string[] n) => g.Tail(1),
-            "stddev" => (GroupBy g, string[] n) => g.ToGroupByStatistics().StdDev(n, true),
-            "stddevp" => (GroupBy g, string[] n) => g.ToGroupByStatistics().StdDev(n, false),
-            "var" or "variance" => (GroupBy g, string[] n) => g.ToGroupByStatistics().Variance(n, true),
-            "varp" or "variancep" => (GroupBy g, string[] n) => g.ToGroupByStatistics().Variance(n, false),
-            "skew" => (GroupBy g, string[] n) => g.ToGroupByStatistics().Skew(n, true),
-            "skewp" => (GroupBy g, string[] n) => g.ToGroupByStatistics().Skew(n, false),
-            "kurt" or "kurtosis" => (GroupBy g, string[] n) => g.ToGroupByStatistics().Kurtosis(n, true),
-            "kurtp" or "kurtosisp" => (GroupBy g, string[] n) => g.ToGroupByStatistics().Kurtosis(n, false),
-            _ => throw new ArgumentException($"unknown group by operation'{groupByOperation}', must be one of 'sum', 'product', 'min' 'max' 'mean', 'median', 'count', 'first', 'last', 'stddev', 'stddevp', 'var', 'varp', 'skew', 'skewp', 'kurt' or 'kurp'")
+            var groupedDataFrame = GroupByEnhanced(dataFrameWithComposite, groupBySet.Key, groupBySet.Select(x => x.AggColumn).Distinct().ToArray(), groupBy);
+            groupedDataFrame.Columns[0].SetName(compositeKeyCol.Name);
+
+            var joined = dataFrameWithComposite.Merge(groupedDataFrame, new[] { compositeKeyCol.Name }, new[] { compositeKeyCol.Name }, "_left", "_right", JoinAlgorithm.Left);
+            var joinedColumnNames = joined.Columns.Select(x => x.Name).ToList();
+
+            foreach (var columnSet in groupBySet)
+            {
+                var aggregationColumn = joined[$"{columnSet.AggColumn}_right"].Clone();
+                aggregationColumn.SetName(newColumns.GetSafeColumnName(columnSet.OutputName));
+                newColumns.Add(aggregationColumn);
+            }
+        }
+
+        var newDataFrame = new DataFrame(newColumns);
+        newDataFrame = newDataFrame.Filter(compositeKeyCol.IsDuplicateElement().ElementwiseEquals(false));
+        return newDataFrame;
+    }
+
+    private static DataFrame GroupByEnhanced(this DataFrame dataFrame, string groupByOperation, string[] columnNames, GroupBy groupBy)
+    {
+        return groupByOperation.ToLower() switch
+        {
+            "sum" => groupBy.ToGroupByEnhanced(dataFrame).Sum(columnNames),
+            "product" or "prod" => groupBy.ToGroupByEnhanced(dataFrame).Product(columnNames),
+            "min" or "minimum" => groupBy.ToGroupByEnhanced(dataFrame).Min(columnNames),
+            "max" or "maximum" => groupBy.ToGroupByEnhanced(dataFrame).Max(columnNames),
+            "mean" or "average" or "avg" => groupBy.ToGroupByEnhanced(dataFrame).Mean(columnNames),
+            "med" or "median" => groupBy.ToGroupByEnhanced(dataFrame).Median(columnNames),
+            "count" => groupBy.ToGroupByEnhanced(dataFrame).Count(columnNames, false),
+            "counta" => groupBy.ToGroupByEnhanced(dataFrame).Count(columnNames, true),
+            "first" => groupBy.ToGroupByEnhanced(dataFrame).First(columnNames, false),
+            "firsta" => groupBy.ToGroupByEnhanced(dataFrame).First(columnNames, true),
+            "last" => groupBy.ToGroupByEnhanced(dataFrame).Last(columnNames, false),
+            "lasta" => groupBy.ToGroupByEnhanced(dataFrame).Last(columnNames, true),
+            "all" => groupBy.ToGroupByEnhanced(dataFrame).All(columnNames, false),
+            "alla" => groupBy.ToGroupByEnhanced(dataFrame).All(columnNames, true),
+            "stddev" => groupBy.ToGroupByEnhanced(dataFrame).StdDev(columnNames, true),
+            "stddevp" => groupBy.ToGroupByEnhanced(dataFrame).StdDev(columnNames, false),
+            "var" or "variance" => groupBy.ToGroupByEnhanced(dataFrame).Variance(columnNames, true),
+            "varp" or "variancep" => groupBy.ToGroupByEnhanced(dataFrame).Variance(columnNames, false),
+            "skew" => groupBy.ToGroupByEnhanced(dataFrame).Skew(columnNames, true),
+            "skewp" => groupBy.ToGroupByEnhanced(dataFrame).Skew(columnNames, false),
+            "kurt" or "kurtosis" => groupBy.ToGroupByEnhanced(dataFrame).Kurtosis(columnNames, true),
+            "kurtp" or "kurtosisp" => groupBy.ToGroupByEnhanced(dataFrame).Kurtosis(columnNames, false),
+            _ => throw new ArgumentException($"unknown group by operation'{groupByOperation}', must be one of 'sum', 'product', 'min' 'max' 'mean', 'median', 'count', 'counta', 'first', 'firsta', 'last', 'lasta', 'stddev', 'stddevp', 'var', 'varp', 'skew', 'skewp', 'kurt' or 'kurp'")
         };
     }
 
-    private static IGroupByStatistics ToGroupByStatistics(this GroupBy groupBy)
+    private static IGroupByEnhanced ToGroupByEnhanced(this GroupBy groupBy, DataFrame dataFrame)
     {
         if (groupBy is GroupBy<bool> boolGroupBy)
         {
-            return new GroupByStatistics<bool>(boolGroupBy);
+            return new GroupByEnhanced<bool>(boolGroupBy, dataFrame);
         }
         else if (groupBy is GroupBy<double> doubleGroupBy)
         {
-            return new GroupByStatistics<double>(doubleGroupBy);
+            return new GroupByEnhanced<double>(doubleGroupBy, dataFrame);
         }
         else if (groupBy is GroupBy<float> floatGroupBy)
         {
-            return new GroupByStatistics<float>(floatGroupBy);
+            return new GroupByEnhanced<float>(floatGroupBy, dataFrame);
         }
         else if (groupBy is GroupBy<decimal> decimalGroupBy)
         {
-            return new GroupByStatistics<decimal>(decimalGroupBy);
+            return new GroupByEnhanced<decimal>(decimalGroupBy, dataFrame);
         }
         else if (groupBy is GroupBy<string> stringGroupBy)
         {
-            return new GroupByStatistics<string>(stringGroupBy);
+            return new GroupByEnhanced<string>(stringGroupBy, dataFrame);
         }
         else if (groupBy is GroupBy<int> intGroupBy)
         {
-            return new GroupByStatistics<int>(intGroupBy);
+            return new GroupByEnhanced<int>(intGroupBy, dataFrame);
         }
         else if (groupBy is GroupBy<uint> uintGroupBy)
         {
-            return new GroupByStatistics<uint>(uintGroupBy);
+            return new GroupByEnhanced<uint>(uintGroupBy, dataFrame);
         }
         else if (groupBy is GroupBy<long> longGroupBy)
         {
-            return new GroupByStatistics<long>(longGroupBy);
+            return new GroupByEnhanced<long>(longGroupBy, dataFrame);
         }
         else if (groupBy is GroupBy<ulong> ulongGroupBy)
         {
-            return new GroupByStatistics<ulong>(ulongGroupBy);
+            return new GroupByEnhanced<ulong>(ulongGroupBy, dataFrame);
         }
         else if (groupBy is GroupBy<short> shortGroupBy)
         {
-            return new GroupByStatistics<short>(shortGroupBy);
+            return new GroupByEnhanced<short>(shortGroupBy, dataFrame);
         }
         else if (groupBy is GroupBy<ushort> ushortGroupBy)
         {
-            return new GroupByStatistics<ushort>(ushortGroupBy);
+            return new GroupByEnhanced<ushort>(ushortGroupBy, dataFrame);
         }
         else if (groupBy is GroupBy<char> charGroupBy)
         {
-            return new GroupByStatistics<char>(charGroupBy);
+            return new GroupByEnhanced<char>(charGroupBy, dataFrame);
         }
         else if (groupBy is GroupBy<sbyte> sbyteGroupBy)
         {
-            return new GroupByStatistics<sbyte>(sbyteGroupBy);
+            return new GroupByEnhanced<sbyte>(sbyteGroupBy, dataFrame);
         }
         else if (groupBy is GroupBy<byte> byteGroupBy)
         {
-            return new GroupByStatistics<byte>(byteGroupBy);
+            return new GroupByEnhanced<byte>(byteGroupBy, dataFrame);
         }
         else if (groupBy is GroupBy<DateTime> dateTimeGroupBy)
         {
-            return new GroupByStatistics<DateTime>(dateTimeGroupBy);
+            return new GroupByEnhanced<DateTime>(dateTimeGroupBy, dataFrame);
         }
 
         throw new NotSupportedException($"cannot group by column of type");
@@ -416,15 +535,26 @@ internal static class DataFrameUtilities
         return new DataFrame(keyColumn, valueColumn);
     }
 
-    public static string GetSafeColumnName(this DataFrame dataFrame, string baseName)
+    private static string GetSafeColumnName(this DataFrame dataFrame, string baseName)
     {
         var columnName = baseName;
+        var tail = 0;
         while (dataFrame.Columns.IndexOf(columnName) >= 0)
-            columnName = $"{columnName}";
+            columnName = $"{baseName}.{tail++}";
         return columnName;
     }
 
-    public static StringDataFrameColumn MakeCompositeColumn(this DataFrame dataFrame, List<string>? includeColumns = null)
+    private static string GetSafeColumnName(this IList<DataFrameColumn> columns, string baseName)
+    {
+        var columnName = baseName;
+        var tail = 0;
+        var columnNames = columns.Select(x => x.Name).ToHashSet();
+        while (columnNames.Contains(columnName))
+            columnName = $"{baseName}.{tail++}";
+        return columnName;
+    }
+
+    public static DataFrameColumn MakeCompositeColumn(this DataFrame dataFrame, List<string>? includeColumns = null)
     {
         var compositeIndex = dataFrame.Columns
             .Where(x => includeColumns is null || includeColumns.Contains(x.Name))
