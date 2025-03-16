@@ -14,7 +14,7 @@ var config = new ConfigurationBuilder()
 
 var outputPath = config["OutputPath"] ?? "../../../../docs/docs/excel";
 if (!Directory.Exists(outputPath))
-    throw new Exception($"Output path '{outputPath}' does not exist");
+    Directory.CreateDirectory(outputPath);
 
 var addInAssembly = Assembly.GetAssembly(typeof(XlBlocksAddIn)) ?? throw new Exception("cannot find AddIn assembly");
 var excelFunctions = addInAssembly.GetTypes()
