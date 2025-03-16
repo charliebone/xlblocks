@@ -52,14 +52,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build-and-test", "build-and
 		.github\actions\build-and-test\action.yml = .github\actions\build-and-test\action.yml
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs-jekyll", "docs-jekyll", "{CBC5BDDE-D035-481F-A4CE-BE6438E0838A}"
-	ProjectSection(SolutionItems) = preProject
-		docs-jekyll\Gemfile = docs-jekyll\Gemfile
-		docs-jekyll\Gemfile.lock = docs-jekyll\Gemfile.lock
-		docs-jekyll\index.md = docs-jekyll\index.md
-		docs-jekyll\_config.yml = docs-jekyll\_config.yml
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XlBlocks.AddIn.DocGen", "src\XlBlocks.AddIn.DocGen\XlBlocks.AddIn.DocGen.csproj", "{C16B7B2A-AA59-43B6-ABA1-A53DC83ED189}"
 EndProject
 Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "docs", "docs\", "{29F559A1-143D-7038-A368-B91C5016CF54}"

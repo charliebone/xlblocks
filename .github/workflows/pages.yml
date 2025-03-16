@@ -25,6 +25,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Download docgen exe
+        uses: actions/download-artifact@v4
+        with:
+          name: docgen-exe
+      - name: Run docgen exe
+        run: ./docgen-exe/XlBlocks.AddIn.DocGen.exe
       - name : Setup Python
         uses: actions/setup-python@v5
         with:

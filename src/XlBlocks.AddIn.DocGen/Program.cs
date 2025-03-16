@@ -28,5 +28,5 @@ foreach (var functionGroup in functionsByType)
 }
 
 // save to /docs/excel folder
-excelDocSet.Save("../../../../docs/excel");
+excelDocSet.Save("../../../../docs/docs/excel");
 Console.WriteLine("Doc gen is finished.");
