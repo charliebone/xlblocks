@@ -36,8 +36,9 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: docgen-exe
+          path: docgen-exe
       - name: Run docgen exe
-        run: ./docgen-exe/XlBlocks.AddIn.DocGen.exe
+        run: docgen-exe/XlBlocks.AddIn.DocGen.exe
       - name : Setup Python
         uses: actions/setup-python@v5
         with:
