@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <PackageReference Include="Grynwald.MarkdownGenerator" Version="3.0.106" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="8.0.0" />
   </ItemGroup>
 
   <ItemGroup>
