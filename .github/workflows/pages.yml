@@ -39,6 +39,7 @@ jobs:
           path: docgen-exe
       - name: Run docgen exe
         run: ../docgen-exe/XlBlocks.AddIn.DocGen.exe --OutputPath ./excel
+        shell: pwsh
       - name : Setup Python
         uses: actions/setup-python@v5
         with:
