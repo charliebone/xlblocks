@@ -6,20 +6,23 @@ using sly.lexer;
 [Lexer]
 public enum DataFrameExpressionToken
 {
-    // note: hard requirement for columns starting only with letter, dot or underscore -- no leading numbers
-    [LexemeLabel("en", "identifier")]
-    [Lexeme(GenericToken.Identifier, IdentifierType.Custom, "_A-Za-z\\.", "-_0-9A-Za-z\\.")]
-    IDENTIFIER,
+    [Lexeme(GenericToken.Extension)]
+    [LexemeLabel("en", "column name")]
+    COLUMN_IDENTIFIER,
 
-    [LexemeLabel("en", "numeric literal")]
+    [LexemeLabel("en", "function name")]
+    [Lexeme(GenericToken.Identifier, IdentifierType.Custom, "_A-Za-z\\.", "-_0-9A-Za-z\\.")]
+    FUNCTION_IDENTIFIER,
+
+    [LexemeLabel("en", "integer")]
     [Int]
     INT,
 
-    [LexemeLabel("en", "numeric literal")]
+    [LexemeLabel("en", "number")]
     [Double]
     NUMBER,
 
-    [LexemeLabel("en", "string literal")]
+    [LexemeLabel("en", "string")]
     [String("\"", "\\")]
     [String("\'", "\\")]
     STRING,
@@ -44,7 +47,7 @@ public enum DataFrameExpressionToken
     [Keyword("xor")]
     XOR,
 
-    [LexemeLabel("en", "is")]
+    [LexemeLabel("en", "IS")]
     [Keyword("IS")]
     [Keyword("is")]
     IS,
@@ -54,17 +57,17 @@ public enum DataFrameExpressionToken
     [Keyword("null")]
     NULL,
 
-    [LexemeLabel("en", "in")]
+    [LexemeLabel("en", "IN")]
     [Keyword("IN")]
     [Keyword("in")]
     IN,
 
-    [LexemeLabel("en", "like")]
+    [LexemeLabel("en", "LIKE")]
     [Keyword("LIKE")]
     [Keyword("like")]
     LIKE,
 
-    [LexemeLabel("en", "case-insensitive like")]
+    [LexemeLabel("en", "LIKEI")]
     [Keyword("LIKEI")]
     [Keyword("likei")]
     LIKEI,
@@ -87,48 +90,48 @@ public enum DataFrameExpressionToken
     [Sugar("^")]
     CARET,
 
-    [LexemeLabel("en", "plus sign")]
+    [LexemeLabel("en", "plus")]
     [Sugar("+")]
     ARITH_PLUS,
 
-    [LexemeLabel("en", "minus sign")]
+    [LexemeLabel("en", "minus")]
     [Sugar("-")]
     ARITH_MINUS,
 
-    [LexemeLabel("en", "multiplication symbol")]
+    [LexemeLabel("en", "multiplication")]
     [Sugar("*")]
     ARITH_TIMES,
 
-    [LexemeLabel("en", "division symbol")]
+    [LexemeLabel("en", "division")]
     [Sugar("/")]
     ARITH_DIVIDE,
 
-    [LexemeLabel("en", "modulo sign")]
+    [LexemeLabel("en", "modulo")]
     [Sugar("%")]
     ARITH_MODULO,
 
-    [LexemeLabel("en", "is equal to")]
+    [LexemeLabel("en", "equal to")]
     [Sugar("==")]
     COMP_EQUALS,
 
-    [LexemeLabel("en", "is not equal to")]
+    [LexemeLabel("en", "not equal to")]
     [Sugar("<>")]
     [Sugar("!=")]
     COMP_NOTEQUALS,
 
-    [LexemeLabel("en", "is less than")]
+    [LexemeLabel("en", "less than")]
     [Sugar("<")]
     COMP_LT,
 
-    [LexemeLabel("en", "is greater than")]
+    [LexemeLabel("en", "greater than")]
     [Sugar(">")]
     COMP_GT,
 
-    [LexemeLabel("en", "is less than or equal to")]
+    [LexemeLabel("en", "less than or equal to")]
     [Sugar("<=")]
     COMP_LTE,
 
-    [LexemeLabel("en", "is greater than or equal to")]
+    [LexemeLabel("en", "greater than or equal to")]
     [Sugar(">=")]
     COMP_GTE,
 
@@ -143,12 +146,4 @@ public enum DataFrameExpressionToken
     [LexemeLabel("en", "right parenthesis")]
     [Sugar(")")]
     PARENS_RIGHT,
-
-    [LexemeLabel("en", "left bracket")]
-    [Sugar("[")]
-    BRACKET_LEFT,
-
-    [LexemeLabel("en", "right bracket")]
-    [Sugar("]")]
-    BRACKET_RIGHT
 }

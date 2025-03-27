@@ -3,6 +3,7 @@
 using System;
 using ExcelDna.Integration;
 using Microsoft.Data.Analysis;
+using sly.lexer;
 using sly.parser;
 using sly.parser.generator;
 using XlBlocks.AddIn.Parser;
@@ -71,7 +72,6 @@ public class ParserTests
             { 3, "Deposit", 300.00 },
             { 4, "Food", -133.33 },
         },
-
         new[] { typeof(int), typeof(string), typeof(double) });
 
     #region Helpers
@@ -80,7 +80,7 @@ public class ParserTests
     {
         var parserInstance = new DataFrameExpressionParser();
         var builder = new ParserBuilder<DataFrameExpressionToken, IColumnExpression>();
-        var parser = builder.BuildParser(parserInstance, ParserType.EBNF_LL_RECURSIVE_DESCENT, $"{nameof(DataFrameExpressionParser)}_expressions");
+        var parser = builder.BuildParser(parserInstance, ParserType.EBNF_LL_RECURSIVE_DESCENT, $"{nameof(DataFrameExpressionParser)}_expressions", DataFrameExpressionParser.AddExtension);
         if (parser.IsError)
         {
             foreach (var error in parser.Errors)
@@ -251,6 +251,14 @@ public class ParserTests
         result = ParseWithDataFrame("!([Age] < 30)", _testData1);
         expected = _testData1.Columns["Age"].ElementwiseLessThan(30).ElementwiseNotEquals(true);
         DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
+
+        result = ParseWithDataFrame("-[Age]", _testData1);
+        expected = _testData1.Columns["Age"].Multiply(-1);
+        DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
+
+        result = ParseWithDataFrame("-([Age])", _testData1);
+        expected = _testData1.Columns["Age"].Multiply(-1);
+        DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
     }
 
     [Fact]
@@ -345,7 +353,7 @@ public class ParserTests
 
     [Theory]
     // parser syntax errors
-    [InlineData("Id]", "unexpected right bracket (']")]
+    [InlineData("Id]", "Lexical Error, line 0, column 2 : Unrecognized symbol ']' (93)")]
     [InlineData("bad_string", "unexpected end of stream")]
     [InlineData("NOT NOT TRUE", "unexpected NOT ('NOT")]
     [InlineData("ISNULL([Nickname]", "unexpected end of stream.")]
@@ -695,6 +703,50 @@ public class ParserTests
         DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
     }
 
+    private static void CheckId(ILexer<DataFrameExpressionToken> lexer, string source)
+    {
+        var lexingResult = lexer.Tokenize(source);
+        Assert.NotNull(lexingResult);
+        Assert.True(lexingResult.IsOk);
+        Assert.NotNull(lexingResult.Tokens);
+        //Assert.Equal(1, lexingResult.Tokens.Count);
+        Assert.Equal(DataFrameExpressionToken.COLUMN_IDENTIFIER, lexingResult.Tokens[0].TokenID);
+    }
+
+    [Fact]
+    public static void Lexer_CheckIdentifier()
+    {
+        var buildResult = LexerBuilder.BuildLexer<DataFrameExpressionToken>(extensionBuilder: DataFrameExpressionParser.AddExtension);
+        Assert.NotNull(buildResult.Result);
+        Assert.True(buildResult.IsOk);
+
+        CheckId(buildResult.Result, "[column]");
+        CheckId(buildResult.Result, "[Column Name]");
+        CheckId(buildResult.Result, "[Column123]");
+        CheckId(buildResult.Result, "[name_has_underscores]");
+    }
+
+    [Fact]
+    public void Parser_NamesWithSpaces()
+    {
+        var withSpaces = DataFrameUtilities.ToDataFrame(
+        new object[,]
+        {
+            { "Id Number", "Full Name" },
+            { 1, "Alice X" },
+            { 2, "Bob Y" },
+            { 3, "Charlie Z" }
+        },
+        new[] { typeof(int), typeof(string) });
+
+        result = ParseWithDataFrame("[Full Name]", withSpaces);
+        expected = withSpaces.Columns["Full Name"];
+        DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
+
+        result = ParseWithDataFrame("-[Id Number]", withSpaces);
+        expected = withSpaces.Columns["Id Number"].Multiply(-1);
+        DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
+    }
 
     [Fact]
     public void ParserThreadSafety()
