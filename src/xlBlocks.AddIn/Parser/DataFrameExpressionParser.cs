@@ -3,6 +3,7 @@ namespace XlBlocks.AddIn.Parser;
 using System.Collections.Generic;
 using NLog;
 using sly.lexer;
+using sly.lexer.fsm;
 using sly.parser;
 using sly.parser.generator;
 using sly.parser.parser;
@@ -22,7 +23,7 @@ internal class DataFrameExpressionParser
         // parser should be thread-safe so long as context visitor is safe: https://github.com/b3b00/csly/issues/182
         var parserInstance = new DataFrameExpressionParser();
         var builder = new ParserBuilder<DataFrameExpressionToken, IColumnExpression>();
-        var parser = builder.BuildParser(parserInstance, ParserType.EBNF_LL_RECURSIVE_DESCENT, $"{nameof(DataFrameExpressionParser)}_expressions");
+        var parser = builder.BuildParser(parserInstance, ParserType.EBNF_LL_RECURSIVE_DESCENT, $"{nameof(DataFrameExpressionParser)}_expressions", AddExtension);
         if (parser.IsError)
         {
             var message = $"errors when building {nameof(DataFrameExpressionParser)}: '{string.Join("', '", parser.Errors.Select(x => x.Message))}'";
@@ -84,7 +85,7 @@ internal class DataFrameExpressionParser
     }
 
     [Operand]
-    [Production("primary : BRACKET_LEFT [d] IDENTIFIER BRACKET_RIGHT [d]")]
+    [Production("primary : COLUMN_IDENTIFIER")]
     public IColumnExpression Primary_BracketedIdentifier(Token<DataFrameExpressionToken> identifier)
     {
         return new ColumnExpression(identifier.StringWithoutQuotes);
@@ -141,7 +142,7 @@ internal class DataFrameExpressionParser
     }
 
     [Operand]
-    [Production("function_call : IDENTIFIER PARENS_LEFT [d] operand_list PARENS_RIGHT [d]")]
+    [Production("function_call : FUNCTION_IDENTIFIER PARENS_LEFT [d] operand_list PARENS_RIGHT [d]")]
     public IColumnExpression Function_Call(Token<DataFrameExpressionToken> identifier, IColumnExpression expressionList)
     {
         return new FunctionCallExpression(identifier, expressionList);
@@ -151,5 +152,31 @@ internal class DataFrameExpressionParser
     public IColumnExpression Operand_List(IColumnExpression firstExpression, List<Group<DataFrameExpressionToken, IColumnExpression>> restExpressions)
     {
         return new ExpressionListExpression(firstExpression, restExpressions);
+    }
+
+    public static void AddExtension(DataFrameExpressionToken token, LexemeAttribute lexem, GenericLexer<DataFrameExpressionToken> lexer)
+    {
+        if (token != DataFrameExpressionToken.COLUMN_IDENTIFIER)
+            return;
+
+        static FSMMatch<GenericToken> ColumnIdentifierCallback(FSMMatch<GenericToken> match)
+        {
+            var result = match.Result.Value;
+            match.Result.SpanValue = match.Result.Value[1..^1].AsMemory();
+            match.Properties[GenericLexer<DataFrameExpressionToken>.DerivedToken] = DataFrameExpressionToken.COLUMN_IDENTIFIER;
+            return match;
+        }
+
+        if (token == DataFrameExpressionToken.COLUMN_IDENTIFIER)
+        {
+            lexer.FSMBuilder.GoTo(GenericLexer<DataFrameExpressionToken>.start)
+                .SafeTransition('[')
+                .ExceptTransition(new[] { ']' })
+                .Mark("in_columnid")
+                .ExceptTransitionTo(new[] { ']' }, "in_columnid")
+                .Transition(']')
+                .End(GenericToken.Extension)
+                .CallBack(ColumnIdentifierCallback);
+        }
     }
 }
