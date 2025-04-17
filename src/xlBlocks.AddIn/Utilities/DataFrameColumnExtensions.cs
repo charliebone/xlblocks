@@ -473,8 +473,11 @@ internal static class DataFrameColumnExtensions
         if (column.Length != conditionalColumn.Length)
             throw new ArgumentException("Input columns must be the same length");
 
+        if (column is DateTimeDataFrameColumn dateColumn)
+            return CumulativeMinIf_Dates(dateColumn, conditionalColumn);
+
         if (!column.IsNumericColumn())
-            throw new ArgumentException("Column must be numeric");
+            throw new ArgumentException("Column must be numeric or a date");
 
         var doubleColumn = new PseudoDoubleDataFrameColumn(column);
         var valueDictionary = DictionaryUtilities.BuildTypedDictionary(conditionalColumn.DataType);
@@ -502,13 +505,47 @@ internal static class DataFrameColumnExtensions
         return result;
     }
 
+    private static DataFrameColumn CumulativeMinIf_Dates(this DateTimeDataFrameColumn dateColumn, DataFrameColumn conditionalColumn)
+    {
+        var valueDictionary = DictionaryUtilities.BuildTypedDictionary(conditionalColumn.DataType);
+        var result = new DateTimeDataFrameColumn("min", dateColumn.Length);
+        for (var i = 0L; i < dateColumn.Length; i++)
+        {
+            var dateValue = dateColumn[i];
+            var conditionalValue = conditionalColumn[i];
+            if (dateValue is null || conditionalValue is null)
+                continue;
+
+            if (valueDictionary.Contains(conditionalValue))
+            {
+                var cumulativeValue = valueDictionary[conditionalValue];
+                if (cumulativeValue is null || cumulativeValue is not DateTime cumulativeDateValue)
+                    result[i] = dateValue.Value;
+                else
+                    result[i] = cumulativeDateValue > dateValue.Value ? dateValue.Value : cumulativeDateValue;
+
+                valueDictionary[conditionalValue] = result[i];
+            }
+            else
+            {
+                result[i] = dateValue;
+                valueDictionary.Add(conditionalValue, dateValue);
+            }
+        }
+
+        return result;
+    }
+
     internal static DataFrameColumn CumulativeMaxIf(this DataFrameColumn column, DataFrameColumn conditionalColumn)
     {
         if (column.Length != conditionalColumn.Length)
             throw new ArgumentException("Input columns must be the same length");
 
+        if (column is DateTimeDataFrameColumn dateColumn)
+            return CumulativeMaxIf_Dates(dateColumn, conditionalColumn);
+
         if (!column.IsNumericColumn())
-            throw new ArgumentException("Column must be numeric");
+            throw new ArgumentException("Column must be numeric or a date");
 
         var doubleColumn = new PseudoDoubleDataFrameColumn(column);
         var valueDictionary = DictionaryUtilities.BuildTypedDictionary(conditionalColumn.DataType);
@@ -530,6 +567,37 @@ internal static class DataFrameColumnExtensions
             {
                 result[i] = doubleValue;
                 valueDictionary.Add(conditionalValue, doubleValue);
+            }
+        }
+
+        return result;
+    }
+
+    private static DataFrameColumn CumulativeMaxIf_Dates(this DateTimeDataFrameColumn dateColumn, DataFrameColumn conditionalColumn)
+    {
+        var valueDictionary = DictionaryUtilities.BuildTypedDictionary(conditionalColumn.DataType);
+        var result = new DateTimeDataFrameColumn("max", dateColumn.Length);
+        for (var i = 0L; i < dateColumn.Length; i++)
+        {
+            var dateValue = dateColumn[i];
+            var conditionalValue = conditionalColumn[i];
+            if (dateValue is null || conditionalValue is null)
+                continue;
+
+            if (valueDictionary.Contains(conditionalValue))
+            {
+                var cumulativeValue = valueDictionary[conditionalValue];
+                if (cumulativeValue is null || cumulativeValue is not DateTime cumulativeDateValue)
+                    result[i] = dateValue.Value;
+                else
+                    result[i] = cumulativeDateValue < dateValue.Value ? dateValue.Value : cumulativeDateValue;
+
+                valueDictionary[conditionalValue] = result[i];
+            }
+            else
+            {
+                result[i] = dateValue;
+                valueDictionary.Add(conditionalValue, dateValue);
             }
         }
 

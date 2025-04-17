@@ -170,6 +170,21 @@ internal class PseudoDoubleDataFrameColumn : PrimitiveDataFrameColumn<double>
                 return (otherColumnNullIndices, groupedOccurances);
             };
         }
+        else if (column is DateTimeDataFrameColumn dateColumn)
+        {
+            _getNullCountDelegate = () => dateColumn.NullCount;
+            _getValueDelegate = (rowIndex) =>
+            {
+                var dateVal = dateColumn[rowIndex];
+                return dateVal.HasValue ? (double)dateVal.Value.ToOADate() : null;
+            };
+            _getEnumeratorDelegate = () => dateColumn.GetEnumerator();
+            _getGroupedOccurancesDelegate = (other) =>
+            {
+                var groupedOccurances = dateColumn.GetGroupedOccurrences(other, out var otherColumnNullIndices);
+                return (otherColumnNullIndices, groupedOccurances);
+            };
+        }
         else
         {
             throw new ArgumentException($"Cannot wrap column of type '{column.DataType.Name}' in a pseudo double column");

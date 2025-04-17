@@ -209,6 +209,15 @@ internal class XlBlockList : IXlBlockCopyableObject<XlBlockList>, IXlBlockArraya
         return new XlBlockList(duplicateList);
     }
 
+    public XlBlockList Reverse()
+    {
+        var reversedList = _generatorDelegates[_dataType](null);
+        foreach (var item in _list.Cast<object>().Reverse())
+            reversedList.Add(item);
+
+        return new XlBlockList(reversedList);
+    }
+
     public string ContentsToString(string separator)
     {
         return string.Join(separator, _list.Cast<object>());

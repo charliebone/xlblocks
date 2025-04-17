@@ -61,7 +61,7 @@ internal static class DataTypes_Dictionary
     [ExcelFunction(Description = "Get a value from a dictionary", IsThreadSafe = true)]
     public static object? XBDict_GetValue(
         [ExcelArgument(Description = "A dictionary"), CacheContents(AsReference = true)] XlBlockDictionary dict,
-        [ExcelArgument(Description = "A key for the dictionary")] string key)
+        [ExcelArgument(Description = "A key for the dictionary")] object key)
     {
         return dict[key];
     }
@@ -83,7 +83,7 @@ internal static class DataTypes_Dictionary
     [ExcelFunction(Description = "Get the keys of a dictionary as a range", IsThreadSafe = true)]
     public static bool XBDict_ContainsKey(
         [ExcelArgument(Description = "A dictionary"), CacheContents(AsReference = true)] XlBlockDictionary dict,
-        [ExcelArgument(Description = "A key for the dictionary")] string key)
+        [ExcelArgument(Description = "A key for the dictionary")] object key)
     {
         return dict.ContainsKey(key);
     }

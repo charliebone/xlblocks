@@ -131,6 +131,23 @@ public class XlBlockDictionaryTests
     }
 
     [Fact]
+    public void Build_DateKeys_StringValues()
+    {
+        object[,] keys = { { new DateTime(2022, 2, 1) }, { new DateTime(2023, 1, 22) }, { new DateTime(2024, 2, 10) } };
+        object[,] values = { { "Tiger" }, { "Rabbit" }, { "Dragon" } };
+        var dict = XlBlockDictionary.Build(XlBlockRange.Build(keys), XlBlockRange.Build(values), "error");
+
+        Assert.Equal(3, dict.Count);
+        Assert.Equal(typeof(DateTime), dict.KeyType);
+        Assert.True(dict.ContainsKey(new DateTime(2022, 2, 1)));
+        Assert.True(dict.ContainsKey(new DateTime(2023, 1, 22)));
+        Assert.True(dict.ContainsKey(new DateTime(2024, 2, 10)));
+        Assert.Equal("Tiger", dict[new DateTime(2022, 2, 1)]);
+        Assert.Equal("Rabbit", dict[new DateTime(2023, 1, 22)]);
+        Assert.Equal("Dragon", dict[new DateTime(2024, 2, 10)]);
+    }
+
+    [Fact]
     public void Build_OnErrors_Error_ThrowsException_MultipleInvalidKeys()
     {
         object[,] keys = { { ExcelError.ExcelErrorNA }, { "key2" }, { ExcelMissing.Value }, { ExcelEmpty.Value } };

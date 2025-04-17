@@ -471,6 +471,26 @@ public class XlBlockListTests
         Assert.Equal(expected, result);
     }
 
+    [Fact]
+    public void Reverse_NumberTypes()
+    {
+        var list = XlBlockList.Build(XlBlockRange.Build(new object[,] { { 1, 2, 3, 4, 5 } }), "drop");
+        var result = list.Reverse();
+
+        var expected = new object[] { 5, 4, 3, 2, 1 };
+        Assert.Equal(expected, result.Get());
+    }
+
+    [Fact]
+    public void Reverse_MixedTypes()
+    {
+        var list = XlBlockList.Build(XlBlockRange.Build(new object[,] { { 1, "apple", 3.14, "banana" } }), "drop");
+        var result = list.Reverse();
+
+        var expected = new object[] { "banana", 3.14, "apple", 1 };
+        Assert.Equal(expected, result.Get());
+    }
+
     #endregion
 
     #region Static method tests

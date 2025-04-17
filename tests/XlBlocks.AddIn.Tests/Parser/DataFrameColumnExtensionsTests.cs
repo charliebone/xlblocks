@@ -44,13 +44,14 @@ public class DataFrameColumnExtensionsTests
     private static readonly DataFrame _transactions = DataFrameUtilities.ToDataFrame(
         new object[,]
         {
-            { "Id", "Description", "Amount" },
-            { 1, "Supplies", -77.38 },
-            { 2, "Refund", 25.22 },
-            { 3, "Deposit", 300.00 },
-            { 4, "Food", -133.33 },
+            { "Time", "Employee", "Description", "Amount" },
+            { new DateTime(2025, 1, 23, 10, 2, 45), "Alice", "Supplies", -77.38 },
+            { new DateTime(2024, 7, 17, 18, 0, 8), "Alice", "Refund", 25.22 },
+            { new DateTime(2025, 2, 19, 7, 2, 37), "Bob", "Deposit", 300.00 },
+            { new DateTime(2024, 12, 6, 11, 34, 6), "Alice", "Food", -133.33 },
+            { new DateTime(2025, 2, 4, 13, 58, 0), "Bob", "Food", -17.56 },
         },
-        new[] { typeof(int), typeof(string), typeof(double) });
+        new[] { typeof(DateTime), typeof(string), typeof(string), typeof(double) });
 
     [Theory]
     [InlineData(@"test", @"test")]
@@ -198,7 +199,7 @@ public class DataFrameColumnExtensionsTests
     public void Elementwise_Abs_Tests()
     {
         result = _transactions["Amount"].ElementwiseAbs();
-        expected = DataFrameUtilities.CreateDataFrameColumn(new[] { 77.38, 25.22, 300.00, 133.33 });
+        expected = DataFrameUtilities.CreateDataFrameColumn(new[] { 77.38, 25.22, 300.00, 133.33, 17.56 });
         DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
     }
 
@@ -378,6 +379,24 @@ public class DataFrameColumnExtensionsTests
     {
         result = _logDataTable.Columns["Id"].CumulativeMaxIf(_logDataTable.Columns["Category"]);
         expected = DataFrameUtilities.CreateDataFrameColumn(new[] { 0d, 1d, 2d, 3d, 4d, 5d, 6d, 7d, 8d, 9d, 10d, 11d });
+        DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
+    }
+
+    [Fact]
+    public void CumulativeMinIf_Date_Tests()
+    {
+        result = _transactions.Columns["Time"].CumulativeMinIf(_transactions.Columns["Employee"]);
+        expected = DataFrameUtilities.CreateDataFrameColumn(new[] { new DateTime(2025, 1, 23, 10, 2, 45), new DateTime(2024, 7, 17, 18, 0, 8), new DateTime(2025, 2, 19, 7, 2, 37),
+            new DateTime(2024, 7, 17, 18, 0, 8), new DateTime(2025, 2, 4, 13, 58, 0) });
+        DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
+    }
+
+    [Fact]
+    public void CumulativeMaxIf_Date_Tests()
+    {
+        result = _transactions.Columns["Time"].CumulativeMaxIf(_transactions.Columns["Employee"]);
+        expected = DataFrameUtilities.CreateDataFrameColumn(new[] { new DateTime(2025, 1, 23, 10, 2, 45), new DateTime(2025, 1, 23, 10, 2, 45), new DateTime(2025, 2, 19, 7, 2, 37),
+            new DateTime(2025, 1, 23, 10, 2, 45), new DateTime(2025, 2, 19, 7, 2, 37)  });
         DataFrameTestHelpers.AssertDataColumnsEqual(expected, result);
     }
 }
