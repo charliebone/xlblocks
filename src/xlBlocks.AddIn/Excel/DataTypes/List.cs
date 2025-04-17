@@ -155,6 +155,14 @@ internal static class DataTypes_List
     }
 
     [return: CacheContents]
+    [ExcelFunction(Description = "Reverse the order of the contents of a list", IsThreadSafe = true)]
+    public static XlBlockList XBList_Reverse(
+        [ExcelArgument(Name = "list", Description = "A list"), CacheContents] XlBlockList list)
+    {
+        return list.Reverse();
+    }
+
+    [return: CacheContents]
     [ExcelFunction(Description = "Combine multiple lists into one, retaining duplicate values", IsThreadSafe = true)]
     public static XlBlockList XBList_UnifyLists(
         [ExcelArgument(Name = "list", Description = "A list"), CacheContents] params XlBlockList[] lists)

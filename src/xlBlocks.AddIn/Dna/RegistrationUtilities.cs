@@ -43,6 +43,7 @@ internal static class RegistrationUtilities
             string stringValue => $"'{stringValue}'",
             bool boolValue => $"{(boolValue ? "TRUE" : "FALSE")}",
             DateTime dateValue => $"{dateValue:yyyy-mm-dd}",
+            Missing _ => string.Empty,
             _ => defaultValue?.ToString() ?? string.Empty
         };
 
