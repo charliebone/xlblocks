@@ -2123,6 +2123,23 @@ public class XlBlockTableTests
     }
 
     [Fact]
+    public void ToDictionaryOfDictionaries_DateKeys()
+    {
+        var result = _accessLogs.ToDictionaryOfDictionaries("Date", "last");
+
+        Assert.Equal(7, result.Count);
+        Assert.Equal(typeof(DateTime), result.KeyType);
+        Assert.True(result.ContainsKey(new DateTime(2024, 1, 23)));
+        Assert.True(result.ContainsKey(new DateTime(2024, 7, 14)));
+
+        var dict1 = result[new DateTime(2024, 1, 23)] as XlBlockDictionary;
+        Assert.NotNull(dict1);
+        Assert.Equal(3, dict1.Count);
+        Assert.Equal(2d, dict1["EmployeeID"]);
+        Assert.Equal("Bob", dict1["EmployeeName"]);
+    }
+
+    [Fact]
     public void Project_SpecificColumns_SortTestTable()
     {
         var currentColumns = XlBlockRange.Build(new object[,] { { "Id" }, { "Category" }, { "Average" } });

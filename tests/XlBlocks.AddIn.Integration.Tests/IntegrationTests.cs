@@ -20,7 +20,7 @@ public partial class IntegrationTests
                 case -2146826252: return ExcelError.ExcelErrorNum;
                 case -2146826246: return ExcelError.ExcelErrorNA;
                 case -2146826273: return ExcelError.ExcelErrorValue;
-            };
+            }
         }
         return value;
     }

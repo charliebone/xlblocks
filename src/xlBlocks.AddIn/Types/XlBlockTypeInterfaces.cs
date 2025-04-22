@@ -21,7 +21,6 @@ public interface IElementCacher
     public string CollectionHexKey { get; }
 
     string CacheElement(object element, int index);
-    string CacheElement(object element, string key);
 }
 
 public interface IXlBlockCacheableCollection
