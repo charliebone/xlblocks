@@ -172,11 +172,11 @@ internal class XlBlockDictionary : IXlBlockCopyableObject<XlBlockDictionary>, IX
 
     public IXlBlockCacheableCollection CacheCollectionValues(IElementCacher elementCacher)
     {
-        if (KeyType != typeof(string))
+        if (!_generatorDelegates.ContainsKey(KeyType))
             return this;
 
-        var cacheKeyDict = new Dictionary<string, object>();
-        foreach (var key in _dictionary.Keys.Cast<string>())
+        var cacheKeyDict = _generatorDelegates[KeyType](null);
+        foreach (var key in _dictionary.Keys)
         {
             var val = _dictionary[key];
             if (val is null || !ShouldCacheElement(val))
@@ -185,7 +185,7 @@ internal class XlBlockDictionary : IXlBlockCopyableObject<XlBlockDictionary>, IX
                 continue;
             }
 
-            var elementHexKey = elementCacher.CacheElement(val, key);
+            var elementHexKey = elementCacher.CacheElement(val, key.GetHashCode());
             cacheKeyDict[key] = elementHexKey;
         }
         return new XlBlockDictionary(cacheKeyDict, KeyType);

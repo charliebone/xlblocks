@@ -145,15 +145,6 @@ internal class ObjectCache
             _objectCache.OnCacheInvalidated(EventArgs.Empty);
             return hexKey;
         }
-
-        public string CacheElement(object element, string key)
-        {
-            var elementHash = GetCacheCollectionKey(_referenceHash, _referenceHex, key, out var hexKey);
-            _objectCache._cache[elementHash] = element;
-            _objectCache._referenceCache[elementHash] = $"{_reference}_{key}";
-            _objectCache.OnCacheInvalidated(EventArgs.Empty);
-            return hexKey;
-        }
     }
 
     public ElementCacher GetElementCacher(string reference)

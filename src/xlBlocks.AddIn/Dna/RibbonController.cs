@@ -90,6 +90,6 @@ public class RibbonController : ExcelRibbon
             case "button_errorlog":
                 GuiHelper.ShowErrorLogViewerForm();
                 break;
-        };
+        }
     }
 }
