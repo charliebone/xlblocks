@@ -224,6 +224,19 @@ internal class XlBlockDictionary : IXlBlockCopyableObject<XlBlockDictionary>, IX
         if (keys.Count != values.Count)
             throw new ArgumentException("keys and values must have same length");
 
+        return BuildWithEnumerables(keys, values, onErrors);
+    }
+
+    public static XlBlockDictionary Build(XlBlockRange range, string onErrors)
+    {
+        if (range.ColumnCount != 2)
+            throw new ArgumentException("range must be a two column range");
+
+        return BuildWithEnumerables(range.GetColumn(0), range.GetColumn(1), onErrors);
+    }
+
+    private static XlBlockDictionary BuildWithEnumerables(IEnumerable<object> keys, IEnumerable<object> values, string onErrors)
+    {
         var guessConversions = keys.ConvertToBestTypes();
         var determinedType = guessConversions.Where(x => !x.IsMissingOrError)
             .Select(x => x.ConvertedType)
@@ -251,11 +264,24 @@ internal class XlBlockDictionary : IXlBlockCopyableObject<XlBlockDictionary>, IX
 
     public static XlBlockDictionary BuildTyped(XlBlockRange keys, string keyType, XlBlockRange values, string onErrors)
     {
-        var parsedType = ParamTypeConverter.StringToType(keyType) ?? throw new ArgumentException($"unknown type '{keyType}'");
-
         if (keys.Count != values.Count)
             throw new ArgumentException("keys and values must have same length");
 
+        return BuildTypedWithEnumerables(keys, keyType, values, onErrors);
+    }
+
+    public static XlBlockDictionary BuildTyped(XlBlockRange range, string keyType, string onErrors)
+    {
+        if (range.ColumnCount != 2)
+            throw new ArgumentException("range must be a two column range");
+
+        return BuildTypedWithEnumerables(range.GetColumn(0), keyType, range.GetColumn(1), onErrors);
+    }
+
+    private static XlBlockDictionary BuildTypedWithEnumerables(IEnumerable<object> keys, string keyType, IEnumerable<object> values, string onErrors)
+    { 
+        var parsedType = ParamTypeConverter.StringToType(keyType) ?? throw new ArgumentException($"unknown type '{keyType}'");
+        
         if (!_generatorDelegates.ContainsKey(parsedType))
             throw new ArgumentException($"type '{keyType}' is not a valid dictionary key type");
 
