@@ -30,10 +30,4 @@ internal static class Utilities
     {
         return Environment.MachineName;
     }
-
-    [ExcelFunction(Description = "Get the name of the current machine")]
-    public static object XBUtils_RegInfo()
-    {
-        return ExcelIntegration.GetRegistrationInfo(ExcelDnaUtil.XllPath, 0);
-    }
 }

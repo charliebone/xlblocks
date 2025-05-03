@@ -137,8 +137,8 @@ internal static class DataTypes_Table
         [ExcelArgument(Description = "The left table to join"), CacheContents(AsReference = true)] XlBlockTable leftTable,
         [ExcelArgument(Description = "The right table to join"), CacheContents(AsReference = true)] XlBlockTable rightTable,
         [ExcelArgument(Description = "The join type, one of 'full', 'inner', 'right' or 'left'")] string joinType,
-        [ExcelArgument(Description = "The keys to join on, defaults to all common columns'")] XlBlockRange? joinOn = null,
-        [ExcelArgument(Description = "The suffix to apply to shared non-key columns from the left table'")] string? leftSuffix = ".left",
+        [ExcelArgument(Description = "The keys to join on, defaults to all common columns")] XlBlockRange? joinOn = null,
+        [ExcelArgument(Description = "The suffix to apply to shared non-key columns from the left table")] string? leftSuffix = ".left",
         [ExcelArgument(Description = "The suffix to apply to shared non-key columns from the right table")] string? rightSuffix = ".right",
         [ExcelArgument(Description = "Include both sets of identical joined columns in output")] bool includeDuplicateJoinColumns = false)
     {
@@ -276,7 +276,7 @@ internal static class DataTypes_Table
     }
 
     [return: CacheContents]
-    [ExcelFunction(Description = "Project a table onto a new table, optionally changing column names and types", IsThreadSafe = true)]
+    [ExcelFunction(Description = "Perform aggregation operations on a table", IsThreadSafe = true)]
     public static XlBlockTable XBTable_GroupBy(
        [ExcelArgument(Description = "A table"), CacheContents(AsReference = true)] XlBlockTable table,
        [ExcelArgument(Description = "Names of columns to group by")] XlBlockRange groupByColumns,

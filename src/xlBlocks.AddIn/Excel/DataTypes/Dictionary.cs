@@ -8,7 +8,7 @@ using XlBlocks.AddIn.Types;
 internal static class DataTypes_Dictionary
 {
     [return: CacheContents]
-    [ExcelFunction(Description = "Build a dictionary from a range", IsThreadSafe = true)]
+    [ExcelFunction(Description = "Build a dictionary from a two ranges", IsThreadSafe = true)]
     public static XlBlockDictionary XBDict_Build(
         [ExcelArgument(Description = "A range of data to use for dictionary keys")] XlBlockRange keys,
         [ExcelArgument(Description = "A range of data to use for dictionary values")] XlBlockRange values,
@@ -18,7 +18,15 @@ internal static class DataTypes_Dictionary
     }
 
     [return: CacheContents]
-    [ExcelFunction(Description = "Build a dictionary of a given key type from a range", IsThreadSafe = true)]
+    [ExcelFunction(Description = "Build a dictionary from an array", IsThreadSafe = true)]
+    public static XlBlockDictionary XBDict_BuildFromArray(
+        [ExcelArgument(Description = "A two column range of data to use for dictionary keys and values")] XlBlockRange range,
+        [ExcelArgument(Description = "Error handling ('drop' or 'error')")] string onErrors = "drop")
+    {
+        return XlBlockDictionary.Build(range, onErrors);
+    }
+
+    [ExcelFunction(Description = "Build a dictionary of a given key type from two ranges", IsThreadSafe = true)]
     public static XlBlockDictionary XBDict_BuildTyped(
         [ExcelArgument(Description = "A range of data to use for dictionary keys")] XlBlockRange keys,
         [ExcelArgument(Description = "The data type of the dictionary keys")] string keyType,
@@ -26,6 +34,16 @@ internal static class DataTypes_Dictionary
         [ExcelArgument(Description = "Error handling ('drop' or 'error')")] string onErrors = "drop")
     {
         return XlBlockDictionary.BuildTyped(keys, keyType, values, onErrors);
+    }
+
+    [return: CacheContents]
+    [ExcelFunction(Description = "Build a dictionary of a given key type from an array", IsThreadSafe = true)]
+    public static XlBlockDictionary XBDict_BuildTypedFromArray(
+        [ExcelArgument(Description = "A two column range of data to use for dictionary keys and values")] XlBlockRange range,
+        [ExcelArgument(Description = "The data type of the dictionary keys")] string keyType,
+        [ExcelArgument(Description = "Error handling ('drop' or 'error')")] string onErrors = "drop")
+    {
+        return XlBlockDictionary.BuildTyped(range, keyType, onErrors);
     }
 
     [return: CacheContents]
