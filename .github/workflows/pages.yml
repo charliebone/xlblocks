@@ -3,7 +3,9 @@ name: pages
 on:
   push:
     branches:
-      - docs-mkdocs
+      - main
+    paths:
+      - 'docs/**'
 
   workflow_dispatch:
 
