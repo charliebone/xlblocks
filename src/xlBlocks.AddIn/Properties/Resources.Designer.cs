@@ -61,22 +61,22 @@ namespace XlBlocks.AddIn.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static byte[] error_output_off {
+        internal static System.Drawing.Bitmap error_output_off {
             get {
                 object obj = ResourceManager.GetObject("error_output_off", resourceCulture);
-                return ((byte[])(obj));
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static byte[] error_output_on {
+        internal static System.Drawing.Bitmap error_output_on {
             get {
                 object obj = ResourceManager.GetObject("error_output_on", resourceCulture);
-                return ((byte[])(obj));
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         
@@ -112,6 +112,16 @@ namespace XlBlocks.AddIn.Properties {
         internal static System.Drawing.Bitmap xlblocks_logo {
             get {
                 object obj = ResourceManager.GetObject("xlblocks_logo", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap xlblocks_logo_square {
+            get {
+                object obj = ResourceManager.GetObject("xlblocks_logo_square", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

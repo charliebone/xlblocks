@@ -3,7 +3,7 @@ name: pages
 on:
   push:
     branches:
-      - add-pages
+      - docs-mkdocs
 
   workflow_dispatch:
 
@@ -18,38 +18,48 @@ concurrency:
 
 jobs:
   build:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Build and test
+      uses: ./.github/actions/build-and-test
+  
+  build-docs:
     runs-on: ubuntu-latest
+    needs: build
     defaults:
       run:
         working-directory: docs
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Setup Ruby
-        uses: ruby/setup-ruby@v1
+      - name: Download excel docs
+        uses: actions/download-artifact@v4
         with:
-          ruby-version: '3.3'
-          bundler-cache: true
-          cache-version: 0
-          working-directory: '${{ github.workspace }}/docs'
+          name: excel-docs
+          path: docs/docs/excel
+      - name : Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.x
+      - name: Install mkdocs
+        run: pip install mkdocs-material mkdocs-exclude
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v5
-      - name: Build with Jekyll
-        run: bundle exec jekyll build --baseurl "${{ steps.pages.outputs.base_path }}"
-        env:
-          JEKYLL_ENV: production
+      - name: Build site
+        run: mkdocs build
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: docs/_site/
-
-  deploy:
+          path: docs/site
+  
+  deploy-docs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-    needs: build
+    needs: build-docs
     steps:
       - name: Deploy to GitHub Pages
         id: deployment

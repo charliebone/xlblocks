@@ -4,7 +4,7 @@
 <br>
 <p align="center">
   <a href="https://excel-blocks.net/">
-    <img alt="XlBlocks logo" title="XlBlocks" src="https://github.com/charliebone/xlblocks/blob/main/src/xlBlocks.AddIn/Resources/xlblocks_logo.png?raw=true" width="650">
+    <img alt="XlBlocks logo" title="XlBlocks" src="https://github.com/charliebone/xlblocks/blob/main/src/XlBlocks.AddIn/Resources/xlblocks_logo.png?raw=true" width="650">
   </a>
 </p>
 

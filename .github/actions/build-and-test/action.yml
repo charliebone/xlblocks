@@ -21,8 +21,16 @@ runs:
     - name: Run tests
       run: dotnet test ./tests/XlBlocks.AddIn.Tests/XlBlocks.AddIn.Tests.csproj --configuration Release --no-build --verbosity normal
       shell: pwsh
-    - name: Upload artifacts
+    - name: Run docgen
+      run: ./artifacts/bin/XlBlocks.AddIn.DocGen/Release/XlBlocks.AddIn.DocGen.exe --OutputPath ./excel-docs --ExcelDocsPath ./docs/docs/excel-base
+      shell: pwsh
+    - name: Upload addin
       uses: actions/upload-artifact@v4
       with:
         name: excel-addins
         path: ./artifacts/bin/XlBlocks.AddIn/Release/*-packed.xll
+    - name: Upload excel docs
+      uses: actions/upload-artifact@v4
+      with:
+        name: excel-docs
+        path: ./excel-docs

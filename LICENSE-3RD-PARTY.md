@@ -1,8 +1,14 @@
+# Third Party License Information
+
+This file contains the license information for the third-party libraries used in the XlBlocks project.
+
 -----------------------------------------------------------------------------
-                        The zlib License (zlib)
-        applies to: 
-        - Excel-DNA, Copyright (c) Govert van Drimmelen
------------------------------------------------------------------------------
+
+## The zlib License (zlib)
+
+> Applies to:
+> 
+> - Excel-DNA, Copyright &copy; Govert van Drimmelen
 
 This software is provided 'as-is', without any express or implied
 warranty.  In no event will the authors be held liable for any damages
@@ -20,17 +26,16 @@ freely, subject to the following restrictions:
    misrepresented as being the original software.
 3. This notice may not be removed or altered from any source distribution.
 
+-----------------------------------------------------------------------------
 
------------------------------------------------------------------------------
-                        The MIT License (MIT)
-        applies to: 
-		- Microsoft.Data.Analysis (ML.NET), System.Management, 
-          System.Microsoft.CodeDom, System.Reactive
-			Copyright (c) .NET Foundation and Contributors									  
-        - ReaLTaiizor, Copyright (c) Taiizor
-		- HexConverter, Copyright (c) Fausto David Suarez Rosario
-        - csly, Copyright (c) Olivier Duhart
------------------------------------------------------------------------------
+## The MIT License (MIT)
+
+> Applies to: 
+> 
+> - Microsoft.Data.Analysis (ML.NET), System.Management, System.Microsoft.CodeDom, System.Reactive, Copyright &copy; .NET Foundation and Contributors									  
+> - ReaLTaiizor, Copyright &copy; Taiizor
+> - HexConverter, Copyright &copy; Fausto David Suarez Rosario
+> - csly, Copyright &copy; Olivier Duhart
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -50,13 +55,13 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
+-----------------------------------------------------------------------------
 
------------------------------------------------------------------------------
-                        The BSD 3-Clause License (BSD-3)
-        applies to: 
-        - nLog, Copyright (c) Jaroslaw Kowalski, Kim Christensen, 
-		                      Julian Verdurmen
------------------------------------------------------------------------------
+## The BSD 3-Clause License (BSD-3)
+
+> Applies to:
+> 
+> - nLog, Copyright &copy; Jaroslaw Kowalski, Kim Christensen, Julian Verdurmen
 
 Redistribution and use in source and binary forms, with or without 
 modification, are permitted provided that the following conditions 
@@ -85,12 +90,13 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF 
 THE POSSIBILITY OF SUCH DAMAGE.
 
+-----------------------------------------------------------------------------
 
------------------------------------------------------------------------------
-                        The Apache License, v2.0 (APL)
-        applies to: 
-        - murmurhash-net, Copyright (c) Darren Kopp
------------------------------------------------------------------------------
+## The Apache License, v2.0 (APL)
+
+> Applies to:
+> - murmurhash-net, Copyright &copy; Darren Kopp
+
 Apache License
 
 Version 2.0, January 2004

@@ -1,0 +1,36 @@
+site_name: XlBlocks
+site_url: https://xlblocks.net
+repo_url: https://github.com/charliebone/xlblocks
+theme:
+    name: material
+    logo: assets/images/xlblocks_logo.png
+    favicon: assets/images/favicon.ico
+    palette: 
+      primary: blue grey
+markdown_extensions: 
+    - pymdownx.highlight:
+        use_pygments: true
+        extend_pygments_lang:
+          - name: excel
+            lang: elixirt
+    - pymdownx.inlinehilite:
+    - pymdownx.superfences:
+plugins:
+  - exclude:
+      glob:
+        - excel-base/*
+extra_css:
+  - assets/stylesheets/custom.css
+nav:
+    - Home: index.md
+    - Installation: install.md
+    - Worksheet Functions:
+        - Cache: excel/cache.md
+        - Dictionary: excel/dict.md
+        - List: excel/list.md
+        - Range: excel/range.md
+        - String: excel/string.md
+        - Table: excel/table.md
+        - Utils: excel/utils.md
+    - Expressions: expressions.md
+    - License: license.md

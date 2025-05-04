@@ -28,9 +28,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.gitignore = .gitignore
 		Directory.Build.props = Directory.Build.props
 		Directory.Build.targets = Directory.Build.targets
-		LICENSE-3RD-PARTY.txt = LICENSE-3RD-PARTY.txt
-		LICENSE.txt = LICENSE.txt
 		README.md = README.md
+		LICENSE-3RD-PARTY.md = LICENSE-3RD-PARTY.md
+		LICENSE.md = LICENSE.md
 		variables.wxi = variables.wxi
 	EndProjectSection
 EndProject
@@ -52,15 +52,28 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build-and-test", "build-and
 		.github\actions\build-and-test\action.yml = .github\actions\build-and-test\action.yml
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{CBC5BDDE-D035-481F-A4CE-BE6438E0838A}"
-	ProjectSection(SolutionItems) = preProject
-		docs\Gemfile = docs\Gemfile
-		docs\Gemfile.lock = docs\Gemfile.lock
-		docs\index.md = docs\index.md
-		docs\_config.yml = docs\_config.yml
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XlBlocks.AddIn.DocGen", "src\XlBlocks.AddIn.DocGen\XlBlocks.AddIn.DocGen.csproj", "{C16B7B2A-AA59-43B6-ABA1-A53DC83ED189}"
+EndProject
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "docs", "docs\", "{29F559A1-143D-7038-A368-B91C5016CF54}"
+	ProjectSection(WebsiteProperties) = preProject
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.8"
+		Debug.AspNetCompiler.VirtualPath = "/localhost_57123"
+		Debug.AspNetCompiler.PhysicalPath = "docs\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_57123\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/localhost_57123"
+		Release.AspNetCompiler.PhysicalPath = "docs\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_57123\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		VWDPort = "57123"
+		SlnRelativePath = "docs\"
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -186,6 +199,22 @@ Global
 		{C16B7B2A-AA59-43B6-ABA1-A53DC83ED189}.Release|x64.Build.0 = Release|Any CPU
 		{C16B7B2A-AA59-43B6-ABA1-A53DC83ED189}.Release|x86.ActiveCfg = Release|Any CPU
 		{C16B7B2A-AA59-43B6-ABA1-A53DC83ED189}.Release|x86.Build.0 = Release|Any CPU
+		{29F559A1-143D-7038-A368-B91C5016CF54}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{29F559A1-143D-7038-A368-B91C5016CF54}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{29F559A1-143D-7038-A368-B91C5016CF54}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{29F559A1-143D-7038-A368-B91C5016CF54}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{29F559A1-143D-7038-A368-B91C5016CF54}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{29F559A1-143D-7038-A368-B91C5016CF54}.Debug|x64.Build.0 = Debug|Any CPU
+		{29F559A1-143D-7038-A368-B91C5016CF54}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{29F559A1-143D-7038-A368-B91C5016CF54}.Debug|x86.Build.0 = Debug|Any CPU
+		{29F559A1-143D-7038-A368-B91C5016CF54}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{29F559A1-143D-7038-A368-B91C5016CF54}.Release|Any CPU.Build.0 = Debug|Any CPU
+		{29F559A1-143D-7038-A368-B91C5016CF54}.Release|ARM64.ActiveCfg = Debug|Any CPU
+		{29F559A1-143D-7038-A368-B91C5016CF54}.Release|ARM64.Build.0 = Debug|Any CPU
+		{29F559A1-143D-7038-A368-B91C5016CF54}.Release|x64.ActiveCfg = Debug|Any CPU
+		{29F559A1-143D-7038-A368-B91C5016CF54}.Release|x64.Build.0 = Debug|Any CPU
+		{29F559A1-143D-7038-A368-B91C5016CF54}.Release|x86.ActiveCfg = Debug|Any CPU
+		{29F559A1-143D-7038-A368-B91C5016CF54}.Release|x86.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
