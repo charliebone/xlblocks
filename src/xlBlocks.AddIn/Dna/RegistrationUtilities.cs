@@ -36,7 +36,7 @@ internal static class RegistrationUtilities
         return functionRegistration;
     }
 
-    private static string? GetDefaultDescriptionString(object? defaultValue)
+    internal static string? GetDefaultDescriptionString(object? defaultValue)
     {
         var defaultStr = defaultValue switch
         {
