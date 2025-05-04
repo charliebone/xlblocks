@@ -43,7 +43,7 @@ jobs:
         with:
           python-version: 3.x
       - name: Install mkdocs
-        run: pip install mkdocs-material
+        run: pip install mkdocs-material mkdocs-exclude
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v5
