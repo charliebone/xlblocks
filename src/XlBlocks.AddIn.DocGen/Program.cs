@@ -18,6 +18,8 @@ var outputPath = config["OutputPath"] ?? "../../../../docs/docs/excel";
 if (!Directory.Exists(outputPath))
     Directory.CreateDirectory(outputPath);
 
+var baseExcelDocsPath = config["ExcelDocsPath"] ?? Path.Combine(outputPath, "../excel-base");
+
 var addInAssembly = Assembly.GetAssembly(typeof(XlBlocksAddIn)) ?? throw new Exception("cannot find AddIn assembly");
 var excelFunctions = addInAssembly.GetTypes()
     .SelectMany(x => x.GetMethods(BindingFlags.Public | BindingFlags.Static))
@@ -92,7 +94,7 @@ excelDocSet.Save(outputPath, false, (MdDocument document, string path) =>
     document.Save(path, MdSerializationOptions.Presets.MkDocs);
 
     // append base content
-    var baseFile = Path.Combine(outputPath, "../excel-base", $"{trimmedKey.ToLower()}.md");
+    var baseFile = Path.Combine(baseExcelDocsPath, $"{trimmedKey.ToLower()}.md");
     if (File.Exists(baseFile))
     {
         var baseContents = File.ReadAllText(baseFile);
