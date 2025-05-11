@@ -26,6 +26,7 @@ internal static class DataTypes_Dictionary
         return XlBlockDictionary.Build(range, onErrors);
     }
 
+    [return: CacheContents]
     [ExcelFunction(Description = "Build a dictionary of a given key type from two ranges", IsThreadSafe = true)]
     public static XlBlockDictionary XBDict_BuildTyped(
         [ExcelArgument(Description = "A range of data to use for dictionary keys")] XlBlockRange keys,
