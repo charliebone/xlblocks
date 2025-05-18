@@ -485,6 +485,25 @@ public class XlBlockTableTests
         Assert.Equal(expected, Encoding.Latin1.GetString(csvStream.ToArray()));
     }
 
+    [Fact]
+    public void SaveToCsv_StandardDateFormat()
+    {
+        var tableWithDatesAndTimes = XlBlockTable.Build(XlBlockRange.Build(
+        new object[,]
+        {
+            { "AccessPoint", "Time", "EmployeeID" },
+            { 2, new DateTime(2023, 2, 1), 2 },
+            { 3, new DateTime(2020, 12, 1, 14, 23, 55), 1 },
+            { 2, new DateTime(2022, 7, 10, 8, 1, 45), 5 }
+        }));
+
+        using var csvStream = new MemoryStream();
+        tableWithDatesAndTimes.SaveToCsv(csvStream, ",", true);
+
+        var expected = "AccessPoint,Time,EmployeeID\r\n2,2023-02-01 00:00:00,2\r\n3,2020-12-01 14:23:55,1\r\n2,2022-07-10 08:01:45,5\r\n";
+        Assert.Equal(expected, Encoding.UTF8.GetString(csvStream.ToArray()).Trim(new[] { '\ufeff' }));
+    }
+
     #endregion
 
     #region Join and Union
