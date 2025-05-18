@@ -3,6 +3,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -256,7 +257,30 @@ internal class XlBlockTable : IXlBlockCopyableObject<XlBlockTable>, IXlBlockArra
         if (delimiter.Length != 1)
             throw new ArgumentException("separator must be a single character");
 
-        DataFrame.SaveCsv(_dataFrame, stream, delimiter[0], includeHeader, encoding: Encoding.GetEncoding(encoding));
+        // use iso6801 format for saving datetimes
+        var csvCulture = new CultureInfo(CultureInfo.CurrentCulture.Name);
+        csvCulture.DateTimeFormat.LongDatePattern = "yyyy-MM-dd";
+        csvCulture.DateTimeFormat.ShortDatePattern = "yyyy-MM-dd";
+        csvCulture.DateTimeFormat.LongTimePattern = "HH:mm:ss";
+        csvCulture.DateTimeFormat.ShortTimePattern = "HH:mm:ss";
+
+        // basically until the ml.net library gets this fix released we change thread culture to run the function
+        // use a long running thread to avoid screwing up culture on a reused thread pool thread
+        var task = Task.Factory.StartNew(() =>
+        {
+            var originalCulture = Thread.CurrentThread.CurrentCulture;
+            try
+            {
+                Thread.CurrentThread.CurrentCulture = csvCulture;
+                DataFrame.SaveCsv(_dataFrame, stream, delimiter[0], includeHeader, encoding: Encoding.GetEncoding(encoding));
+            }
+            finally
+            {
+                Thread.CurrentThread.CurrentCulture = originalCulture;
+            }
+        }, TaskCreationOptions.LongRunning);
+
+        task.Wait();
     }
 
     public static XlBlockTable Join(XlBlockTable left, XlBlockTable right, string joinType, XlBlockRange? joinOn,

@@ -582,7 +582,7 @@ internal static class ParamTypeConverter
         stringValue = stringValue.Trim();
 
         // should put more thought into this
-        var iso6801Formats = new[] { "yyyy-MM-ddTHH:mm:ss", "yyyy-MM-dd" };
+        var iso6801Formats = new[] { "yyyy-MM-ddTHH:mm:ss", "yyyyMMddTHHmmss", "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd", "yyyyMMdd" };
         if (DateTime.TryParseExact(stringValue, iso6801Formats, CultureInfo.InvariantCulture, DateTimeStyles.None, out var parsedDate) ||
             DateTime.TryParse(stringValue, CultureInfo.CurrentCulture, DateTimeStyles.None, out parsedDate))
         {
