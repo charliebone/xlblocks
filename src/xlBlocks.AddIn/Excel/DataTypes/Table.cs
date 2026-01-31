@@ -270,9 +270,10 @@ internal static class DataTypes_Table
         [ExcelArgument(Description = "A table"), CacheContents(AsReference = true)] XlBlockTable table,
         [ExcelArgument(Description = "Names of columns to include in the projection")] XlBlockRange currentColumnNames,
         [ExcelArgument(Description = "Names to use to rename the columns in the projection"), Optional] XlBlockRange? newColumnNames,
-        [ExcelArgument(Description = "Types to use to convert the columns in the projection"), Optional] XlBlockRange? newColumnTypes)
+        [ExcelArgument(Description = "Types to use to convert the columns in the projection"), Optional] XlBlockRange? newColumnTypes,
+        [ExcelArgument(Description = "If true, raise error when provided column names do not exist in table")] bool strict = true)
     {
-        return table.Project(currentColumnNames, newColumnNames, newColumnTypes);
+        return table.Project(currentColumnNames, newColumnNames, newColumnTypes, strict);
     }
 
     [return: CacheContents]
