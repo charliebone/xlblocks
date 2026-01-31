@@ -228,7 +228,7 @@ internal class XlBlockTable : IXlBlockCopyableObject<XlBlockTable>, IXlBlockArra
         if (columnNames is not null && columnTypes is not null && columnNames.Length != columnTypes.Length)
             throw new ArgumentException("Column names and column types must be same length");
 
-        using var csvStream = new FileStream(filePath, FileMode.Open);
+        using var csvStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
         var dataFrame = DataFrame.LoadCsv(csvStream, delimiter[0], hasHeader, columnNames, columnTypes,
             addIndexColumn: false,
             encoding: Encoding.GetEncoding(encoding),
@@ -605,7 +605,7 @@ internal class XlBlockTable : IXlBlockCopyableObject<XlBlockTable>, IXlBlockArra
         return new XlBlockDictionary(dict, keyColumn.DataType);
     }
 
-    public XlBlockTable Project(XlBlockRange currentColumnNamesRange, XlBlockRange? newColumnNamesRange, XlBlockRange? newColumnTypesRange)
+    public XlBlockTable Project(XlBlockRange currentColumnNamesRange, XlBlockRange? newColumnNamesRange, XlBlockRange? newColumnTypesRange, bool strict)
     {
         if (newColumnNamesRange is not null && currentColumnNamesRange.Count != newColumnNamesRange.Count)
             throw new ArgumentException("new column names range must be same length of current column names range");
@@ -620,7 +620,10 @@ internal class XlBlockTable : IXlBlockCopyableObject<XlBlockTable>, IXlBlockArra
         var columns = new List<DataFrameColumn>();
         foreach (var (currentColumnName, newColumnName, columnType) in currentColumnNames.Zip(newColumnNames, columnTypes))
         {
-            AssertColumnExists(currentColumnName);
+            if (strict)
+                AssertColumnExists(currentColumnName);
+            else if (!ContainsColumn(currentColumnName))
+                continue;
 
             var column = _dataFrame[currentColumnName];
             var type = (string.IsNullOrEmpty(columnType) ? column.DataType : ParamTypeConverter.StringToType(columnType)) ?? throw new ArgumentException($"unknown type '{columnType}'");

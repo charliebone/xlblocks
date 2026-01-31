@@ -2144,7 +2144,7 @@ public class XlBlockTableTests
     {
         var currentColumns = XlBlockRange.Build(new object[,] { { "Id" }, { "Category" }, { "Average" } });
 
-        var result = _logDataTable.Project(currentColumns, null, null);
+        var result = _logDataTable.Project(currentColumns, null, null, true);
 
         object[,] expectedResult =
         {
@@ -2171,7 +2171,7 @@ public class XlBlockTableTests
         var currentColumns = XlBlockRange.Build(new object[,] { { "Id" }, { "Category" }, { "Average" } });
         var newColumns = XlBlockRange.Build(new object[,] { { "Identifier" }, { "CategoryType" }, { "AvgValue" } });
 
-        var result = _logDataTable.Project(currentColumns, newColumns, null);
+        var result = _logDataTable.Project(currentColumns, newColumns, null, true);
 
         object[,] expectedResult =
         {
@@ -2198,7 +2198,7 @@ public class XlBlockTableTests
         var currentColumns = XlBlockRange.Build(new object[,] { { "Id" }, { "ErrorCount" }, { "Average" } });
         var newTypes = XlBlockRange.Build(new object[,] { { "string" }, { "string" }, { "string" } });
 
-        var result = _logDataTable.Project(currentColumns, null, newTypes);
+        var result = _logDataTable.Project(currentColumns, null, newTypes, true);
 
         object[,] expectedResult =
         {
@@ -2234,7 +2234,7 @@ public class XlBlockTableTests
         var currentColumns = XlBlockRange.Build(new object[,] { { "ID" }, { "Name" }, { "Birthday" } });
         var newTypes = XlBlockRange.Build(new object[,] { { "integer" }, { "string" }, { "DateTime" } });
 
-        var result = tableWithDates.Project(currentColumns, null, newTypes);
+        var result = tableWithDates.Project(currentColumns, null, newTypes, true);
 
         object[,] expectedResult =
         {
@@ -2247,12 +2247,46 @@ public class XlBlockTableTests
     }
 
     [Fact]
+    public void Project_MissingColumns_IgnoresWhenNotStrict()
+    {
+        var currentColumns = XlBlockRange.Build(new object[,] { { "Id" }, { "Category" }, { "NonExistentColumn" }, { "Average" } });
+        var newColumns = XlBlockRange.Build(new object[,] { { "Identifier" }, { "CategoryType" }, { "NonExistentColumnRenamed" }, { "AvgValue" } });
+
+        var result = _logDataTable.Project(currentColumns, newColumns, null, false);
+
+        object[,] expectedResult =
+        {
+            { "Identifier", "CategoryType", "AvgValue" },
+            { 0, "Trace", 38.83 },
+            { 1, "Warning", null! },
+            { 2, null!, 83.45 },
+            { 3, "Critical", 1.77 },
+            { 4, "Debug", 53.67 },
+            { 5, null!, null! },
+            { 6, "Warning", 33.32 },
+            { 7, "Critical", 0.82 },
+            { 8, "Info", null! },
+            { 9, "Info", null! },
+            { 10, "Debug", 6.34 },
+            { 11, "Warning", null! }
+        };
+        AssertTableMatchesExpected(expectedResult, result);
+    }
+
+    [Fact]
+    public void Project_MissingColumns_ThrowsExceptionWhenStrict()
+    {
+        var currentColumns = XlBlockRange.Build(new object[,] { { "Id" }, { "NonExistentColumn" } });
+        Assert.Throws<ArgumentException>(() => _logDataTable.Project(currentColumns, null, null, true));
+    }
+
+    [Fact]
     public void Project_TypeConversionError_SortTestTable_ThrowsException()
     {
         var currentColumns = XlBlockRange.Build(new object[,] { { "Category" } });
         var newTypes = XlBlockRange.Build(new object[,] { { "double" } });
 
-        Assert.Throws<ArgumentException>(() => _logDataTable.Project(currentColumns, null, newTypes));
+        Assert.Throws<ArgumentException>(() => _logDataTable.Project(currentColumns, null, newTypes, true));
     }
 
     [Fact]
