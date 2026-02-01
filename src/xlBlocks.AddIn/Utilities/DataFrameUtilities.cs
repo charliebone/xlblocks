@@ -395,6 +395,24 @@ internal static class DataFrameUtilities
         };
     }
 
+    public enum MissingColumnBehavior
+    {
+        Error,
+        Ignore,
+        Add
+    }
+
+    public static MissingColumnBehavior ParseMissingColumnBehavior(string onMissingColumn)
+    {
+        return onMissingColumn.ToLowerInvariant() switch
+        {
+            "error" => MissingColumnBehavior.Error,
+            "ignore" => MissingColumnBehavior.Ignore,
+            "add" => MissingColumnBehavior.Add,
+            _ => throw new ArgumentException($"unknown missing column behavior '{onMissingColumn}', must be one of 'error', 'ignore' or 'add'")
+        };
+    }
+
     public static DataFrame ComputeGroupAggregations(DataFrame dataFrame, List<string> groupColumnNames, List<string> groupByOperations, List<string> aggregationColumnNames, List<string> newColumnNames)
     {
         if (groupByOperations.Count != aggregationColumnNames.Count || groupByOperations.Count != newColumnNames.Count)
