@@ -271,9 +271,9 @@ internal static class DataTypes_Table
         [ExcelArgument(Description = "Names of columns to include in the projection")] XlBlockRange currentColumnNames,
         [ExcelArgument(Description = "Names to use to rename the columns in the projection"), Optional] XlBlockRange? newColumnNames,
         [ExcelArgument(Description = "Types to use to convert the columns in the projection"), Optional] XlBlockRange? newColumnTypes,
-        [ExcelArgument(Description = "If true, raise error when provided column names do not exist in table")] bool strict = true)
+        [ExcelArgument(Description = "Behavior on missing columns, one of 'error', 'ignore' or 'add'")] string onMissingColumns = "error")
     {
-        return table.Project(currentColumnNames, newColumnNames, newColumnTypes, strict);
+        return table.Project(currentColumnNames, newColumnNames, newColumnTypes, onMissingColumns);
     }
 
     [return: CacheContents]

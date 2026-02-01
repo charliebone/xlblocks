@@ -629,13 +629,15 @@ internal class XlBlockTable : IXlBlockCopyableObject<XlBlockTable>, IXlBlockArra
         return new XlBlockDictionary(dict, keyColumn.DataType);
     }
 
-    public XlBlockTable Project(XlBlockRange currentColumnNamesRange, XlBlockRange? newColumnNamesRange, XlBlockRange? newColumnTypesRange, bool strict)
+    public XlBlockTable Project(XlBlockRange currentColumnNamesRange, XlBlockRange? newColumnNamesRange, XlBlockRange? newColumnTypesRange, string onMissingColumns = "error")
     {
         if (newColumnNamesRange is not null && currentColumnNamesRange.Count != newColumnNamesRange.Count)
             throw new ArgumentException("new column names range must be same length of current column names range");
 
         if (newColumnTypesRange is not null && currentColumnNamesRange.Count != newColumnTypesRange.Count)
             throw new ArgumentException("new column types range must be same length of current column names range");
+
+        var missingColumnBehavior = DataFrameUtilities.ParseMissingColumnBehavior(onMissingColumns);
 
         var currentColumnNames = currentColumnNamesRange.GetAs<string>(false);
         var newColumnNames = newColumnNamesRange?.GetAs<string>(false) ?? currentColumnNames;
@@ -644,17 +646,27 @@ internal class XlBlockTable : IXlBlockCopyableObject<XlBlockTable>, IXlBlockArra
         var columns = new List<DataFrameColumn>();
         foreach (var (currentColumnName, newColumnName, columnType) in currentColumnNames.Zip(newColumnNames, columnTypes))
         {
-            if (strict)
+            if (missingColumnBehavior == DataFrameUtilities.MissingColumnBehavior.Error)
                 AssertColumnExists(currentColumnName);
-            else if (!ContainsColumn(currentColumnName))
-                continue;
 
-            var column = _dataFrame[currentColumnName];
-            var type = (string.IsNullOrEmpty(columnType) ? column.DataType : ParamTypeConverter.StringToType(columnType)) ?? throw new ArgumentException($"unknown type '{columnType}'");
+            if (!ContainsColumn(currentColumnName))
+            {
+                if (missingColumnBehavior == DataFrameUtilities.MissingColumnBehavior.Ignore)
+                    continue;
 
-            var newColumn = column.ConvertColumnType(type);
-            newColumn.SetName(newColumnName);
-            columns.Add(newColumn);
+                var type = string.IsNullOrEmpty(columnType) ? typeof(double) : (ParamTypeConverter.StringToType(columnType) ?? typeof(double));
+                var newColumn = DataFrameUtilities.CreateConstantDataFrameColumn(null!, type, RowCount, newColumnName);
+                columns.Add(newColumn);
+            }
+            else
+            {
+                var column = _dataFrame[currentColumnName];
+                var type = (string.IsNullOrEmpty(columnType) ? column.DataType : ParamTypeConverter.StringToType(columnType)) ?? throw new ArgumentException($"unknown type '{columnType}'");
+
+                var newColumn = column.ConvertColumnType(type);
+                newColumn.SetName(newColumnName);
+                columns.Add(newColumn);
+            }
         }
 
         var dataFrame = new DataFrame(columns);
